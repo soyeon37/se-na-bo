@@ -15,6 +15,31 @@ public class Disease extends BaseEntity {
     @Column(name = "id", updatable = false, unique = true)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member memberId;
+
     @Column(name = "disease_name")
     private String diseaseName;
+
+    public Disease (Member memberId, String diseaseName){
+        this.memberId = memberId;
+        this.diseaseName = diseaseName;
+    }
+
+    public Member getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(Member memberId) {
+        this.memberId = memberId;
+    }
+
+    public String getDiseaseName() {
+        return diseaseName;
+    }
+
+    public void setDiseaseName(String diseaseName) {
+        this.diseaseName = diseaseName;
+    }
 }

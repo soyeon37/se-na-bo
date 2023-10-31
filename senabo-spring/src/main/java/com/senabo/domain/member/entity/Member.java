@@ -1,11 +1,13 @@
 package com.senabo.domain.member.entity;
 
 import com.senabo.common.audit.BaseEntity;
+import com.senabo.domain.member.dto.request.UpdateInfoRequest;
 import lombok.*;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Entity
@@ -54,6 +56,33 @@ public class Member extends BaseEntity  {
     @Column(name = "enter_time")
     private LocalDateTime enterTime;
 
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE)
+    private List<BrushingTeeth> brushingTeethList;
+
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE)
+    private List<Bath> bathList;
+
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Communication> communicationList;
+
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Disease> diseaseList;
+
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Expense> expenseList;
+
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Feed> feedList;
+
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Poop> poopList;
+
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Stress> stressList;
+
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Walk> walkList;
+
     public Member(String name, String email, String species, String sex, BigDecimal houseLatitude, BigDecimal houseLogitude, SNSType snsType) {
         this.name = name;
         this.email = email;
@@ -65,4 +94,14 @@ public class Member extends BaseEntity  {
         affection = 0;
         stressLevel = 0;
     }
+
+    public void update(UpdateInfoRequest request){
+        this.name = request.name();
+        this.sex = request.sex();
+        this.species = request.species();
+        this.houseLatitude = request.houseLatitude();
+        this.houseLogitude = request.houseLogitude();
+    }
+
+
 }
