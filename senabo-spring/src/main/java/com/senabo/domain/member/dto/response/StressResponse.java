@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @Builder
 public record StressResponse(
         Long id,
+        Long memberId,
         int poopScore,
         int brushingTeethScore,
         int walkScore,

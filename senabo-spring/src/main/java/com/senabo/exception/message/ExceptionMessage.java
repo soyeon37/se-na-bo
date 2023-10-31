@@ -2,7 +2,7 @@ package com.senabo.exception.message;
 
 public enum ExceptionMessage {
 
-    FAIL_DELETE_DATA("저장에 실패했습니다."),
+    FAIL_DELETE_DATA("삭제에 실패했습니다."),
 
     FAIL_UPDATE_DATA("수정에 실패했습니다."),
 

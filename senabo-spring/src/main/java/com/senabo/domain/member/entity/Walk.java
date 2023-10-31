@@ -38,6 +38,11 @@ public class Walk extends BaseEntity {
         this.distance = distance;
     }
 
+    public void update(LocalDateTime endTime, Double distance){
+        this.endTime = endTime;
+        this.distance = distance;
+    }
+
     public Member getMemberId() {
         return memberId;
     }
