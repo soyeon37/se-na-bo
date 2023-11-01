@@ -54,7 +54,7 @@ public class MemberController {
 
     // 로그아웃
 
-    // Member read
+    // 회원 정보 조회
     @GetMapping("/get")
     @Operation(summary = "회원 정보 조회", description = "회원 정보를 조회한다.")
     public ApiResponse<MemberResponse> getInfo(@RequestParam(name = "id") Long id) {
@@ -68,26 +68,6 @@ public class MemberController {
         MemberResponse response = memberService.updateInfo(id, request);
         return ApiResponse.success("회원정보 수정", response);
     }
-
-    // 주간 리포트 전체 read
-
-    // 주간 리포트 상세 조회 read
-
-    // 애정 create
-
-    // 애정 update
-
-    // 애정 read
-
-    // 애정 delete
-
-    // 스트레스 create
-
-    // 스트레스 update
-
-    // 스트레스 read
-
-    // 스트레스 delete
 
 
 }

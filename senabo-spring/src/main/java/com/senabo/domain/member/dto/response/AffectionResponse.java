@@ -11,7 +11,6 @@ public record AffectionResponse(
         Long id,
         Long memberId,
         AffectionType type,
-        String detail,
         int changeAmount,
         int score,
         LocalDateTime createTime,
@@ -22,7 +21,6 @@ public record AffectionResponse(
                 .id(affection.getId())
                 .memberId(affection.getMemberId().getId())
                 .type(affection.getType())
-                .detail(affection.getDetail())
                 .changeAmount(affection.getChangeAmount())
                 .score(affection.getScore())
                 .createTime(affection.getCreateTime())

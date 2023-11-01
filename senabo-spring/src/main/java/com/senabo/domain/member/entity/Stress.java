@@ -22,19 +22,15 @@ public class Stress extends BaseEntity {
     @Column(name = "type")
     private StressType type;
 
-    @Column(name = "detail")
-    private String detail;
-
     @Column(name = "change_amount")
     private int changeAmount;
 
     @Column(name = "score")
     private int score;
 
-    public Stress(Member memberId, StressType type, String detail, int changeAmount, int score) {
+    public Stress(Member memberId, StressType type, int changeAmount, int score) {
         this.memberId = memberId;
         this.type = type;
-        this.detail = detail;
         this.changeAmount = changeAmount;
         this.score = score;
     }
@@ -53,14 +49,6 @@ public class Stress extends BaseEntity {
 
     public void setType(StressType type) {
         this.type = type;
-    }
-
-    public String getDetail() {
-        return detail;
-    }
-
-    public void setDetail(String detail) {
-        this.detail = detail;
     }
 
     public int getChangeAmount() {

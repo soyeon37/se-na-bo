@@ -20,4 +20,5 @@ public interface ReportRepository extends JpaRepository<Report, String> {
     Report findLatestData(Member memberId);
 
 
+    Report findByMemberIdAndWeek(Member member, int week);
 }

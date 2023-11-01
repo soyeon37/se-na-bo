@@ -11,7 +11,6 @@ public record StressResponse(
         Long id,
         Long memberId,
         StressType type,
-        String detail,
         int changeAmount,
         int score,
         LocalDateTime createTime,
@@ -22,7 +21,6 @@ public record StressResponse(
                 .id(stress.getId())
                 .memberId(stress.getMemberId().getId())
                 .type(stress.getType())
-                .detail(stress.getDetail())
                 .changeAmount(stress.getChangeAmount())
                 .score(stress.getScore())
                 .createTime(stress.getCreateTime())

@@ -11,6 +11,7 @@ public record ReportResponse(
         Long id,
         Long memberId,
         int week,
+        int totalTime,
         int startAffectionScore,
         int startStressScore,
         int endAffectionScore,
@@ -20,6 +21,7 @@ public record ReportResponse(
         int feedScore,
         int brushingTeethScore,
         int diseaseScore,
+        Boolean complete,
         LocalDateTime createTime,
         LocalDateTime updateTime
 ) {
@@ -27,6 +29,8 @@ public record ReportResponse(
         return ReportResponse.builder()
                 .id(report.getId())
                 .memberId(report.getMemberId().getId())
+                .week(report.getWeek())
+                .totalTime(report.getTotalTime())
                 .startAffectionScore(report.getStartAffectionScore())
                 .startStressScore(report.getStartStressScore())
                 .endAffectionScore(report.getEndAffectionScore())
@@ -36,6 +40,7 @@ public record ReportResponse(
                 .feedScore(report.getFeedScore())
                 .brushingTeethScore(report.getBrushingTeethScore())
                 .diseaseScore(report.getDiseaseScore())
+                .complete(report.getComplete())
                 .createTime(report.getCreateTime())
                 .updateTime(report.getUpdateTime())
                 .build();

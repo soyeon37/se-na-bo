@@ -3,6 +3,7 @@ package com.senabo.domain.member.controller;
 import com.senabo.common.api.ApiResponse;
 import com.senabo.domain.member.dto.request.CreateExpenseRequest;
 import com.senabo.domain.member.dto.request.CreateWalkRequest;
+import com.senabo.domain.member.dto.request.UpdateTotalTimeRequest;
 import com.senabo.domain.member.dto.request.UpdateWalkRequest;
 import com.senabo.domain.member.dto.response.*;
 import com.senabo.domain.member.entity.*;
@@ -27,14 +28,15 @@ public class ActivityController {
 
     // 양치 create
     @PostMapping("/brushing")
-    @Operation(summary = "양치 생성", description = "양치 시각을 저장한다.")
+    @Operation(summary = "양치 내역 생성", description = "양치 시각을 저장한다.")
     public ApiResponse<BrushingTeethResponse> createBrushingTeeth(@RequestParam(name = "id") Long id){
         BrushingTeethResponse response = activityService.createBrushingTeeth(id);
         return ApiResponse.success("양치질 완료", response);
     }
+
     // 양치 read
     @GetMapping("/brushing")
-    @Operation(summary = "양치 조회", description = "양치 내역을 조회한다.")
+    @Operation(summary = "양치 내역 조회", description = "양치 내역을 조회한다.")
     public ApiResponse<List<BrushingTeethResponse>> getBrushingTeeth(@RequestParam(name = "id") Long id){
         List<BrushingTeeth> response = activityService.getBrushingTeeth(id);
         List<BrushingTeethResponse> responseList = response.stream()
@@ -42,6 +44,17 @@ public class ActivityController {
                 .collect(Collectors.toList());
         return ApiResponse.success("양치질 조회", responseList);
     }
+    @GetMapping("/brushing/{week}")
+    @Operation(summary = "양치 내역 조회", description = "양치 내역을 조회한다.")
+    public ApiResponse<List<BrushingTeethResponse>> getBrushingTeeth(@RequestParam(name = "id") Long id, @RequestParam(name = "week") int week){
+        List<BrushingTeeth> response = activityService.getBrushingTeethWeek(id, week);
+        List<BrushingTeethResponse> responseList = response.stream()
+                .map(BrushingTeethResponse::from)
+                .collect(Collectors.toList());
+        return ApiResponse.success("양치질 조회", responseList);
+    }
+
+
     // 양치 delete
     @DeleteMapping("/brushing")
     @Operation(summary = "양치 삭제", description = "양치 내역을 삭제한다.")
@@ -256,4 +269,59 @@ public class ActivityController {
         activityService.removeBath(id);
         return ApiResponse.success("목욕 삭제", true);
     }
+
+    // 주간 리포트 전체 read
+    @GetMapping("/report")
+    @Operation(summary = "주간 리포트 전체 조회", description = "주간 리포트 내역을 전체 조회한다.")
+    public ApiResponse<List<ReportResponse>> getReport(@RequestParam(name = "id") Long id){
+        List<Report> response = activityService.getReport(id);
+        List<ReportResponse> responseList = response.stream()
+                .map(ReportResponse::from)
+                .collect(Collectors.toList());
+        return ApiResponse.success("주간 리포트 전체 조회", responseList);
+    }
+
+    // 접속 시간 저장
+    @PatchMapping ("/report/time")
+    @Operation(summary = "총 사용 시간 업데이트", description = "처음 접속 시간과 마지막 접속 시간을 받아서 총 사용 시간을 업데이트한다.")
+    public ApiResponse<ReportResponse> updateTotalTimeReport(@RequestParam(name = "id") Long id, @RequestBody UpdateTotalTimeRequest request){
+        ReportResponse response = activityService.updateTotalTime(id, request);
+        return ApiResponse.success("총 사용 시간 업데이트", response);
+    }
+
+
+    // 애정 create
+    @PostMapping("/affection/{type}")
+    @Operation(summary = "애정 지수 생성", description = "애정 지수가 5 상승한다.")
+    public ApiResponse<AffectionResponse> createAffection (@RequestParam(name = "id") Long id, @RequestParam(name = "type") AffectionType type){
+        AffectionResponse response = activityService.createAffection(id, type, 5);
+        return ApiResponse.success("애정 지수 생성", response);
+    }
+
+    // 애정 read
+    @GetMapping("/affection")
+    @Operation(summary = "애정 지수 전제 조회", description = "애정 지수 내역을 전체 조회한다.")
+    public ApiResponse<List<AffectionResponse>> getAffection (@RequestParam(name = "id") Long id){
+        List<Affection> response = activityService.getAffection(id);
+        List<AffectionResponse> responseList = response.stream().map(AffectionResponse::from).collect(Collectors.toList());
+        return ApiResponse.success("애정 지수 전체 조회", responseList);
+    }
+
+    // 스트레스 create
+    @PostMapping("/stress/{type}")
+    @Operation(summary = "스트레스 지수 생성", description = "스트레스 지수가 1 상승한다.")
+    public ApiResponse<StressResponse> createStress (@RequestParam(name = "id") Long id, @RequestParam(name = "type") StressType type){
+        StressResponse response = activityService.createStress(id, type, 1);
+        return ApiResponse.success("스트레스 지수 생성", response);
+    }
+
+    // 스트레스 read
+    @GetMapping("/stress")
+    @Operation(summary = "스트레스 지수 전제 조회", description = "스트레스 지수 내역을 전체 조회한다.")
+    public ApiResponse<List<StressResponse>> getStress (@RequestParam(name = "id") Long id){
+        List<Stress> response = activityService.getStress(id);
+        List<StressResponse> responseList = response.stream().map(StressResponse::from).collect(Collectors.toList());
+        return ApiResponse.success("스트레스 지수 전체 조회", responseList);
+    }
+
 }

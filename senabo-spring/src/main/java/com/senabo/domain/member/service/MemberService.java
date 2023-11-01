@@ -3,24 +3,18 @@ package com.senabo.domain.member.service;
 import com.senabo.domain.member.dto.request.SignUpRequest;
 import com.senabo.domain.member.dto.request.UpdateInfoRequest;
 import com.senabo.domain.member.dto.response.MemberResponse;
-import com.senabo.domain.member.entity.*;
-import com.senabo.domain.member.repository.AffectionRepository;
+import com.senabo.domain.member.entity.Member;
+import com.senabo.domain.member.entity.Report;
 import com.senabo.domain.member.repository.MemberRepository;
 import com.senabo.domain.member.repository.ReportRepository;
-import com.senabo.domain.member.repository.StressRepository;
 import com.senabo.exception.message.ExceptionMessage;
 import com.senabo.exception.model.UserAuthException;
 import com.senabo.exception.model.UserException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -45,11 +39,18 @@ public class MemberService {
         // 회원가입
         Member member = memberRepository.save(
                 new Member(request.name(), request.email(), request.species(), request.sex(), request.houseLatitude(), request.houseLogitude(), request.snsType()));
+
+        Report report = reportRepository.save(
+                new Report(member, 1, 0, 50)
+        );
         try {
             memberRepository.flush();
+            reportRepository.flush();
         } catch (DataIntegrityViolationException e) {
             throw new UserAuthException(String.valueOf(ExceptionMessage.FAIL_SAVE_DATA));
         }
+
+
         return MemberResponse.from(member);
     }
 
@@ -77,8 +78,6 @@ public class MemberService {
         member.update(request);
         return MemberResponse.from(member);
     }
-
-
 
     @Transactional
     public Member findById(Long id) {

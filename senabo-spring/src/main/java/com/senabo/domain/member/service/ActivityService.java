@@ -2,28 +2,23 @@ package com.senabo.domain.member.service;
 
 import com.senabo.domain.member.dto.request.CreateExpenseRequest;
 import com.senabo.domain.member.dto.request.CreateWalkRequest;
+import com.senabo.domain.member.dto.request.UpdateTotalTimeRequest;
 import com.senabo.domain.member.dto.request.UpdateWalkRequest;
 import com.senabo.domain.member.dto.response.*;
 import com.senabo.domain.member.entity.*;
 import com.senabo.domain.member.repository.*;
 import com.senabo.exception.message.ExceptionMessage;
 import com.senabo.exception.model.UserException;
-import jakarta.persistence.AccessType;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cglib.core.Local;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,11 +57,27 @@ public class ActivityService {
 
     @Transactional
     public List<BrushingTeeth> getBrushingTeeth(Long id) {
-        List<BrushingTeeth> reponse = brushingTeethsFindByMemberId(id);
+        Member member = findById(id);
 
-        return reponse;
+        List<BrushingTeeth> brushingTeethList = brushingTeethRepository.findByMemberId(member);
+        if (brushingTeethList.isEmpty()) {
+            throw new EntityNotFoundException("Brushing Teeth에서 해당 MemberId를 찾을 수 없습니다.: " + id);
+        }
+        return brushingTeethList;
     }
-
+    @Transactional
+    public List<BrushingTeeth> getBrushingTeethWeek(Long id, int week) {
+        Member member = findById(id);
+        Report report = reportRepository.findByMemberIdAndWeek(member, week);
+        if(!report.getComplete()) throw new EntityNotFoundException("완료한 주차가 아닙니다.: " + week);
+        LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        List<BrushingTeeth> brushingTeethList = brushingTeethRepository.findBrushingTeethWeek(member, endTime, startTime);
+        if (brushingTeethList.isEmpty()) {
+            throw new EntityNotFoundException("Brushing Teeth에서 해당 MemberId를 찾을 수 없습니다.: " + id);
+        }
+        return brushingTeethList;
+    }
     @Transactional
     public void removeBrushingTeeth(Long id) {
         try {
@@ -78,15 +89,8 @@ public class ActivityService {
         }
     }
 
-    @Transactional
-    public List<BrushingTeeth> brushingTeethsFindByMemberId(Long id) {
-        Member member = findById(id);
-        List<BrushingTeeth> brushingTeethList = brushingTeethRepository.findByMemberId(member);
-        if (brushingTeethList.isEmpty()) {
-            throw new EntityNotFoundException("Brushing Teeth에서 해당 MemberId를 찾을 수 없습니다.: " + id);
-        }
-        return brushingTeethList;
-    }
+
+
 
     @Transactional
     public PoopResponse createPoop(Long id) {
@@ -343,6 +347,27 @@ public class ActivityService {
     }
 
     @Transactional
+    public List<Report> getReport(Long id) {
+        Member member = findById(id);
+        List<Report> reportList = reportRepository.findByMemberId(member);
+        if(reportList.isEmpty()){
+            throw new EntityNotFoundException("Report에서 해당 MemberId를 찾을 수 없습니다.: " + id);
+        }
+        return reportList;
+    }
+
+    // 앱 사용 시간 저장
+    @Transactional
+    public ReportResponse updateTotalTime(Long id, UpdateTotalTimeRequest request){
+        Member member = findById(id);
+        Duration duration = Duration.between(request.startTime(), request.endTime());
+        int hour = (int) duration.toHours();
+        Report report = reportRepository.findLatestData(member);
+        report.updateTotalTime(hour);
+        return  ReportResponse.from(report);
+    }
+
+    @Transactional
     public Map<String, Object> checkLastFeed(Long id) {
         Map<String, Object> result = new HashMap<>();
         Member member = findById(id);
@@ -394,33 +419,20 @@ public class ActivityService {
         else if (nowH.isAfter(twelveAfter)) {
             log.info("배식 후 13시간 경과: 스트레스 증가");
             // 스트레스 1 증가
-            int newStress = originStress + 1;
             Duration duration = Duration.between(nowH, lastFeedH);
             long hours = duration.toHours();
-            String detail = "배식 "+ hours +"시간 경과했습니다. 스트레스 + 1";
             int changeAmount = 1;
             // 배식 15시간 경과 : 스트레스 3 증가 (1회)
             if (nowH.isEqual(fifteenAfter)) {
-                log.info("배식 "+ hours +"시간 경과: 공복 토 푸시 알림 및 스트레스 3 증가");
+                log.info("배식 " + hours + "시간 경과: 공복 토 푸시 알림 및 스트레스 3 증가");
                 // 공복 토 푸시 알림
                 /*
 
                  */
                 // 스트레스 3 증가
-                newStress = originStress + 3;
-                detail = "배식 "+ hours +"시간 경과로 공복 토를 했습니다. 스트레스 + 3";
                 changeAmount = 3;
             }
-            Stress stress = stressRepository.save(
-                    new Stress(member, StressType.FEED, detail, changeAmount, newStress)
-            );
-            member.updateStress(newStress);
-            try {
-                stressRepository.flush();
-            } catch (DataIntegrityViolationException e) {
-                throw new UserException(String.valueOf(ExceptionMessage.FAIL_SAVE_DATA));
-            }
-            StressResponse.from(stress);
+            saveStress(member, StressType.FEED, changeAmount);
         }
 
     }
@@ -431,145 +443,158 @@ public class ActivityService {
         int originStress = member.getStressLevel();
         Poop poop = poopRepository.findLatestData(member);
 
-        if(originStress == 100 || poop.getCleanYn()) return;
+        if (originStress == 100 || poop.getCleanYn()) return;
 
         Map<String, Object> map = checkLastFeed(1L);
         LocalDateTime lastFeedH = (LocalDateTime) map.get("lastFeedDateTime");
         LocalDateTime nowH = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
-        log.info("마지막 밥 제공 시간: "+lastFeedH);
+        log.info("마지막 밥 제공 시간: " + lastFeedH);
         LocalDateTime threeAfter = lastFeedH.plusHours(3);
-        if(nowH.isEqual(threeAfter)){
+        if (nowH.isEqual(threeAfter)) {
             // 배변 활동 푸시 알림
             /*
 
              */
-        }else if(nowH.isAfter(threeAfter)){
+        } else if (nowH.isAfter(threeAfter)) {
             // 스트레스 1 증가
             Duration duration = Duration.between(nowH, lastFeedH);
             long hours = duration.toHours();
-            log.info("배변 후 "+ hours +"시간 경과: 스트레스 1 증가");
-            int newStress = originStress + 1;
-            String detail = "배변 패드를 치우지 않은 채 "+ hours +"시간이 경과했습니다. 스트레스 + 1";
+            log.info("배변 후 " + hours + "시간 경과: 스트레스 1 증가");
             int changeAmount = 1;
 
-            Stress stress = stressRepository.save(
-                    new Stress(member, StressType.POOP, detail, changeAmount, newStress)
-            );
-            member.updateStress(newStress);
-            try {
-                stressRepository.flush();
-            } catch (DataIntegrityViolationException e) {
-                throw new UserException(String.valueOf(ExceptionMessage.FAIL_SAVE_DATA));
-            }
-            StressResponse.from(stress);
+            saveStress(member, StressType.POOP, changeAmount);
         }
     }
 
 
-    // 매일 오후 12시, 20시에 실행
-    @Scheduled(cron = "0 0 12,20 * * *")
-    public void scheduleWalk(){
-        // @AuthenticationPrincipal UserDetails userDetails
-        // Member member = findById(principal.getUsername());
-        Member member = findById(1L);
 
-        // 산책 푸시 알림
-        /*
-
-         */
-    }
 
     @Transactional
-    public void scheduleCheckWalk(Long id){
+    public void scheduleCheckWalk(Long id) {
         Member member = findById(id);
         int originAffection = member.getAffection();
         int originStress = member.getStressLevel();
-        int newAffection = 0;
-        int newStress = 0;
-        String affectionDetail = "";
-        String stressDetail = "";
         int changeAffectionAmount = 0;
         int changeStressAmount = 0;
 
         LocalDateTime startToday = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
         List<Walk> list = walkRepository.findTodayData(member, startToday);
         double totalDistance = 0.0;
-        for(int i = 0; i < list.size(); i++){
-             totalDistance += list.get(i).getDistance();
+        for (int i = 0; i < list.size(); i++) {
+            totalDistance += list.get(i).getDistance();
         }
 
-        log.info("총 산책 거리: "+totalDistance);
+        log.info("총 산책 거리: " + totalDistance);
 
         boolean complete = false;
 
-        if(totalDistance < 5.0){
-
-            affectionDetail = "오늘의 총 산책 거리는 "+ totalDistance +"Km 입니다. 애정 - 5";
-            newAffection = originAffection - 5;
-            changeAffectionAmount = 5;
-
-            stressDetail = "오늘의 총 산책 거리는 "+ totalDistance +"Km 입니다. 스트레스 + 10";
-            newStress = originStress + 10;
+        if (totalDistance < 5.0) {
+            changeAffectionAmount = -5;
             changeStressAmount = 10;
-        }else{
+        } else {
             complete = true;
-            affectionDetail = "오늘의 총 산책 거리는 "+ totalDistance +"Km 입니다. 애정 + 5";
             changeAffectionAmount = 5;
-            newAffection = originAffection + 5;
-
-            stressDetail = "오늘의 총 산책 거리는 "+ totalDistance +"Km 입니다. 스트레스 - 10";
-            newStress = originStress - 10;
-            changeStressAmount = 10;
+            changeStressAmount = -10;
         }
 
 
         // !complete 미완료 + stress 증가 -> not 100
         // complete 완료 + stress 감소 -> not 0
-        if((!complete && originStress != 100) || (complete && originStress != 0)) {
-            log.info("스트레스 저장");
-            Stress stress = stressRepository.save(
-                    new Stress(member, StressType.WALK, stressDetail, changeStressAmount, newStress)
-            );
-            member.updateStress(newStress);
-            try {
-                stressRepository.flush();
-            } catch (DataIntegrityViolationException e) {
-                throw new UserException(String.valueOf(ExceptionMessage.FAIL_SAVE_DATA));
-            }
-            StressResponse.from(stress);
+        if ((!complete && originStress != 100) || (complete && originStress != 0)) {
+            saveStress(member, StressType.WALK, changeStressAmount);
         }
 
 
         // 미완료 + affection 감소 -> not 0
         // 완료 + affection 증가 -> not 100
-        if((!complete && originAffection != 0) || (complete && originAffection != 100)) {
-            log.info("애정 저장");
-            Affection affection = affectionRepository.save(
-                    new Affection(member, AffectionType.WALK, affectionDetail, changeAffectionAmount, newAffection)
-            );
-            member.updateAffection(newAffection);
-            try {
-                stressRepository.flush();
-                affectionRepository.flush();
-            } catch (DataIntegrityViolationException e) {
-                throw new UserException(String.valueOf(ExceptionMessage.FAIL_SAVE_DATA));
-            }
-            AffectionResponse.from(affection);
+        if ((!complete && originAffection != 0) || (complete && originAffection != 100)) {
+            saveAffection(member, AffectionType.WALK, changeAffectionAmount);
         }
+    }
+    @Transactional
+    public StressResponse saveStress(Member member, StressType type, int changeAmount){
+        log.info("스트레스 저장");
+        int originStress = member.getStressLevel();
+        Stress stress = stressRepository.save(
+                new Stress(member, type, changeAmount, originStress + changeAmount)
+        );
+        member.updateStress(originStress + changeAmount);
+        try {
+            stressRepository.flush();
+        } catch (DataIntegrityViolationException e) {
+            throw new UserException(String.valueOf(ExceptionMessage.FAIL_SAVE_DATA));
+        }
+        return StressResponse.from(stress);
+    }
+
+    @Transactional
+    public AffectionResponse saveAffection(Member member, AffectionType type, int changeAmount) {
+        log.info("애정 저장");
+        int originAffection = member.getAffection();
+        Affection affection = affectionRepository.save(
+                new Affection(member, type, changeAmount, originAffection+changeAmount)
+        );
+        member.updateAffection(originAffection+changeAmount);
+        try {
+            affectionRepository.flush();
+        } catch (DataIntegrityViolationException e) {
+            throw new UserException(String.valueOf(ExceptionMessage.FAIL_SAVE_DATA));
+        }
+        return AffectionResponse.from(affection);
+    }
+
+    public AffectionResponse createAffection(Long id, AffectionType type, int changeAmount) {
+        Member member = findById(id);
+        return saveAffection(member, type, changeAmount);
+    }
+
+    @Transactional
+    public List<Affection> getAffection(Long id) {
+        Member member = findById(id);
+        List<Affection> affectionList = affectionRepository.findByMemberId(member);
+        if (affectionList.isEmpty()) {
+            throw new EntityNotFoundException("Affection에서 해당 MemberId를 찾을 수 없습니다.: " + id);
+        }
+        return affectionList;
+    }
+    @Transactional
+    public StressResponse createStress(Long id, StressType type, int changeAmount) {
+        Member member = findById(id);
+        return saveStress(member, type, changeAmount);
+    }
+
+    @Transactional
+    public List<Stress> getStress(Long id) {
+        Member member = findById(id);
+        List<Stress> stressList = stressRepository.findByMemberId(member);
+        if (stressList.isEmpty()) {
+            throw new EntityNotFoundException("Stress에서 해당 MemberId를 찾을 수 없습니다.: " + id);
+        }
+        return stressList;
     }
 
     @Transactional
     public void scheduleReport(Long id) {
         // 마지막 리포트의 create datetime 가져오기
         Member member = findById(id);
-        Report report = reportRepository.findLatestData(member);
-        LocalDateTime lastCreateTime = report.getCreateTime();
+        Report lastReport = reportRepository.findLatestData(member);
+        LocalDateTime lastCreateTime = lastReport.getCreateTime();
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime lastStart = lastCreateTime.truncatedTo(ChronoUnit.DAYS);
         // 7일이 되었으면 새로운 report 생성
         Duration duration = Duration.between(now, lastCreateTime);
         long days = duration.toDays();
-        if(days >= 7){
+        if (days >= 7 && !lastReport.getComplete()) {
+            /**
+             * Affection
+             */
+            Affection affection = getLatestAffectionData(member);
+            int endAffectionScore = affection.getScore();
+            /**
+             * Stress
+             */
+            Stress stress = getLatestStressData(member);
+            int endStressScore = stress.getScore();
             /**
              * 배변 score
              * Poop 테이블에서 lastCreateTime 기준보다 큰 data를 가져온다.
@@ -578,56 +603,73 @@ public class ActivityService {
              */
             Long poopStressCnt = 0L;
             poopStressCnt = getCountLastWeekList(member, lastStart, StressType.POOP);
-            int poopScore = (int) (1 - poopStressCnt/168) * 100;
+            int poopScore = (int) (1 - poopStressCnt / 168) * 100;
 
             /**
              *  산책 score
              */
             Long walkStressCnt = 0L;
             walkStressCnt = getCountLastWeekList(member, lastStart, StressType.WALK);
-            int walkScore = (int) (1 - walkStressCnt/7) * 100;
+            int walkScore = (int) (1 - walkStressCnt / 7) * 100;
 
             // 질병 score
             Long diseaseStressCnt = 0L;
             diseaseStressCnt = getCountLastWeekDiseaseList(member, lastStart);
-            int diseaseScore = (int) (100 - diseaseStressCnt*10);
-            if(diseaseScore <= 0) diseaseScore = 0;
+            int diseaseScore = (int) (100 - diseaseStressCnt * 10);
+            if (diseaseScore <= 0) diseaseScore = 0;
 
             // 먹이 score
             Long feedStressCnt = 0L;
             feedStressCnt = getCountLastWeekList(member, lastStart, StressType.FEED);
-            int feedScore = (int) (1 - feedStressCnt/14) * 100;
+            int feedScore = (int) (1 - feedStressCnt / 14) * 100;
 
             // 양치 score
             Long brusingStressCnt = 0L;
             brusingStressCnt = getCountLastWeekList(member, lastStart, StressType.BRUSHING_TEETH);
-            int brushingScore = (int) (1 - brusingStressCnt/7) * 100;
+            int brushingScore = (int) (1 - brusingStressCnt / 7) * 100;
 
             // lastreport update
-//            report.update(true);
-
-//            return PoopResponse.from(poop);
+            lastReport.update(endAffectionScore, endStressScore, poopScore, walkScore, feedScore, brushingScore, diseaseScore);
+            ReportResponse.from(lastReport);
 
             // newreport save
-
-
+            Report newReport = reportRepository.save(
+                    new Report(member, lastReport.getWeek()+1, endAffectionScore, endStressScore)
+            );
+            try {
+              reportRepository.flush();
+            } catch (DataIntegrityViolationException e) {
+                throw new UserException(String.valueOf(ExceptionMessage.FAIL_SAVE_DATA));
+            }
 
         }
     }
+
+
     @Transactional
-    public List<Stress> getLastWeekList(Member member, LocalDateTime lastStart, StressType type){
+    public Affection getLatestAffectionData(Member member) {
+        return affectionRepository.findLatestData(member);
+    }
+
+    @Transactional
+    public Stress getLatestStressData(Member member) {
+        return stressRepository.findLatestData(member);
+    }
+
+    @Transactional
+    public List<Stress> getLastWeekList(Member member, LocalDateTime lastStart, StressType type) {
         List<Stress> list = stressRepository.findLastWeekData(member, lastStart, type);
         return list;
     }
 
     @Transactional
-    public Long getCountLastWeekList(Member member, LocalDateTime lastStart, StressType type){
+    public Long getCountLastWeekList(Member member, LocalDateTime lastStart, StressType type) {
         Long count = stressRepository.countLastWeekData(member, lastStart, type);
         return count;
     }
 
     @Transactional
-    public Long getCountLastWeekDiseaseList(Member member, LocalDateTime lastStart){
+    public Long getCountLastWeekDiseaseList(Member member, LocalDateTime lastStart) {
         Long count = diseaseRepository.countLastWeekData(member, lastStart);
         return count;
     }
@@ -637,4 +679,7 @@ public class ActivityService {
     public Member findById(Long id) {
         return memberRepository.findById(id).orElseThrow(() -> new UserException(ExceptionMessage.USER_NOT_FOUND));
     }
+
+
+
 }

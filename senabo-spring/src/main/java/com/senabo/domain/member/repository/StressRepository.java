@@ -20,4 +20,6 @@ public interface StressRepository extends JpaRepository<Stress, String> {
     @Query("SELECT COUNT(s) FROM Stress s WHERE s.memberId = ?1 and s.createTime >= ?2 and s.type = ?3")
     Long countLastWeekData(Member memberId, LocalDateTime lastStart, StressType type);
 
+    @Query("SELECT s FROM Stress s WHERE s.updateTime = (SELECT MAX(s2.updateTime) FROM Stress s2 WHERE s2.memberId = ?1)")
+    Stress findLatestData(Member memberId);
 }

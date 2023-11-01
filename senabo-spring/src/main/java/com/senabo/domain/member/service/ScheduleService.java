@@ -13,45 +13,61 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ScheduleService {
     private final ActivityService activityService;
-    private final MemberService memberService;
 
     // 1시간 마다 실행 ex) 01:00, 02:00, 03:00 ...
     @Scheduled(cron = "0 0 0/1 * * *")
     public void schedulePoop() {
         // @AuthenticationPrincipal UserDetails userDetails
         // Member member = findById(principal.getUsername());
+        log.info("배변 스케줄러 실행");
         Long id = 1L;
         activityService.schedulePoop(id);
     }
 
     // 1시간 마다 실행 ex) 01:00, 02:00, 03:00 ...
     @Scheduled(cron = "0 0 0/1 * * *")
-//    @Scheduled(fixedDelay = 10000)
     public void scheduleFeed() {
         // @AuthenticationPrincipal UserDetails userDetails
         // Member member = findById(principal.getUsername());
+        log.info("배식 스케줄러 실행");
         Long id = 1L;
         activityService.scheduleFeed(id);
     }
 
     // 매일 오후 11시 59분에 실행
     @Scheduled(cron = "0 0 23 * * *")
-//    @Scheduled(fixedDelay = 10000)
     public void scheduleCheckWalk(){
         // @AuthenticationPrincipal UserDetails userDetails
         // Member member = findById(principal.getUsername());
+        log.info("산책 스케줄러 실행");
         Long id = 1L;
         activityService.scheduleCheckWalk(id);
-    }// 매일 오후 11시 59분에 실행
-    @Scheduled(cron = "0 0 23 * * *")
-//    @Scheduled(fixedDelay = 10000)
+    }
+
+    // 매일 오후 12시, 20시에 실행
+    @Scheduled(cron = "0 0 12,20 * * *")
+    public void scheduleWalk() {
+        // @AuthenticationPrincipal UserDetails userDetails
+        // Member member = findById(principal.getUsername());
+//        Member member = findById(1L);
+
+        // 산책 푸시 알림
+        /*
+
+         */
+    }
+
+    // 매일 오전 12시 00분에 실행
+    @Scheduled(cron = "0 0 0 * * *")
     public void scheduleReport(){
         // @AuthenticationPrincipal UserDetails userDetails
         // Member member = findById(principal.getUsername());
+        log.info("리포트 스케줄러 실행");
         Long id = 1L;
         activityService.scheduleReport(id);
 
     }
 
     // 어플 종료 확인
+
 }

@@ -22,6 +22,9 @@ public class Report extends BaseEntity {
     @Column(name = "week")
     private int week;
 
+    @Column(name = "total_time")
+    private int totalTime;
+
     @Column(name = "start_affection_score")
     private int startAffectionScore;
 
@@ -49,11 +52,30 @@ public class Report extends BaseEntity {
     @Column(name = "disease_score")
     private int diseaseScore;
 
-    public Report(Member memberId, int week, int startAffectionScore, int startStressScore, int endAffectionScore, int endStressScore, int poopScore, int walkScore, int feedScore, int brushingTeethScore, int diseaseScore) {
+    @Column(name = "complete")
+    private Boolean complete;
+
+    public Report(Member memberId, int week, int startAffectionScore, int startStressScore) {
         this.memberId = memberId;
         this.week = week;
         this.startAffectionScore = startAffectionScore;
         this.startStressScore = startStressScore;
+        this.totalTime = 0;
+        this.endAffectionScore = 0;
+        this.endStressScore = 0;
+        this.poopScore = 0;
+        this.walkScore = 0;
+        this.feedScore = 0;
+        this.brushingTeethScore = 0;
+        this.diseaseScore = 0;
+        this.complete = false;
+    }
+
+    public void updateTotalTime(int totalTime){
+        this.totalTime = totalTime;
+    }
+
+    public void update(int endAffectionScore, int endStressScore, int poopScore, int walkScore, int feedScore, int brushingTeethScore, int diseaseScore) {
         this.endAffectionScore = endAffectionScore;
         this.endStressScore = endStressScore;
         this.poopScore = poopScore;
@@ -61,9 +83,7 @@ public class Report extends BaseEntity {
         this.feedScore = feedScore;
         this.brushingTeethScore = brushingTeethScore;
         this.diseaseScore = diseaseScore;
+        this.complete = true;
     }
 
-//    public void update(){
-//
-//    }
 }
