@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Stress extends BaseEntity {
+public class Affection extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, unique = true)
@@ -20,7 +20,7 @@ public class Stress extends BaseEntity {
     private Member memberId;
 
     @Column(name = "type")
-    private StressType type;
+    private AffectionType type;
 
     @Column(name = "detail")
     private String detail;
@@ -31,7 +31,7 @@ public class Stress extends BaseEntity {
     @Column(name = "score")
     private int score;
 
-    public Stress(Member memberId, StressType type, String detail, int changeAmount, int score) {
+    public Affection(Member memberId, AffectionType type, String detail, int changeAmount, int score) {
         this.memberId = memberId;
         this.type = type;
         this.detail = detail;
@@ -47,11 +47,11 @@ public class Stress extends BaseEntity {
         this.memberId = memberId;
     }
 
-    public StressType getType() {
+    public AffectionType getType() {
         return type;
     }
 
-    public void setType(StressType type) {
+    public void setType(AffectionType type) {
         this.type = type;
     }
 

@@ -32,3 +32,6 @@ logging:
     org.hibernate:
       type.descriptor.sql: trace #show parameter binding
       SQL: DEBUG
+
+#jwt:
+#  secret: o79wfnSC9mNCkN6xKfAinMH4Zh9WZCnby/zNpPa9Yi2FiXy+cbqZUho6/gWNWVWj

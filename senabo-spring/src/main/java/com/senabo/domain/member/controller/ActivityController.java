@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -187,6 +188,13 @@ public class ActivityController {
         return ApiResponse.success("배식 조회", responseList);
     }
 
+    // 배식 가능 여부 check
+    @GetMapping("/feed/check")
+    @Operation(summary = "배식 가능 여부 확인", description = "마지막 배식시간이 현재 시각으로 부터 12시간이 경과했는지 확인한다. 가능하면 ture, 불가능하면 false를 return한다.")
+    public ApiResponse<Object> checkFeed(@RequestParam(name = "id") Long id){
+        Map<String,Object> response = activityService.checkLastFeed(id);
+        return ApiResponse.success("배식 가능 여부 확인", response);
+    }
     // 배식 delete
     @DeleteMapping("/feed")
     @Operation(summary = "배식 내역 삭제", description = "배식 내역을 삭제한다.")

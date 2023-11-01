@@ -8,19 +8,30 @@ import com.senabo.domain.member.entity.*;
 import com.senabo.domain.member.repository.*;
 import com.senabo.exception.message.ExceptionMessage;
 import com.senabo.exception.model.UserException;
+import jakarta.persistence.AccessType;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cglib.core.Local;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ActivityService {
     private final MemberRepository memberRepository;
     private final BrushingTeethRepository brushingTeethRepository;
@@ -31,6 +42,8 @@ public class ActivityService {
     private final FeedRepository feedRepository;
     private final ExpenseRepository expenseRepository;
     private final DiseaseRepository diseaseRepository;
+    private final StressRepository stressRepository;
+    private final AffectionRepository affectionRepository;
 
     @Transactional
     public BrushingTeethResponse createBrushingTeeth(Long id) {
@@ -227,6 +240,7 @@ public class ActivityService {
             throw new UserException(ExceptionMessage.FAIL_DELETE_DATA);
         }
     }
+
     @Transactional
     public FeedResponse createFeed(Long id) {
         Member member = findById(id);
@@ -264,7 +278,7 @@ public class ActivityService {
     public DiseaseResponse createDisease(Long id, String diseaseName) {
         Member member = findById(id);
         Disease disease = diseaseRepository.save(
-                new Disease(member,diseaseName));
+                new Disease(member, diseaseName));
         try {
             diseaseRepository.flush();
         } catch (DataIntegrityViolationException e) {
@@ -272,6 +286,7 @@ public class ActivityService {
         }
         return DiseaseResponse.from(disease);
     }
+
     @Transactional
     public List<Disease> getDisease(Long id) {
         Member member = findById(id);
@@ -291,6 +306,7 @@ public class ActivityService {
             throw new UserException(ExceptionMessage.FAIL_DELETE_DATA);
         }
     }
+
     @Transactional
     public BathResponse createBath(Long id) {
         Member member = findById(id);
@@ -313,6 +329,7 @@ public class ActivityService {
         }
         return bathList;
     }
+
     @Transactional
     public void removeBath(Long id) {
         try {
@@ -321,6 +338,225 @@ public class ActivityService {
         } catch (DataIntegrityViolationException e) {
             throw new UserException(ExceptionMessage.FAIL_DELETE_DATA);
         }
+    }
+
+    @Transactional
+    public Map<String, Object> checkLastFeed(Long id) {
+        Map<String, Object> result = new HashMap<>();
+        Member member = findById(id);
+        Feed feed = feedRepository.findLatestData(member);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime nowH = now.truncatedTo(ChronoUnit.HOURS);
+        LocalDateTime lastFeedH = feed.getCreateTime().truncatedTo(ChronoUnit.HOURS);
+        LocalDateTime twelveAfter = lastFeedH.plusHours(12);
+        if (nowH.isBefore(twelveAfter)) {
+            result.put("possibleYn", false);
+        } else {
+            result.put("possibleYn", true);
+        }
+        result.put("lastFeedDateTime", lastFeedH);
+        result.put("nowDateTime", nowH);
+        return result;
+    }
+
+
+    @Transactional
+    public void scheduleFeed(Long id) {
+        Member member = findById(id);
+        Feed feed = feedRepository.findLatestData(member);
+        int originStress = member.getStressLevel();
+
+        if (feed == null || originStress == 100) return;
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime nowH = now.truncatedTo(ChronoUnit.HOURS);
+        LocalDateTime lastFeedH = feed.getCreateTime().truncatedTo(ChronoUnit.HOURS);
+
+        LocalDateTime twelveAfter = lastFeedH.plusHours(12);
+        LocalDateTime fifteenAfter = lastFeedH.plusHours(15);
+
+        log.info("현재 시각: " + nowH);
+        log.info("마지막으로 먹이준 시간: " + lastFeedH);
+        log.info("마지막으로 먹이준 시간 + 12: " + twelveAfter);
+
+
+        // 배식 12시간 경과
+        if (nowH.equals(twelveAfter)) {
+            log.info("배식 후 12시간 경과: 밥 푸시 알림 실행");
+            // 밥 푸시 알림
+            /*
+
+             */
+        }
+        // 배식 13시간 경과 이후 : 스트레스 1 씩 증가
+        else if (nowH.isAfter(twelveAfter)) {
+            log.info("배식 후 13시간 경과: 스트레스 증가");
+            // 스트레스 1 증가
+            int newStress = originStress + 1;
+            Duration duration = Duration.between(nowH, lastFeedH);
+            long hours = duration.toHours();
+            String detail = "배식 "+ hours +"시간 경과했습니다. 스트레스 + 1";
+            int changeAmount = 1;
+            // 배식 15시간 경과 : 스트레스 3 증가 (1회)
+            if (nowH.isEqual(fifteenAfter)) {
+                log.info("배식 "+ hours +"시간 경과: 공복 토 푸시 알림 및 스트레스 3 증가");
+                // 공복 토 푸시 알림
+                /*
+
+                 */
+                // 스트레스 3 증가
+                newStress = originStress + 3;
+                detail = "배식 "+ hours +"시간 경과로 공복 토를 했습니다. 스트레스 + 3";
+                changeAmount = 3;
+            }
+            Stress stress = stressRepository.save(
+                    new Stress(member, StressType.FEED, detail, changeAmount, newStress)
+            );
+            member.updateStress(newStress);
+            try {
+                stressRepository.flush();
+            } catch (DataIntegrityViolationException e) {
+                throw new UserException(String.valueOf(ExceptionMessage.FAIL_SAVE_DATA));
+            }
+            StressResponse.from(stress);
+        }
+
+    }
+
+    @Transactional
+    public void schedulePoop(Long id) {
+        Member member = findById(id);
+        int originStress = member.getStressLevel();
+        Poop poop = poopRepository.findLatestData(member);
+
+        if(originStress == 100 || poop.getCleanYn()) return;
+
+        Map<String, Object> map = checkLastFeed(1L);
+        LocalDateTime lastFeedH = (LocalDateTime) map.get("lastFeedDateTime");
+        LocalDateTime nowH = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
+        log.info("마지막 밥 제공 시간: "+lastFeedH);
+        LocalDateTime threeAfter = lastFeedH.plusHours(3);
+        if(nowH.isEqual(threeAfter)){
+            // 배변 활동 푸시 알림
+            /*
+
+             */
+        }else if(nowH.isAfter(threeAfter)){
+            // 스트레스 1 증가
+            Duration duration = Duration.between(nowH, lastFeedH);
+            long hours = duration.toHours();
+            log.info("배변 후 "+ hours +"시간 경과: 스트레스 1 증가");
+            int newStress = originStress + 1;
+            String detail = "배변 패드를 치우지 않은 채 "+ hours +"시간이 경과했습니다. 스트레스 + 1";
+            int changeAmount = 1;
+
+            Stress stress = stressRepository.save(
+                    new Stress(member, StressType.POOP, detail, changeAmount, newStress)
+            );
+            member.updateStress(newStress);
+            try {
+                stressRepository.flush();
+            } catch (DataIntegrityViolationException e) {
+                throw new UserException(String.valueOf(ExceptionMessage.FAIL_SAVE_DATA));
+            }
+            StressResponse.from(stress);
+        }
+    }
+
+
+    // 매일 오후 12시, 20시에 실행
+    @Scheduled(cron = "0 0 12,20 * * *")
+    public void scheduleWalk(){
+        // @AuthenticationPrincipal UserDetails userDetails
+        // Member member = findById(principal.getUsername());
+        Member member = findById(1L);
+
+        // 산책 푸시 알림
+        /*
+
+         */
+    }
+
+    @Transactional
+    public void scheduleCheckWalk(Long id){
+        Member member = findById(id);
+        int originAffection = member.getAffection();
+        int originStress = member.getStressLevel();
+        int newAffection = 0;
+        int newStress = 0;
+        String affectionDetail = "";
+        String stressDetail = "";
+        int changeAffectionAmount = 0;
+        int changeStressAmount = 0;
+
+        LocalDateTime startToday = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
+        List<Walk> list = walkRepository.findTodayData(member, startToday);
+        double totalDistance = 0.0;
+        for(int i = 0; i < list.size(); i++){
+             totalDistance += list.get(i).getDistance();
+        }
+
+        log.info("총 산책 거리: "+totalDistance);
+
+        boolean complete = false;
+
+        if(totalDistance < 5.0){
+
+            affectionDetail = "오늘의 총 산책 거리는 "+ totalDistance +"Km 입니다. 애정 - 5";
+            newAffection = originAffection - 5;
+            changeAffectionAmount = 5;
+
+            stressDetail = "오늘의 총 산책 거리는 "+ totalDistance +"Km 입니다. 스트레스 + 10";
+            newStress = originStress + 10;
+            changeStressAmount = 10;
+        }else{
+            complete = true;
+            affectionDetail = "오늘의 총 산책 거리는 "+ totalDistance +"Km 입니다. 애정 + 5";
+            changeAffectionAmount = 5;
+            newAffection = originAffection + 5;
+
+            stressDetail = "오늘의 총 산책 거리는 "+ totalDistance +"Km 입니다. 스트레스 - 10";
+            newStress = originStress - 10;
+            changeStressAmount = 10;
+        }
+
+
+        // !complete 미완료 + stress 증가 -> not 100
+        // complete 완료 + stress 감소 -> not 0
+        if((!complete && originStress != 100) || (complete && originStress != 0)) {
+            log.info("스트레스 저장");
+            Stress stress = stressRepository.save(
+                    new Stress(member, StressType.WALK, stressDetail, changeStressAmount, newStress)
+            );
+            member.updateStress(newStress);
+            try {
+                stressRepository.flush();
+            } catch (DataIntegrityViolationException e) {
+                throw new UserException(String.valueOf(ExceptionMessage.FAIL_SAVE_DATA));
+            }
+            StressResponse.from(stress);
+        }
+
+
+        // 미완료 + affection 감소 -> not 0
+        // 완료 + affection 증가 -> not 100
+        if((!complete && originAffection != 0) || (complete && originAffection != 100)) {
+            log.info("애정 저장");
+            Affection affection = affectionRepository.save(
+                    new Affection(member, AffectionType.WALK, affectionDetail, changeAffectionAmount, newAffection)
+            );
+            member.updateAffection(newAffection);
+            try {
+                stressRepository.flush();
+                affectionRepository.flush();
+            } catch (DataIntegrityViolationException e) {
+                throw new UserException(String.valueOf(ExceptionMessage.FAIL_SAVE_DATA));
+            }
+            AffectionResponse.from(affection);
+        }
+
+
+
     }
 
     @Transactional

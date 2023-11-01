@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -56,6 +57,14 @@ public class Member extends BaseEntity  {
     @Column(name = "enter_time")
     private LocalDateTime enterTime;
 
+    @Column(nullable = true)
+    private String deviceToken;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    private List<Role> roles = new ArrayList<>(List.of(Role.ROLE_USER));
+
     @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BrushingTeeth> brushingTeethList;
 
@@ -92,7 +101,7 @@ public class Member extends BaseEntity  {
         this.houseLogitude = houseLogitude;
         this.snsType = snsType;
         affection = 0;
-        stressLevel = 0;
+        stressLevel = 50;
     }
 
     public void update(UpdateInfoRequest request){
@@ -102,6 +111,12 @@ public class Member extends BaseEntity  {
         this.houseLatitude = request.houseLatitude();
         this.houseLogitude = request.houseLogitude();
     }
+    public void updateStress(int stressLevel){
+        this.stressLevel = stressLevel;
+    }
 
 
+    public void updateAffection(int affection) {
+        this.affection = affection;
+    }
 }

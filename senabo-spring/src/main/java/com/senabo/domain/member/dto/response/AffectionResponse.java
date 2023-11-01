@@ -1,0 +1,31 @@
+package com.senabo.domain.member.dto.response;
+
+import com.senabo.domain.member.entity.Affection;
+import com.senabo.domain.member.entity.AffectionType;
+import lombok.Builder;
+
+import java.time.LocalDateTime;
+
+@Builder
+public record AffectionResponse(
+        Long id,
+        Long memberId,
+        AffectionType type,
+        String detail,
+        int changeAmount,
+        int score,
+        LocalDateTime dateTime
+) {
+    public static AffectionResponse from(Affection affection){
+        return AffectionResponse.builder()
+                .id(affection.getId())
+                .memberId(affection.getMemberId().getId())
+                .type(affection.getType())
+                .detail(affection.getDetail())
+                .changeAmount(affection.getChangeAmount())
+                .score(affection.getScore())
+                .dateTime(affection.getUpdateTime())
+                .build();
+    }
+}
+

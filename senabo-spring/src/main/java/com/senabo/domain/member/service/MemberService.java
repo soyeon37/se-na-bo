@@ -3,7 +3,10 @@ package com.senabo.domain.member.service;
 import com.senabo.domain.member.dto.request.SignUpRequest;
 import com.senabo.domain.member.dto.request.UpdateInfoRequest;
 import com.senabo.domain.member.dto.response.MemberResponse;
+import com.senabo.domain.member.entity.Affection;
+import com.senabo.domain.member.entity.AffectionType;
 import com.senabo.domain.member.entity.Member;
+import com.senabo.domain.member.repository.AffectionRepository;
 import com.senabo.domain.member.repository.MemberRepository;
 import com.senabo.domain.member.repository.StressRepository;
 import com.senabo.exception.message.ExceptionMessage;
@@ -12,6 +15,7 @@ import com.senabo.exception.model.UserException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +27,6 @@ public class MemberService {
 
 
     private final MemberRepository memberRepository;
-    private final StressRepository stressRepository;
-
 
 
     public boolean checkEmail(String email) {
@@ -36,7 +38,7 @@ public class MemberService {
     }
 
     public MemberResponse signUp(SignUpRequest request) {
-
+        // 회원가입
         Member member = memberRepository.save(
                 new Member(request.name(), request.email(), request.species(), request.sex(), request.houseLatitude(), request.houseLogitude(), request.snsType()));
         try {
@@ -76,7 +78,4 @@ public class MemberService {
     public Member findById(Long id) {
         return memberRepository.findById(id).orElseThrow(() -> new UserException(ExceptionMessage.USER_NOT_FOUND));
     }
-
-
-
 }
