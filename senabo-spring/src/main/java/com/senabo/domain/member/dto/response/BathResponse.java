@@ -10,14 +10,16 @@ public record BathResponse(
         Long id,
         Long memberId,
 
-        LocalDateTime dateTime
+        LocalDateTime createTime,
+        LocalDateTime updateTime
 ) {
 
     public static BathResponse from(Bath bath) {
         return BathResponse.builder()
                 .id(bath.getId())
                 .memberId(bath.getMemberId().getId())
-                .dateTime(bath.getUpdateTime())
+                .createTime(bath.getCreateTime())
+                .updateTime(bath.getUpdateTime())
                 .build();
     }
 }

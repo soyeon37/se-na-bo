@@ -11,14 +11,16 @@ public record PoopResponse(
         Long id,
         Long memberId,
         Boolean cleanYn,
-        LocalDateTime dateTime
+        LocalDateTime createTime,
+        LocalDateTime updateTime
 ) {
     public static PoopResponse from(Poop poop) {
         return PoopResponse.builder()
                 .id(poop.getId())
                 .memberId(poop.getMemberId().getId())
                 .cleanYn(poop.getCleanYn())
-                .dateTime(poop.getUpdateTime())
+                .createTime(poop.getCreateTime())
+                .updateTime(poop.getUpdateTime())
                 .build();
     }
 }

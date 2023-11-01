@@ -12,7 +12,8 @@ public record ExpenseResponse(
         String item,
         String detail,
         Double amount,
-        LocalDateTime dateTime
+        LocalDateTime createTime,
+        LocalDateTime updateTime
 ) {
     public static ExpenseResponse from(Expense expense) {
         return ExpenseResponse.builder()
@@ -21,7 +22,8 @@ public record ExpenseResponse(
                 .item(expense.getItem())
                 .detail(expense.getDetail())
                 .amount(expense.getAmount())
-                .dateTime(expense.getUpdateTime())
+                .createTime(expense.getCreateTime())
+                .updateTime(expense.getUpdateTime())
                 .build();
     }
 }

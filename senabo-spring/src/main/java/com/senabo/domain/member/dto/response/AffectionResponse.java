@@ -14,7 +14,8 @@ public record AffectionResponse(
         String detail,
         int changeAmount,
         int score,
-        LocalDateTime dateTime
+        LocalDateTime createTime,
+        LocalDateTime updateTime
 ) {
     public static AffectionResponse from(Affection affection){
         return AffectionResponse.builder()
@@ -24,7 +25,8 @@ public record AffectionResponse(
                 .detail(affection.getDetail())
                 .changeAmount(affection.getChangeAmount())
                 .score(affection.getScore())
-                .dateTime(affection.getUpdateTime())
+                .createTime(affection.getCreateTime())
+                .updateTime(affection.getUpdateTime())
                 .build();
     }
 }

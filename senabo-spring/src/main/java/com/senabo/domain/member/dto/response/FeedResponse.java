@@ -9,13 +9,15 @@ import java.time.LocalDateTime;
 public record FeedResponse(
         Long id,
         Long memberId,
-        LocalDateTime dateTime
+        LocalDateTime createTime,
+        LocalDateTime updateTime
 ) {
     public static FeedResponse from(Feed feed){
         return FeedResponse.builder()
                 .id(feed.getId())
                 .memberId(feed.getMemberId().getId())
-                .dateTime(feed.getUpdateTime())
+                .createTime(feed.getCreateTime())
+                .updateTime(feed.getUpdateTime())
                 .build();
     }
 }

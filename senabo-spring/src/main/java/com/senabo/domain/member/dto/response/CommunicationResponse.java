@@ -11,14 +11,16 @@ public record CommunicationResponse(
         Long id,
         Long memberId,
         ActivityType type,
-        LocalDateTime dateTime
+        LocalDateTime createTime,
+        LocalDateTime updateTime
 ) {
     public static CommunicationResponse from(Communication communication) {
         return CommunicationResponse.builder()
                 .id(communication.getId())
                 .memberId(communication.getMemberId().getId())
                 .type(communication.getType())
-                .dateTime(communication.getUpdateTime())
+                .createTime(communication.getCreateTime())
+                .updateTime(communication.getUpdateTime())
                 .build();
     }
 }

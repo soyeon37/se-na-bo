@@ -12,7 +12,8 @@ public record WalkResponse(
         Double distance,
         LocalDateTime startTime,
         LocalDateTime endTime,
-        LocalDateTime dateTime
+        LocalDateTime createTime,
+        LocalDateTime updateTime
 ) {
     public static WalkResponse from(Walk walk){
         return WalkResponse.builder()
@@ -21,7 +22,8 @@ public record WalkResponse(
                 .startTime(walk.getStartTime())
                 .endTime(walk.getEndTime())
                 .distance(walk.getDistance())
-                .dateTime(walk.getUpdateTime())
+                .createTime(walk.getCreateTime())
+                .updateTime(walk.getUpdateTime())
                 .build();
     }
 

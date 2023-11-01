@@ -23,7 +23,8 @@ public record MemberResponse(
         int totalTime,
         LocalDateTime exitTime,
         LocalDateTime enterTime,
-        LocalDateTime dateTime
+        LocalDateTime createTime,
+        LocalDateTime updateTime
         ) {
         public static MemberResponse from(Member member) {
                 return MemberResponse.builder()
@@ -40,6 +41,8 @@ public record MemberResponse(
                         .totalTime(member.getTotalTime())
                         .exitTime(member.getExitTime())
                         .enterTime(member.getEnterTime())
+                        .createTime(member.getCreateTime())
+                        .updateTime(member.getUpdateTime())
                         .build();
         }
 }

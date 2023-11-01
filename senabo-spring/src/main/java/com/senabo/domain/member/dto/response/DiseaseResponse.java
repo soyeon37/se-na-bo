@@ -9,14 +9,16 @@ public record DiseaseResponse(
         Long id,
         Long memberId,
         String diseaseName,
-        LocalDateTime dateTime
+        LocalDateTime createTime,
+        LocalDateTime updateTime
 ) {
     public static DiseaseResponse from (Disease disease){
         return DiseaseResponse.builder()
                 .id(disease.getId())
                 .memberId(disease.getMemberId().getId())
                 .diseaseName(disease.getDiseaseName())
-                .dateTime(disease.getUpdateTime())
+                .createTime(disease.getCreateTime())
+                .updateTime(disease.getUpdateTime())
                 .build();
     }
 }

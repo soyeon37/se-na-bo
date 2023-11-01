@@ -69,13 +69,9 @@ public class MemberController {
         return ApiResponse.success("회원정보 수정", response);
     }
 
-    // 주간 리포트 create
-//    @PostMapping("/report")
-//    @Operation(summary = "주간 리포트 생성", description = "애정 지수, 스트레스 지수를 주마다 주간리포트에 저장한다.")
-//    public ApiResponse<> createReport(@RequestParam(name = "id") Long id){
-//
-//    }
-    // 주간 리포트 read
+    // 주간 리포트 전체 read
+
+    // 주간 리포트 상세 조회 read
 
     // 애정 create
 
@@ -92,5 +88,6 @@ public class MemberController {
     // 스트레스 read
 
     // 스트레스 delete
+
 
 }

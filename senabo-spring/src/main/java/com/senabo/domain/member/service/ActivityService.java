@@ -30,8 +30,8 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class ActivityService {
     private final MemberRepository memberRepository;
     private final BrushingTeethRepository brushingTeethRepository;
@@ -44,6 +44,8 @@ public class ActivityService {
     private final DiseaseRepository diseaseRepository;
     private final StressRepository stressRepository;
     private final AffectionRepository affectionRepository;
+    private final ReportRepository reportRepository;
+
 
     @Transactional
     public BrushingTeethResponse createBrushingTeeth(Long id) {
@@ -554,10 +556,82 @@ public class ActivityService {
             }
             AffectionResponse.from(affection);
         }
-
-
-
     }
+
+    @Transactional
+    public void scheduleReport(Long id) {
+        // 마지막 리포트의 create datetime 가져오기
+        Member member = findById(id);
+        Report report = reportRepository.findLatestData(member);
+        LocalDateTime lastCreateTime = report.getCreateTime();
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime lastStart = lastCreateTime.truncatedTo(ChronoUnit.DAYS);
+        // 7일이 되었으면 새로운 report 생성
+        Duration duration = Duration.between(now, lastCreateTime);
+        long days = duration.toDays();
+        if(days >= 7){
+            /**
+             * 배변 score
+             * Poop 테이블에서 lastCreateTime 기준보다 큰 data를 가져온다.
+             * 배변 패드를 안 치운 횟수를 100에서 감점한다.
+             * poopList의 전체 횟수 - 치우지 않은 횟수 / 168 * 100
+             */
+            Long poopStressCnt = 0L;
+            poopStressCnt = getCountLastWeekList(member, lastStart, StressType.POOP);
+            int poopScore = (int) (1 - poopStressCnt/168) * 100;
+
+            /**
+             *  산책 score
+             */
+            Long walkStressCnt = 0L;
+            walkStressCnt = getCountLastWeekList(member, lastStart, StressType.WALK);
+            int walkScore = (int) (1 - walkStressCnt/7) * 100;
+
+            // 질병 score
+            Long diseaseStressCnt = 0L;
+            diseaseStressCnt = getCountLastWeekDiseaseList(member, lastStart);
+            int diseaseScore = (int) (100 - diseaseStressCnt*10);
+            if(diseaseScore <= 0) diseaseScore = 0;
+
+            // 먹이 score
+            Long feedStressCnt = 0L;
+            feedStressCnt = getCountLastWeekList(member, lastStart, StressType.FEED);
+            int feedScore = (int) (1 - feedStressCnt/14) * 100;
+
+            // 양치 score
+            Long brusingStressCnt = 0L;
+            brusingStressCnt = getCountLastWeekList(member, lastStart, StressType.BRUSHING_TEETH);
+            int brushingScore = (int) (1 - brusingStressCnt/7) * 100;
+
+            // lastreport update
+//            report.update(true);
+
+//            return PoopResponse.from(poop);
+
+            // newreport save
+
+
+
+        }
+    }
+    @Transactional
+    public List<Stress> getLastWeekList(Member member, LocalDateTime lastStart, StressType type){
+        List<Stress> list = stressRepository.findLastWeekData(member, lastStart, type);
+        return list;
+    }
+
+    @Transactional
+    public Long getCountLastWeekList(Member member, LocalDateTime lastStart, StressType type){
+        Long count = stressRepository.countLastWeekData(member, lastStart, type);
+        return count;
+    }
+
+    @Transactional
+    public Long getCountLastWeekDiseaseList(Member member, LocalDateTime lastStart){
+        Long count = diseaseRepository.countLastWeekData(member, lastStart);
+        return count;
+    }
+
 
     @Transactional
     public Member findById(Long id) {

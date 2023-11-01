@@ -12,13 +12,15 @@ import java.util.stream.Collectors;
 public record BrushingTeethResponse(
         Long id,
         Long memberId,
-        LocalDateTime dateTime
+        LocalDateTime createTime,
+        LocalDateTime updateTime
 ) {
     public static BrushingTeethResponse from(BrushingTeeth brushingTeeth) {
         return BrushingTeethResponse.builder()
                 .id(brushingTeeth.getId())
                 .memberId(brushingTeeth.getMemberId().getId())
-                .dateTime(brushingTeeth.getUpdateTime())
+                .createTime(brushingTeeth.getCreateTime())
+                .updateTime(brushingTeeth.getUpdateTime())
                 .build();
     }
 

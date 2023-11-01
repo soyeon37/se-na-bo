@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -19,5 +20,8 @@ public interface PoopRepository extends JpaRepository<Poop, String> {
 
     @Query("SELECT p FROM Poop p WHERE p.updateTime = (SELECT MAX(p2.updateTime) FROM Poop p2 WHERE p2.memberId = ?1)")
     Poop findLatestData(Member memberId);
+
+    @Query("SELECT p FROM Poop p WHERE p.memberId = ?1 and p.createTime >= ?2")
+    List<Poop> findLastWeekData(Member memberId, LocalDateTime lastStart);
 
 }

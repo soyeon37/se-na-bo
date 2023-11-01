@@ -14,7 +14,8 @@ public record StressResponse(
         String detail,
         int changeAmount,
         int score,
-        LocalDateTime dateTime
+        LocalDateTime createTime,
+        LocalDateTime updateTime
 ) {
     public static StressResponse from(Stress stress){
         return StressResponse.builder()
@@ -24,7 +25,8 @@ public record StressResponse(
                 .detail(stress.getDetail())
                 .changeAmount(stress.getChangeAmount())
                 .score(stress.getScore())
-                .dateTime(stress.getUpdateTime())
+                .createTime(stress.getCreateTime())
+                .updateTime(stress.getUpdateTime())
                 .build();
     }
 }
