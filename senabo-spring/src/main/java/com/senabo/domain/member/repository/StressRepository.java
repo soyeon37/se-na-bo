@@ -22,4 +22,7 @@ public interface StressRepository extends JpaRepository<Stress, String> {
 
     @Query("SELECT s FROM Stress s WHERE s.updateTime = (SELECT MAX(s2.updateTime) FROM Stress s2 WHERE s2.memberId = ?1)")
     Stress findLatestData(Member memberId);
+
+    @Query("select s from Stress s where s.memberId = ?1 and s.updateTime <= ?2 and s.createTime >= ?3 ")
+    List<Stress> findStressWeek(Member member, LocalDateTime endTime, LocalDateTime startTime);
 }

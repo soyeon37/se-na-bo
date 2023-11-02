@@ -1,10 +1,7 @@
 package com.senabo.domain.member.service;
 
-import com.senabo.domain.member.entity.Member;
-import com.senabo.domain.member.entity.Walk;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 

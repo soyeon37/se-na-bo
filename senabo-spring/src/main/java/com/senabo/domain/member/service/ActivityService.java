@@ -69,15 +69,15 @@ public class ActivityService {
     public List<BrushingTeeth> getBrushingTeethWeek(Long id, int week) {
         Member member = findById(id);
         Report report = reportRepository.findByMemberIdAndWeek(member, week);
-        if(!report.getComplete()) throw new EntityNotFoundException("완료한 주차가 아닙니다.: " + week);
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
         List<BrushingTeeth> brushingTeethList = brushingTeethRepository.findBrushingTeethWeek(member, endTime, startTime);
         if (brushingTeethList.isEmpty()) {
-            throw new EntityNotFoundException("Brushing Teeth에서 해당 MemberId를 찾을 수 없습니다.: " + id);
+            throw new EntityNotFoundException("BrushingTeeth에서 해당 주차를 찾을 수 없습니다.: " + id);
         }
         return brushingTeethList;
     }
+
     @Transactional
     public void removeBrushingTeeth(Long id) {
         try {
@@ -112,6 +112,18 @@ public class ActivityService {
         List<Poop> poopList = poopRepository.findByMemberId(member);
         if (poopList.isEmpty()) {
             throw new EntityNotFoundException("Poop에서 해당 MemberId를 찾을 수 없습니다.: " + id);
+        }
+        return poopList;
+    }
+    @Transactional
+    public List<Poop> getPoopWeek(Long id, int week) {
+        Member member = findById(id);
+        Report report = reportRepository.findByMemberIdAndWeek(member, week);
+        LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        List<Poop> poopList = poopRepository.findPoopWeek(member, endTime, startTime);
+        if (poopList.isEmpty()) {
+            throw new EntityNotFoundException("Poop에서 해당 주차를 찾을 수 없습니다.: " + id);
         }
         return poopList;
     }
@@ -158,6 +170,18 @@ public class ActivityService {
         }
         return communicationList;
     }
+    @Transactional
+    public List<Communication> getCommunicationWeek(Long id, int week) {
+        Member member = findById(id);
+        Report report = reportRepository.findByMemberIdAndWeek(member, week);
+        LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        List<Communication> communicationList = communicationRepository.findCommunicationWeek(member, endTime, startTime);
+        if (communicationList.isEmpty()) {
+            throw new EntityNotFoundException("Communication에서 해당 주차를 찾을 수 없습니다.: " + id);
+        }
+        return communicationList;
+    }
 
     @Transactional
     public void removeCommunication(Long id) {
@@ -188,6 +212,19 @@ public class ActivityService {
         List<Walk> walkList = walkRepository.findByMemberId(member);
         if (walkList.isEmpty()) {
             throw new EntityNotFoundException("Walk에서 해당 MemberId를 찾을 수 없습니다.: " + id);
+        }
+        return walkList;
+    }
+
+    @Transactional
+    public List<Walk> getWalkWeek(Long id, int week) {
+        Member member = findById(id);
+        Report report = reportRepository.findByMemberIdAndWeek(member, week);
+        LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        List<Walk> walkList = walkRepository.findWalkWeek(member, endTime, startTime);
+        if (walkList.isEmpty()) {
+            throw new EntityNotFoundException("Walk에서 해당 주차를 찾을 수 없습니다.: " + id);
         }
         return walkList;
     }
@@ -236,6 +273,36 @@ public class ActivityService {
         }
         return expenseList;
     }
+    @Transactional
+    public Long getExpenseTotal(Long id) {
+        Member member = findById(id);
+        Long totalAmount = expenseRepository.getTotalAmount(member);
+       return totalAmount;
+    }
+
+    @Transactional
+    public Long getExpenseTotalWeek(Long id, int week) {
+        Member member = findById(id);
+        Report report = reportRepository.findByMemberIdAndWeek(member, week);
+        LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        Long totalAmount = expenseRepository.getTotalAmountWeek(member, endTime, startTime);
+        return totalAmount;
+    }
+
+
+    @Transactional
+    public List<Expense> getExpenseWeek(Long id, int week) {
+        Member member = findById(id);
+        Report report = reportRepository.findByMemberIdAndWeek(member, week);
+        LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        List<Expense> expenseList = expenseRepository.findExpenseWeek(member, endTime, startTime);
+        if (expenseList.isEmpty()) {
+            throw new EntityNotFoundException("Expense에서 해당 주차를 찾을 수 없습니다.: " + id);
+        }
+        return expenseList;
+    }
 
     @Transactional
     public void removeExpense(Long id) {
@@ -271,6 +338,19 @@ public class ActivityService {
     }
 
     @Transactional
+    public List<Feed> getFeedWeek(Long id, int week) {
+        Member member = findById(id);
+        Report report = reportRepository.findByMemberIdAndWeek(member, week);
+        LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        List<Feed> feedList = feedRepository.findFeedWeek(member, endTime, startTime);
+        if (feedList.isEmpty()) {
+            throw new EntityNotFoundException("Feed에서 해당 주차를 찾을 수 없습니다.: " + id);
+        }
+        return feedList;
+    }
+
+    @Transactional
     public void removeFeed(Long id) {
         try {
             Member member = findById(id);
@@ -299,6 +379,19 @@ public class ActivityService {
         List<Disease> diseaseList = diseaseRepository.findByMemberId(member);
         if (diseaseList.isEmpty()) {
             throw new EntityNotFoundException("Disease에서 해당 MemberId를 찾을 수 없습니다.: " + id);
+        }
+        return diseaseList;
+    }
+
+    @Transactional
+    public List<Disease> getDiseaseWeek(Long id, int week) {
+        Member member = findById(id);
+        Report report = reportRepository.findByMemberIdAndWeek(member, week);
+        LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        List<Disease> diseaseList = diseaseRepository.findDiseaseWeek(member, endTime, startTime);
+        if (diseaseList.isEmpty()) {
+            throw new EntityNotFoundException("Disease에서 해당 주차를 찾을 수 없습니다.: " + id);
         }
         return diseaseList;
     }
@@ -352,6 +445,19 @@ public class ActivityService {
         List<Report> reportList = reportRepository.findByMemberId(member);
         if(reportList.isEmpty()){
             throw new EntityNotFoundException("Report에서 해당 MemberId를 찾을 수 없습니다.: " + id);
+        }
+        return reportList;
+    }
+
+    @Transactional
+    public List<Report> getReportWeek(Long id, int week) {
+        Member member = findById(id);
+        Report report = reportRepository.findByMemberIdAndWeek(member, week);
+        LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        List<Report> reportList = reportRepository.findReportWeek(member, endTime, startTime);
+        if(reportList.isEmpty()){
+            throw new EntityNotFoundException("Report에서 해당 주차를 찾을 수 없습니다.: " + id);
         }
         return reportList;
     }
@@ -557,6 +663,19 @@ public class ActivityService {
         }
         return affectionList;
     }
+
+    @Transactional
+    public List<Affection> getAffectionWeek(Long id, int week) {
+        Member member = findById(id);
+        Report report = reportRepository.findByMemberIdAndWeek(member, week);
+        LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        List<Affection> affectionList = affectionRepository.findAffectionWeek(member, endTime, startTime);
+        if (affectionList.isEmpty()) {
+            throw new EntityNotFoundException("Affection에서 해당 주차를 찾을 수 없습니다.: " + id);
+        }
+        return affectionList;
+    }
     @Transactional
     public StressResponse createStress(Long id, StressType type, int changeAmount) {
         Member member = findById(id);
@@ -569,6 +688,18 @@ public class ActivityService {
         List<Stress> stressList = stressRepository.findByMemberId(member);
         if (stressList.isEmpty()) {
             throw new EntityNotFoundException("Stress에서 해당 MemberId를 찾을 수 없습니다.: " + id);
+        }
+        return stressList;
+    }
+    @Transactional
+    public List<Stress> getStressWeek(Long id, int week) {
+        Member member = findById(id);
+        Report report = reportRepository.findByMemberIdAndWeek(member, week);
+        LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        List<Stress> stressList = stressRepository.findStressWeek(member, endTime, startTime);
+        if (stressList.isEmpty()) {
+            throw new EntityNotFoundException("Stress에서 해당 주차를 찾을 수 없습니다.: " + id);
         }
         return stressList;
     }
@@ -602,6 +733,7 @@ public class ActivityService {
              * poopList의 전체 횟수 - 치우지 않은 횟수 / 168 * 100
              */
             Long poopStressCnt = 0L;
+            poopStressCnt = getCountLastWeekList(member, lastStart, StressType.POOP);
             poopStressCnt = getCountLastWeekList(member, lastStart, StressType.POOP);
             int poopScore = (int) (1 - poopStressCnt / 168) * 100;
 

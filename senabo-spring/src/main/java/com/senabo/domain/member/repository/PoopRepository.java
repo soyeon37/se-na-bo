@@ -23,5 +23,6 @@ public interface PoopRepository extends JpaRepository<Poop, String> {
 
     @Query("SELECT p FROM Poop p WHERE p.memberId = ?1 and p.createTime >= ?2")
     List<Poop> findLastWeekData(Member memberId, LocalDateTime lastStart);
-
+    @Query("select p from Poop p where p.memberId = ?1 and p.updateTime <= ?2 and p.createTime >= ?3 ")
+    List<Poop> findPoopWeek(Member member, LocalDateTime endTime, LocalDateTime startTime);
 }

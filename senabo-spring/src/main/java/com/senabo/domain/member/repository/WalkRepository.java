@@ -1,6 +1,7 @@
 package com.senabo.domain.member.repository;
 
 import com.senabo.domain.member.entity.Member;
+import com.senabo.domain.member.entity.Poop;
 import com.senabo.domain.member.entity.Walk;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +21,7 @@ public interface WalkRepository extends JpaRepository<Walk, String> {
 
     @Query("SELECT w FROM Walk w WHERE w.memberId = ?1 AND w.startTime >= ?2 AND w.endTime IS NOT NULL")
     List<Walk> findTodayData(Member memberId, LocalDateTime startToday);
+
+    @Query("select w from Walk w where w.memberId = ?1 and w.updateTime <= ?2 and w.createTime >= ?3 ")
+    List<Walk> findWalkWeek(Member member, LocalDateTime endTime, LocalDateTime startTime);
 }
