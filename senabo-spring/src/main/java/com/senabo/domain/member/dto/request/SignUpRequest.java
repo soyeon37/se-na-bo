@@ -23,9 +23,9 @@ public record SignUpRequest(
         BigDecimal houseLatitude,
         @Schema(description = "경도", nullable = true, example = "0")
         BigDecimal houseLogitude,
-        @NotNull
-        @Schema(description = "SNS 타입", nullable = false, example = "KAKAO")
-        SNSType snsType
+        String uid,
+        String deviceToken
+
 
 ) {
 

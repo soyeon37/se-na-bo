@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -45,9 +46,6 @@ public class Member extends BaseEntity  {
     @Column(name = "house_logitude", nullable = false)
     private BigDecimal houseLogitude;
 
-    @Column(name = "sns_type", nullable = false)
-    private SNSType snsType;
-
     @Column(name = "total_time")
     private int totalTime;
 
@@ -56,6 +54,9 @@ public class Member extends BaseEntity  {
 
     @Column(name = "enter_time")
     private LocalDateTime enterTime;
+
+    @Column(nullable = true)
+    private String uid;
 
     @Column(nullable = true)
     private String deviceToken;
@@ -92,14 +93,17 @@ public class Member extends BaseEntity  {
     @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Walk> walkList;
 
-    public Member(String name, String email, String species, String sex, BigDecimal houseLatitude, BigDecimal houseLogitude, SNSType snsType) {
+
+
+    public Member(String name, String email, String species, String sex, BigDecimal houseLatitude, BigDecimal houseLogitude, String uid, String deviceToken) {
         this.name = name;
         this.email = email;
         this.species = species;
         this.sex = sex;
         this.houseLatitude = houseLatitude;
         this.houseLogitude = houseLogitude;
-        this.snsType = snsType;
+        this.uid = uid;
+        this.deviceToken = deviceToken;
         affection = 0;
         stressLevel = 50;
     }
@@ -119,4 +123,21 @@ public class Member extends BaseEntity  {
     public void updateAffection(int affection) {
         this.affection = affection;
     }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public void setDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
+    }
+
+
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        return this.roles.stream()
+//                .map(Role::name)
+//                .map(SimpleGrantedAuthority::new)
+//                .toList();
+//    }
 }

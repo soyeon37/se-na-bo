@@ -19,30 +19,32 @@ public record MemberResponse(
         int stressLevel,
         BigDecimal houseLatitude,
         BigDecimal houseLogitude,
-        SNSType snsType,
         int totalTime,
+        String uid,
+        String deviceToken,
         LocalDateTime exitTime,
         LocalDateTime enterTime,
         LocalDateTime createTime,
         LocalDateTime updateTime
-        ) {
-        public static MemberResponse from(Member member) {
-                return MemberResponse.builder()
-                        .id(member.getId())
-                        .name(member.getName())
-                        .email(member.getEmail())
-                        .species(member.getSpecies())
-                        .sex(member.getSex())
-                        .houseLatitude(member.getHouseLatitude())
-                        .houseLogitude(member.getHouseLogitude())
-                        .snsType(member.getSnsType())
-                        .affection(member.getAffection())
-                        .stressLevel(member.getStressLevel())
-                        .totalTime(member.getTotalTime())
-                        .exitTime(member.getExitTime())
-                        .enterTime(member.getEnterTime())
-                        .createTime(member.getCreateTime())
-                        .updateTime(member.getUpdateTime())
-                        .build();
-        }
+) {
+    public static MemberResponse from(Member member) {
+        return MemberResponse.builder()
+                .id(member.getId())
+                .name(member.getName())
+                .email(member.getEmail())
+                .species(member.getSpecies())
+                .sex(member.getSex())
+                .houseLatitude(member.getHouseLatitude())
+                .houseLogitude(member.getHouseLogitude())
+                .uid(member.getUid())
+                .deviceToken(member.getDeviceToken())
+                .affection(member.getAffection())
+                .stressLevel(member.getStressLevel())
+                .totalTime(member.getTotalTime())
+                .exitTime(member.getExitTime())
+                .enterTime(member.getEnterTime())
+                .createTime(member.getCreateTime())
+                .updateTime(member.getUpdateTime())
+                .build();
+    }
 }
