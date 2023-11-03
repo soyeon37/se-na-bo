@@ -1,7 +1,6 @@
 package com.senabo.domain.member.dto.response;
 
-import com.senabo.config.security.jwt.TokenInfo;
-import com.senabo.domain.member.entity.SNSType;
+//import com.senabo.config.security.jwt.TokenInfo;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -17,12 +16,12 @@ public record SignUpResponse(
         int affection,
         int stressLevel,
         BigDecimal houseLatitude,
-        BigDecimal houseLogitude,
-        SNSType snsType,
+        BigDecimal houseLongitude,
         int totalTime,
         LocalDateTime exitTime,
         LocalDateTime enterTime,
         LocalDateTime createTime,
-        LocalDateTime updateTime,
-        TokenInfo token) {
+        LocalDateTime updateTime
+//        TokenInfo token
+) {
 }

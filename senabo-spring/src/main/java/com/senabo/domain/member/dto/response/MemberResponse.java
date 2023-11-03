@@ -1,9 +1,7 @@
 package com.senabo.domain.member.dto.response;
 
 import com.senabo.domain.member.entity.Member;
-import com.senabo.domain.member.entity.SNSType;
 import lombok.Builder;
-import org.springframework.cglib.core.Local;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,7 +16,7 @@ public record MemberResponse(
         int affection,
         int stressLevel,
         BigDecimal houseLatitude,
-        BigDecimal houseLogitude,
+        BigDecimal houseLongitude,
         int totalTime,
         String uid,
         String deviceToken,
@@ -35,7 +33,7 @@ public record MemberResponse(
                 .species(member.getSpecies())
                 .sex(member.getSex())
                 .houseLatitude(member.getHouseLatitude())
-                .houseLogitude(member.getHouseLogitude())
+                .houseLongitude(member.getHouseLongitude())
                 .uid(member.getUid())
                 .deviceToken(member.getDeviceToken())
                 .affection(member.getAffection())

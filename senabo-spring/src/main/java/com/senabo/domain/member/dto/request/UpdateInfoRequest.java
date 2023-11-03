@@ -18,7 +18,7 @@ public record UpdateInfoRequest (
         @Schema(description = "위도", nullable = true, example = "0")
         BigDecimal houseLatitude,
         @Schema(description = "경도", nullable = true, example = "0")
-        BigDecimal houseLogitude
+        BigDecimal houseLongitude
 ) {
 
 }

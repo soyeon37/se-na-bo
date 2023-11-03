@@ -1,14 +1,22 @@
 package com.senabo.domain.member.entity;
 
 import com.senabo.common.audit.BaseEntity;
+import com.senabo.domain.bath.entity.Bath;
+import com.senabo.domain.brushingTeeth.entity.BrushingTeeth;
+import com.senabo.domain.communication.entity.Communication;
+import com.senabo.domain.disease.entity.Disease;
+import com.senabo.domain.expense.entity.Expense;
+import com.senabo.domain.feed.entity.Feed;
 import com.senabo.domain.member.dto.request.UpdateInfoRequest;
+import com.senabo.domain.poop.entity.Poop;
+import com.senabo.domain.stress.entity.Stress;
+import com.senabo.domain.walk.entity.Walk;
 import lombok.*;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -43,8 +51,8 @@ public class Member extends BaseEntity  {
     @Column(name = "house_latitude", nullable = false)
     private BigDecimal houseLatitude;
 
-    @Column(name = "house_logitude", nullable = false)
-    private BigDecimal houseLogitude;
+    @Column(name = "house_longitude", nullable = false)
+    private BigDecimal houseLongitude;
 
     @Column(name = "total_time")
     private int totalTime;
@@ -95,13 +103,13 @@ public class Member extends BaseEntity  {
 
 
 
-    public Member(String name, String email, String species, String sex, BigDecimal houseLatitude, BigDecimal houseLogitude, String uid, String deviceToken) {
+    public Member(String name, String email, String species, String sex, BigDecimal houseLatitude, BigDecimal houseLongitude, String uid, String deviceToken) {
         this.name = name;
         this.email = email;
         this.species = species;
         this.sex = sex;
         this.houseLatitude = houseLatitude;
-        this.houseLogitude = houseLogitude;
+        this.houseLongitude = houseLongitude;
         this.uid = uid;
         this.deviceToken = deviceToken;
         affection = 0;
@@ -113,7 +121,7 @@ public class Member extends BaseEntity  {
         this.sex = request.sex();
         this.species = request.species();
         this.houseLatitude = request.houseLatitude();
-        this.houseLogitude = request.houseLogitude();
+        this.houseLongitude = request.houseLongitude();
     }
     public void updateStress(int stressLevel){
         this.stressLevel = stressLevel;

@@ -1,7 +1,7 @@
 package com.senabo.domain.member.dto.response;
 
 
-import com.senabo.config.security.jwt.TokenInfo;
+//import com.senabo.config.security.jwt.TokenInfo;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -23,7 +23,7 @@ public class FirebaseAuthResponse {
         String species;
         String sex;
         BigDecimal houseLatitude;
-        BigDecimal houseLogitude;
+        BigDecimal houseLongitude;
         int affection;
         int stressLevel;
         int totalTime;
@@ -33,7 +33,7 @@ public class FirebaseAuthResponse {
         LocalDateTime updateTime;
         String uid;
         String deviceToken;
-        TokenInfo token;
+//        TokenInfo token;
     }
 
     // 파이어베이스 인증 오류

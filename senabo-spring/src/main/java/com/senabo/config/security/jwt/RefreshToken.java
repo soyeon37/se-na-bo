@@ -1,4 +1,4 @@
-package com.senabo.config.security.jwt;
-
-public class RefreshToken {
-}
+//package com.senabo.config.security.jwt;
+//
+//public class RefreshToken {
+//}

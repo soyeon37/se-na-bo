@@ -1,6 +1,5 @@
 package com.senabo.domain.member.dto.request;
 
-import com.senabo.domain.member.entity.SNSType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
@@ -22,7 +21,7 @@ public record SignUpRequest(
         @Schema(description = "위도", nullable = true, example = "0")
         BigDecimal houseLatitude,
         @Schema(description = "경도", nullable = true, example = "0")
-        BigDecimal houseLogitude,
+        BigDecimal houseLongitude,
         String uid,
         String deviceToken
 
