@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +53,7 @@ public class PoopService {
 
     @Transactional
     public List<Poop> getPoopWeek(String email, int week) {
-        List<Poop> poopList = null;
+        List<Poop> poopList = new ArrayList<>();
         Member member = memberService.findByEmail(email);
         Optional<Report> result = reportService.findReportWeek(member, week);
         if (result.isEmpty()) return poopList;

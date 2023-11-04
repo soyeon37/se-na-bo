@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,11 +50,12 @@ public class ExpenseService {
         List<Expense> expenseList = expenseRepository.findByMemberId(member);
         return expenseList;
     }
+
     @Transactional
     public Double getExpenseTotal(String email) {
         Member member = memberService.findByEmail(email);
         Double totalAmount = expenseRepository.getTotalAmount(member);
-        if(totalAmount == null) totalAmount = 0.0;
+        if (totalAmount == null) totalAmount = 0.0;
         return totalAmount;
     }
 
@@ -61,22 +63,22 @@ public class ExpenseService {
     public Double getExpenseTotalWeek(String email, int week) {
         Member member = memberService.findByEmail(email);
         Optional<Report> result = reportService.findReportWeek(member, week);
-        if(result.isEmpty()) return 0.0;
+        if (result.isEmpty()) return 0.0;
         Report report = result.get();
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
         Double totalAmount = expenseRepository.getTotalAmountWeek(member, endTime, startTime);
-        if(totalAmount == null) totalAmount = 0.0;
+        if (totalAmount == null) totalAmount = 0.0;
         return totalAmount;
     }
 
 
     @Transactional
     public List<Expense> getExpenseWeek(String email, int week) {
-        List<Expense> expenseList = null;
+        List<Expense> expenseList = new ArrayList<>();
         Member member = memberService.findByEmail(email);
         Optional<Report> result = reportService.findReportWeek(member, week);
-        if(result.isEmpty()) return expenseList;
+        if (result.isEmpty()) return expenseList;
         Report report = result.get();
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);

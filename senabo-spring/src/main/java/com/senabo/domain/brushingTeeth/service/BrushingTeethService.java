@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +51,7 @@ public class BrushingTeethService {
     }
     @Transactional
     public List<BrushingTeeth> getBrushingTeethWeek(String email, int week) {
-        List<BrushingTeeth> brushingTeethList = null;
+        List<BrushingTeeth> brushingTeethList = new ArrayList<>();
         Member member = memberService.findByEmail(email);
         Optional<Report> result = reportService.findReportWeek(member, week);
         if(result.isEmpty()) return brushingTeethList;

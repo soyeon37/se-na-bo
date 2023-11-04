@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +52,7 @@ public class DiseaseService {
 
     @Transactional
     public List<Disease> getDiseaseWeek(String email, int week) {
-        List<Disease> diseaseList = null;
+        List<Disease> diseaseList = new ArrayList<>();
         Member member = memberService.findByEmail(email);
         Optional<Report> result = reportService.findReportWeek(member, week);
         if(result.isEmpty()) return diseaseList;

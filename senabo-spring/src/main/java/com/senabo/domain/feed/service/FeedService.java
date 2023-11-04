@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +53,7 @@ public class FeedService {
 
     @Transactional
     public List<Feed> getFeedWeek(String email, int week) {
-        List<Feed> feedList = null;
+        List<Feed> feedList = new ArrayList<>();
         Member member = memberService.findByEmail(email);
         Optional<Report> result = reportService.findReportWeek(member, week);
         if (result.isEmpty()) return feedList;

@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,7 +58,7 @@ public class CommunicationService {
 
     @Transactional
     public List<Communication> getCommunicationWeek(String email, int week) {
-        List<Communication> communicationList = null;
+        List<Communication> communicationList = new ArrayList<>();
         Member member = memberService.findByEmail(email);
         Optional<Report> result = reportService.findReportWeek(member, week);
         if (result.isEmpty()) return communicationList;
