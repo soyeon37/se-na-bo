@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
 @Tag(name = "Communication", description = "Communication API Document")
 public class CommunicationController {
 
-    private CommunicationService communicationService;
+    private final CommunicationService communicationService;
 
     @PostMapping("/save/{type}")
     @Operation(summary = "교감 내역 저장", description = "교감 내역을 저장한다. WAIT(기다려), SIT(앉아), HAND(손), PAT(쓰다듬기), TUG(터그놀이) 5가지 타입이 있다.")
