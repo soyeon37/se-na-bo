@@ -2,6 +2,8 @@ package com.senabo.domain.member.dto.response;
 
 
 //import com.senabo.config.security.jwt.TokenInfo;
+import com.senabo.domain.member.entity.Sex;
+import com.senabo.domain.member.entity.Species;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -18,10 +20,10 @@ public class FirebaseAuthResponse {
     @Builder
     public static class SignInResponse {
         Long id;
-        String name;
+        String dogName;
         String email;
-        String species;
-        String sex;
+        Species species;
+        Sex sex;
         BigDecimal houseLatitude;
         BigDecimal houseLongitude;
         int affection;

@@ -1,9 +1,10 @@
-package com.senabo.domain.communication.entity;
+package com.senabo.common;
 
 public enum ActivityType {
     WAIT,
     SIT,
     HAND,
     PAT,
-    TUG
+    TUG,
+    WALK
 }

@@ -1,5 +1,6 @@
 package com.senabo.domain.affection.entity;
 
+import com.senabo.common.ActivityType;
 import com.senabo.common.audit.BaseEntity;
 import com.senabo.domain.member.entity.Member;
 import jakarta.persistence.*;
@@ -21,7 +22,7 @@ public class Affection extends BaseEntity {
     private Member memberId;
 
     @Column(name = "type")
-    private AffectionType type;
+    private ActivityType type;
 
     @Column(name = "change_amount")
     private int changeAmount;
@@ -29,7 +30,7 @@ public class Affection extends BaseEntity {
     @Column(name = "score")
     private int score;
 
-    public Affection(Member memberId, AffectionType type, int changeAmount, int score) {
+    public Affection(Member memberId, ActivityType type, int changeAmount, int score) {
         this.memberId = memberId;
         this.type = type;
         this.changeAmount = changeAmount;
@@ -44,11 +45,11 @@ public class Affection extends BaseEntity {
         this.memberId = memberId;
     }
 
-    public AffectionType getType() {
+    public ActivityType getType() {
         return type;
     }
 
-    public void setType(AffectionType type) {
+    public void setType(ActivityType type) {
         this.type = type;
     }
 

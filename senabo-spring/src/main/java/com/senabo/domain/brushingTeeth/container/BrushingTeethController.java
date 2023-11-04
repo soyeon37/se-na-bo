@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -22,41 +24,45 @@ public class BrushingTeethController {
 
     private final BrushingTeethService brushingTeethService;
 
-    @PostMapping("")
-    @Operation(summary = "양치 내역 생성", description = "양치 시각을 저장한다.")
-    public ApiResponse<BrushingTeethResponse> createBrushingTeeth(@RequestParam(name = "id") Long id) {
-        BrushingTeethResponse response = brushingTeethService.createBrushingTeeth(id);
-        return ApiResponse.success("양치질 완료", response);
+    @PostMapping("/save")
+    @Operation(summary = "양치 내역 저장", description = "양치 완료 시각을 저장한다.")
+    public ApiResponse<BrushingTeethResponse> createBrushingTeeth(@RequestParam String email) {
+        BrushingTeethResponse response = brushingTeethService.createBrushingTeeth(email);
+        return ApiResponse.success("양치 내역 저장 성공", response);
     }
 
 
-    @GetMapping("")
+    @GetMapping("/list")
     @Operation(summary = "양치 내역 전체 조회", description = "양치 내역을 전체 조회한다.")
-    public ApiResponse<List<BrushingTeethResponse>> getBrushingTeeth(@RequestParam(name = "id") Long id) {
-        List<BrushingTeeth> response = brushingTeethService.getBrushingTeeth(id);
-        List<BrushingTeethResponse> responseList = response.stream()
+    public ApiResponse<Map<String,Object>> getBrushingTeeth(@RequestParam String email) {
+        List<BrushingTeeth> brushingTeeth = brushingTeethService.getBrushingTeeth(email);
+        if (brushingTeeth.isEmpty()) return ApiResponse.fail("양치 전체 조회 실패", null);
+        Map<String ,Object> response = new HashMap<>();
+        response.put("brushingTeethList", brushingTeeth.stream()
                 .map(BrushingTeethResponse::from)
-                .collect(Collectors.toList());
-        return ApiResponse.success("양치질 전체 조회", responseList);
+                .collect(Collectors.toList()));
+        return ApiResponse.success("양치 전체 조회 성공", response);
     }
 
 
-    @GetMapping("/{week}")
-    @Operation(summary = "양치 주간 내역 조회", description = "양치 내역을 주간 조회한다.")
-    public ApiResponse<List<BrushingTeethResponse>> getBrushingTeethWeek(@RequestParam(name = "id") Long id, @RequestParam(name = "week") int week) {
-        List<BrushingTeeth> response = brushingTeethService.getBrushingTeethWeek(id, week);
-        List<BrushingTeethResponse> responseList = response.stream()
+    @GetMapping("/list/{week}")
+    @Operation(summary = "양치 내역 주간 조회", description = "양치 내역을 주간 조회한다.")
+    public ApiResponse<Map<String,Object>> getBrushingTeethWeek(@RequestParam String email, @RequestParam int week) {
+        List<BrushingTeeth> brushingTeeth = brushingTeethService.getBrushingTeethWeek(email, week);
+        if (brushingTeeth.isEmpty()) return ApiResponse.fail("양치 "+ week + "주차 조회 실패", null);
+        Map<String ,Object> response = new HashMap<>();
+        response.put("brushingTeethList", brushingTeeth.stream()
                 .map(BrushingTeethResponse::from)
-                .collect(Collectors.toList());
-        return ApiResponse.success("양치질 주간 조회", responseList);
+                .collect(Collectors.toList()));
+        return ApiResponse.success("양치 " + week + "주차 조회 성공", response);
     }
 
 
-    @DeleteMapping("")
+    @DeleteMapping("/remove")
     @Operation(summary = "양치 삭제", description = "양치 내역을 삭제한다.")
-    public ApiResponse<Object> removeBrushingTeeth(@RequestParam(name = "id") Long id) {
-        brushingTeethService.removeBrushingTeeth(id);
-        return ApiResponse.success("양치질 삭제", true);
+    public ApiResponse<Object> removeBrushingTeeth(@RequestParam String email) {
+        brushingTeethService.removeBrushingTeeth(email);
+        return ApiResponse.success("양치 삭제 성공", true);
     }
 
 

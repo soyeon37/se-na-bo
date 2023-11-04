@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -22,49 +24,52 @@ import java.util.stream.Collectors;
 public class PoopController {
     private final PoopService poopService;
     
-    @PostMapping("/poop")
+    @PostMapping("/save")
     @Operation(summary = "배변 생성", description = "배변 생성 시각을 저장한다.")
-    public ApiResponse<PoopResponse> createPoop(@RequestParam(name = "id") Long id){
-        PoopResponse response = poopService.createPoop(id);
-        return ApiResponse.success("배변 완료", response);
+    public ApiResponse<PoopResponse> createPoop(@RequestParam String email){
+        PoopResponse response = poopService.createPoop(email);
+        return ApiResponse.success("배변 저장 성공", response);
     }
 
 
-    @GetMapping("/poop")
+    @GetMapping("/list")
     @Operation(summary = "배변 전체 조회", description = "배변 내역을 전체 조회한다.")
-    public ApiResponse<List<PoopResponse>> getPoop(@RequestParam(name = "id") Long id){
-        List<Poop> response = poopService.getPoop(id);
-        List<PoopResponse> responseList = response.stream()
+    public ApiResponse<Map<String,Object>> getPoop(@RequestParam String email){
+        List<Poop> poop = poopService.getPoop(email);
+        if(poop.isEmpty()) return ApiResponse.fail("배변 전체 조회 실패", null);
+        Map<String,Object> response = new HashMap<>();
+        response.put("poopList", poop.stream()
                 .map(PoopResponse::from)
-                .collect(Collectors.toList());
-        return ApiResponse.success("배변 전체 조회", responseList);
+                .collect(Collectors.toList()));
+        return ApiResponse.success("배변 전체 조회 성공", response);
     }
 
 
-    @GetMapping("/poop/{week}")
+    @GetMapping("/list/{week}")
     @Operation(summary = "배변 주간 조회", description = "배변 내역을 주간 조회한다.")
-    public ApiResponse<List<PoopResponse>> getPoopWeek(@RequestParam(name = "id") Long id, @RequestParam(name = "week") int week){
-        List<Poop> response = poopService
-.getPoopWeek(id, week);
-        List<PoopResponse> responseList = response.stream()
+    public ApiResponse<Map<String,Object>> getPoopWeek(@RequestParam String email, @RequestParam int week){
+        List<Poop> poop = poopService.getPoopWeek(email, week);
+        if(poop.isEmpty()) return ApiResponse.fail("배변 " + week + "주차 조회 실패", null);
+        Map<String,Object> response = new HashMap<>();
+        response.put("poopList", poop.stream()
                 .map(PoopResponse::from)
-                .collect(Collectors.toList());
-        return ApiResponse.success("배변 주간 조회", responseList);
+                .collect(Collectors.toList()));
+        return ApiResponse.success("배변 " + week + "주차 조회 성공", response);
     }
 
 
-    @DeleteMapping("/poop")
+    @DeleteMapping("/remove")
     @Operation(summary = "배변 내역 삭제", description = "배변 내역을 삭제한다.")
-    public ApiResponse<Object> removePoop(@RequestParam(name = "id") Long id) {
-        poopService.removePoop(id);
-        return ApiResponse.success("배변 삭제", true);
+    public ApiResponse<Object> removePoop(@RequestParam String email) {
+        poopService.removePoop(email);
+        return ApiResponse.success("배변 삭제 성공", true);
     }
 
 
-    @PatchMapping("/poop")
+    @PatchMapping("/clean")
     @Operation(summary = "배변 청소 완료", description = "배변 청소 여부(cleanYn)를 true로 수정한다.")
-    public ApiResponse<PoopResponse> updatePoop(@RequestParam(name = "id") Long id){
-        PoopResponse response = poopService.updatePoop(id);
-        return ApiResponse.success("배변 청소 완료", response);
+    public ApiResponse<PoopResponse> updatePoop(@RequestParam String email){
+        PoopResponse response = poopService.updatePoop(email);
+        return ApiResponse.success("배변 청소 성공", response);
     }
 }

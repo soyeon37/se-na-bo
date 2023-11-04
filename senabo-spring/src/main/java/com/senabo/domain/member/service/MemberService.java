@@ -37,21 +37,17 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final ReportRepository reportRepository;
-    private final RefreshTokenService refreshTokenService;
+//    private final RefreshTokenService refreshTokenService;
 //    private final TokenProvider tokenProvider;
 
 
     public boolean checkEmail(String email) {
-        boolean duplicateYn = false;
-        if (memberRepository.existsByEmail(email)) {
-            duplicateYn = true;
-        }
-        return duplicateYn;
+        return memberRepository.existsByEmail(email);
     }
 
     public MemberResponse signUp(SignUpRequest request) {
         Member member = memberRepository.save(
-                new Member(request.name(), request.email(), request.species(), request.sex(), request.houseLatitude(), request.houseLongitude(), request.uid(), request.deviceToken()));
+                new Member(request.dogName(), request.email(), request.species(), request.sex(), request.houseLatitude(), request.houseLongitude(), request.uid(), request.deviceToken()));
 
         Report report = reportRepository.save(
                 new Report(member, 1, 0, 50)
@@ -127,7 +123,7 @@ public class MemberService {
         return new FirebaseAuthResponse(true,
                 FirebaseAuthResponse.SignInResponse.builder()
                         .id(member.get().getId())
-                        .name(member.get().getName())
+                        .dogName(member.get().getDogName())
                         .email(member.get().getEmail())
                         .species(member.get().getSpecies())
                         .sex(member.get().getSex())
@@ -191,8 +187,4 @@ public class MemberService {
         return memberRepository.findByEmail(email).orElseThrow(() -> new UserException(ExceptionMessage.USER_NOT_FOUND));
     }
 
-    @Transactional
-    public List<Member> getAllInfo() {
-        return  memberRepository.findAll();
-    }
 }

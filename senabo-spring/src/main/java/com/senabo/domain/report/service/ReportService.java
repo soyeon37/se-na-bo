@@ -1,23 +1,19 @@
 package com.senabo.domain.report.service;
 
-import com.senabo.domain.report.dto.request.UpdateTotalTimeRequest;
 import com.senabo.domain.member.entity.Member;
-import com.senabo.domain.member.repository.MemberRepository;
+import com.senabo.domain.member.service.MemberService;
+import com.senabo.domain.report.dto.request.UpdateTotalTimeRequest;
 import com.senabo.domain.report.dto.response.ReportResponse;
 import com.senabo.domain.report.entity.Report;
 import com.senabo.domain.report.repository.ReportRepository;
-import com.senabo.exception.message.ExceptionMessage;
-import com.senabo.exception.model.UserException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -25,35 +21,32 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReportService {
     private final ReportRepository reportRepository;
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
 
     @Transactional
-    public List<Report> getReport(Long id) {
-        Member member = findById(id);
-        List<Report> reportList = reportRepository.findByMemberId(member);
-        if(reportList.isEmpty()){
-            throw new EntityNotFoundException("Report에서 해당 MemberId를 찾을 수 없습니다.: " + id);
-        }
+    public List<Report> getReport(String email) {
+        Member member = memberService.findByEmail(email);
+        List<Report> reportList = reportRepository.findCompleteReport(member);
         return reportList;
     }
 
     @Transactional
-    public List<Report> getReportWeek(Long id, int week) {
-        Member member = findById(id);
-        Report report = reportRepository.findByMemberIdAndWeek(member, week);
-        LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
-        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        List<Report> reportList = reportRepository.findReportWeek(member, endTime, startTime);
-        if(reportList.isEmpty()){
-            throw new EntityNotFoundException("Report에서 해당 주차를 찾을 수 없습니다.: " + id);
-        }
-        return reportList;
+    public Optional<Report> getReportWeek(String email, int week) {
+        Member member = memberService.findByEmail(email);
+        return findReportWeek(member, week);
     }
+
+    @Transactional
+    public Optional<Report> findReportWeek(Member member, int week) {
+        Optional<Report> report = reportRepository.findCompleteReportWeek(member, week);
+        return report;
+    }
+
 
     // 앱 사용 시간 저장
     @Transactional
-    public ReportResponse updateTotalTime(Long id, UpdateTotalTimeRequest request){
-        Member member = findById(id);
+    public ReportResponse updateTotalTime(String email, UpdateTotalTimeRequest request){
+        Member member = memberService.findByEmail(email);
         Duration duration = Duration.between(request.startTime(), request.endTime());
         int hour = (int) duration.toHours();
         Report report = reportRepository.findLatestData(member);
@@ -134,9 +127,6 @@ public class ReportService {
 //        }
 //    }
 
-    @Transactional
-    public Member findById(Long id) {
-        return memberRepository.findById(id).orElseThrow(() -> new UserException(ExceptionMessage.USER_NOT_FOUND));
-    }
+   
 
 }

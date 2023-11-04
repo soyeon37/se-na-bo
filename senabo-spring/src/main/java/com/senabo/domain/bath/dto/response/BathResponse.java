@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 public record BathResponse(
         Long id,
         Long memberId,
-
         LocalDateTime createTime,
         LocalDateTime updateTime
 ) {

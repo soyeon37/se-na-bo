@@ -1,6 +1,7 @@
 package com.senabo.domain.communication.entity;
 
 
+import com.senabo.common.ActivityType;
 import com.senabo.common.audit.BaseEntity;
 import com.senabo.domain.member.entity.Member;
 import jakarta.persistence.*;

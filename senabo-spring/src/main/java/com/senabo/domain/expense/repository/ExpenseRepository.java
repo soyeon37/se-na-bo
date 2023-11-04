@@ -19,8 +19,8 @@ public interface ExpenseRepository extends JpaRepository<Expense, String> {
     List<Expense> findExpenseWeek(Member member, LocalDateTime endTime, LocalDateTime startTime);
 
     @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.memberId = ?1")
-    Long getTotalAmount(Member member);
+    Double getTotalAmount(Member member);
 
     @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.memberId = ?1 and e.updateTime <= ?2 and e.createTime >= ?3 ")
-    Long getTotalAmountWeek(Member member, LocalDateTime endTime, LocalDateTime startTime);
+    Double getTotalAmountWeek(Member member, LocalDateTime endTime, LocalDateTime startTime);
 }

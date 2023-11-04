@@ -1,6 +1,6 @@
 package com.senabo.domain.communication.dto.response;
 
-import com.senabo.domain.communication.entity.ActivityType;
+import com.senabo.common.ActivityType;
 import com.senabo.domain.communication.entity.Communication;
 import lombok.Builder;
 

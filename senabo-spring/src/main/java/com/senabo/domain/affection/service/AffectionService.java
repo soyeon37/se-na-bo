@@ -1,17 +1,16 @@
 package com.senabo.domain.affection.service;
 
 
+import com.senabo.common.ActivityType;
 import com.senabo.domain.affection.dto.response.AffectionResponse;
 import com.senabo.domain.affection.entity.Affection;
-import com.senabo.domain.affection.entity.AffectionType;
-import com.senabo.domain.member.entity.Member;
-import com.senabo.domain.report.entity.Report;
 import com.senabo.domain.affection.repository.AffectionRepository;
-import com.senabo.domain.member.repository.MemberRepository;
-import com.senabo.domain.report.repository.ReportRepository;
+import com.senabo.domain.member.entity.Member;
+import com.senabo.domain.member.service.MemberService;
+import com.senabo.domain.report.entity.Report;
+import com.senabo.domain.report.service.ReportService;
 import com.senabo.exception.message.ExceptionMessage;
 import com.senabo.exception.model.UserException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -28,17 +28,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AffectionService {
     private final AffectionRepository affectionRepository;
-    private final MemberRepository memberRepository;
-    private final ReportRepository reportRepository;
+    private final MemberService memberService;
+    private final ReportService reportService;
 
     @Transactional
-    public AffectionResponse saveAffection(Member member, AffectionType type, int changeAmount) {
-        log.info("애정 저장");
+    public AffectionResponse saveAffection(Member member, ActivityType type, int changeAmount) {
         int originAffection = member.getAffection();
+        int score = originAffection + changeAmount;
+        if (score > 100) {
+            score = 100;
+        } else if (score < 0) {
+            score = 0;
+        }
+
         Affection affection = affectionRepository.save(
-                new Affection(member, type, changeAmount, originAffection+changeAmount)
+                new Affection(member, type, changeAmount, score)
         );
-        member.updateAffection(originAffection+changeAmount);
+        member.updateAffection(score);
         try {
             affectionRepository.flush();
         } catch (DataIntegrityViolationException e) {
@@ -47,31 +53,28 @@ public class AffectionService {
         return AffectionResponse.from(affection);
     }
 
-    public AffectionResponse createAffection(Long id, AffectionType type, int changeAmount) {
-        Member member = findById(id);
+    public AffectionResponse createAffection(String email, ActivityType type, int changeAmount) {
+        Member member = memberService.findByEmail(email);
         return saveAffection(member, type, changeAmount);
     }
 
     @Transactional
-    public List<Affection> getAffection(Long id) {
-        Member member = findById(id);
+    public List<Affection> getAffection(String email) {
+        Member member = memberService.findByEmail(email);
         List<Affection> affectionList = affectionRepository.findByMemberId(member);
-        if (affectionList.isEmpty()) {
-            throw new EntityNotFoundException("Affection에서 해당 MemberId를 찾을 수 없습니다.: " + id);
-        }
         return affectionList;
     }
 
     @Transactional
-    public List<Affection> getAffectionWeek(Long id, int week) {
-        Member member = findById(id);
-        Report report = reportRepository.findByMemberIdAndWeek(member, week);
+    public List<Affection> getAffectionWeek(String email, int week) {
+        List<Affection> affectionList = null;
+        Member member = memberService.findByEmail(email);
+        Optional<Report> result = reportService.findReportWeek(member, week);
+        if (result.isEmpty()) return affectionList;
+        Report report = result.get();
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        List<Affection> affectionList = affectionRepository.findAffectionWeek(member, endTime, startTime);
-        if (affectionList.isEmpty()) {
-            throw new EntityNotFoundException("Affection에서 해당 주차를 찾을 수 없습니다.: " + id);
-        }
+        affectionList = affectionRepository.findAffectionWeek(member, endTime, startTime);
         return affectionList;
     }
 
@@ -80,8 +83,4 @@ public class AffectionService {
         return affectionRepository.findLatestData(member);
     }
 
-    @Transactional
-    public Member findById(Long id) {
-        return memberRepository.findById(id).orElseThrow(() -> new UserException(ExceptionMessage.USER_NOT_FOUND));
-    }
 }

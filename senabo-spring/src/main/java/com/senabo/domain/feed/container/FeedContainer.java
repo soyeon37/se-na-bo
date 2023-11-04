@@ -1,6 +1,7 @@
 package com.senabo.domain.feed.container;
 
 import com.senabo.common.api.ApiResponse;
+import com.senabo.domain.feed.dto.response.CheckFeedResponse;
 import com.senabo.domain.feed.dto.response.FeedResponse;
 import com.senabo.domain.feed.entity.Feed;
 import com.senabo.domain.feed.service.FeedService;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -20,50 +22,57 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/feed")
 @Tag(name = "Feed", description = "Feed API Document")
 public class FeedContainer {
-    
+
     private final FeedService feedService;
-    @PostMapping("/feed")
-    @Operation(summary = "배식 생성", description = "배식을 저장한다.")
-    public ApiResponse<FeedResponse> createFeed(@RequestParam(name = "id") Long id) {
-        FeedResponse response = feedService.createFeed(id);
-        return ApiResponse.success("배식 저장 완료", response);
+
+    @PostMapping("/save")
+    @Operation(summary = "배식 저장", description = "배식을 저장한다.")
+    public ApiResponse<FeedResponse> createFeed(@RequestParam String email) {
+        FeedResponse response = feedService.createFeed(email);
+        return ApiResponse.success("배식 저장 성공", response);
     }
 
 
-    @GetMapping("/feed")
+    @GetMapping("/list")
     @Operation(summary = "배식 전체 조회", description = "배식 내역을 전체 조회한다.")
-    public ApiResponse<List<FeedResponse>> getFeed(@RequestParam(name = "id") Long id) {
-        List<Feed> response = feedService.getFeed(id);
-        List<FeedResponse> responseList = response.stream()
+    public ApiResponse<Map<String, Object>> getFeed(@RequestParam String email) {
+        List<Feed> feed = feedService.getFeed(email);
+        if (feed.isEmpty()) return ApiResponse.fail("배식 전체 조회 실패", null);
+        Map<String, Object> response = new HashMap<>();
+        response.put("feedList", feed.stream()
                 .map(FeedResponse::from)
-                .collect(Collectors.toList());
-        return ApiResponse.success("배식 전체 조회", responseList);
+                .collect(Collectors.toList()));
+        return ApiResponse.success("배식 전체 조회 성공", response);
     }
 
 
-    @GetMapping("/feed/{week}")
+    @GetMapping("/list/{week}")
     @Operation(summary = "배식 주간 조회", description = "배식 내역을 주간 조회한다.")
-    public ApiResponse<List<FeedResponse>> getFeedWeek(@RequestParam(name = "id") Long id, @RequestParam(name = "week") int week) {
-        List<Feed> response = feedService.getFeedWeek(id, week);
-        List<FeedResponse> responseList = response.stream()
+    public ApiResponse<Map<String, Object>> getFeedWeek(@RequestParam String email, @RequestParam int week) {
+        List<Feed> feed = feedService.getFeedWeek(email, week);
+        if (feed.isEmpty()) return ApiResponse.fail("배식 " + week + "주차 조회 실패", null);
+        Map<String, Object> response = new HashMap<>();
+        response.put("feedList", feed.stream()
                 .map(FeedResponse::from)
-                .collect(Collectors.toList());
-        return ApiResponse.success("배식 주간 조회", responseList);
+                .collect(Collectors.toList()));
+        return ApiResponse.success("배식 " + week + "주차 조회 성공", response);
     }
 
 
-    @GetMapping("/feed/check")
+    @GetMapping("/check")
     @Operation(summary = "배식 가능 여부 확인", description = "마지막 배식시간이 현재 시각으로 부터 12시간이 경과했는지 확인한다. 가능하면 ture, 불가능하면 false를 return한다.")
-    public ApiResponse<Object> checkFeed(@RequestParam(name = "id") Long id) {
-        Map<String, Object> response = feedService.checkLastFeed(id);
-        return ApiResponse.success("배식 가능 여부 확인", response);
+    public ApiResponse<Map<String, Object>> checkLastFeed(@RequestParam String email) {
+        CheckFeedResponse checkLastFeed = feedService.checkLastFeed(email);
+        Map<String, Object> response = new HashMap<>();
+        response.put("feedCheckList", checkLastFeed);
+        return ApiResponse.success("배식 가능 여부 확인 성공", response);
     }
 
 
-    @DeleteMapping("/feed")
+    @DeleteMapping("/remove")
     @Operation(summary = "배식 내역 삭제", description = "배식 내역을 삭제한다.")
-    public ApiResponse<Object> removeFeed(@RequestParam(name = "id") Long id) {
-        feedService.removeFeed(id);
-        return ApiResponse.success("배식 삭제", true);
+    public ApiResponse<Object> removeFeed(@RequestParam String email) {
+        feedService.removeFeed(email);
+        return ApiResponse.success("배식 삭제 성공", true);
     }
 }

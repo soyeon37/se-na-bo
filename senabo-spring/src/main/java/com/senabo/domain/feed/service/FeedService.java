@@ -1,28 +1,25 @@
 package com.senabo.domain.feed.service;
 
+import com.senabo.domain.feed.dto.response.CheckFeedResponse;
 import com.senabo.domain.feed.dto.response.FeedResponse;
 import com.senabo.domain.feed.entity.Feed;
 import com.senabo.domain.feed.repository.FeedRepository;
 import com.senabo.domain.member.entity.Member;
+import com.senabo.domain.member.service.MemberService;
 import com.senabo.domain.report.entity.Report;
-import com.senabo.domain.member.repository.MemberRepository;
-import com.senabo.domain.report.repository.ReportRepository;
-import com.senabo.domain.stress.entity.StressType;
+import com.senabo.domain.report.service.ReportService;
 import com.senabo.exception.message.ExceptionMessage;
 import com.senabo.exception.model.UserException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -30,12 +27,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FeedService {
     private final FeedRepository feedRepository;
-    private final MemberRepository memberRepository;
-    private final ReportRepository reportRepository;
+    private final MemberService memberService;
+    private final ReportService reportService;
 
     @Transactional
-    public FeedResponse createFeed(Long id) {
-        Member member = findById(id);
+    public FeedResponse createFeed(String email) {
+        Member member = memberService.findByEmail(email);
         Feed feed = feedRepository.save(
                 new Feed(member));
         try {
@@ -47,32 +44,29 @@ public class FeedService {
     }
 
     @Transactional
-    public List<Feed> getFeed(Long id) {
-        Member member = findById(id);
+    public List<Feed> getFeed(String email) {
+        Member member = memberService.findByEmail(email);
         List<Feed> feedList = feedRepository.findByMemberId(member);
-        if (feedList.isEmpty()) {
-            throw new EntityNotFoundException("Feed에서 해당 MemberId를 찾을 수 없습니다.: " + id);
-        }
         return feedList;
     }
 
     @Transactional
-    public List<Feed> getFeedWeek(Long id, int week) {
-        Member member = findById(id);
-        Report report = reportRepository.findByMemberIdAndWeek(member, week);
+    public List<Feed> getFeedWeek(String email, int week) {
+        List<Feed> feedList = null;
+        Member member = memberService.findByEmail(email);
+        Optional<Report> result = reportService.findReportWeek(member, week);
+        if (result.isEmpty()) return feedList;
+        Report report = result.get();
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        List<Feed> feedList = feedRepository.findFeedWeek(member, endTime, startTime);
-        if (feedList.isEmpty()) {
-            throw new EntityNotFoundException("Feed에서 해당 주차를 찾을 수 없습니다.: " + id);
-        }
+        feedList = feedRepository.findFeedWeek(member, endTime, startTime);
         return feedList;
     }
 
     @Transactional
-    public void removeFeed(Long id) {
+    public void removeFeed(String email) {
         try {
-            Member member = findById(id);
+            Member member = memberService.findByEmail(email);
             List<Feed> list = feedRepository.deleteByMemberId(member);
         } catch (DataIntegrityViolationException e) {
             throw new UserException(ExceptionMessage.FAIL_DELETE_DATA);
@@ -80,27 +74,19 @@ public class FeedService {
     }
 
     @Transactional
-    public Map<String, Object> checkLastFeed(Long id) {
-        Map<String, Object> result = new HashMap<>();
-        Member member = findById(id);
+    public CheckFeedResponse checkLastFeed(String email) {
+        Member member = memberService.findByEmail(email);
         Feed feed = feedRepository.findLatestData(member);
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime nowH = now.truncatedTo(ChronoUnit.HOURS);
         LocalDateTime lastFeedH = feed.getCreateTime().truncatedTo(ChronoUnit.HOURS);
         LocalDateTime twelveAfter = lastFeedH.plusHours(12);
-        if (nowH.isBefore(twelveAfter)) {
-            result.put("possibleYn", false);
-        } else {
-            result.put("possibleYn", true);
-        }
-        result.put("lastFeedDateTime", lastFeedH);
-        result.put("nowDateTime", nowH);
-        return result;
+        return CheckFeedResponse.from(now.isAfter(twelveAfter), lastFeedH, nowH);
     }
 
 //    @Transactional
-//    public void scheduleFeed(Long id) {
-//        Member member = findById(id);
+//    public void scheduleFeed(String email) {
+//        Member member = memberService.findByEmail(email);
 //        Feed feed = feedRepository.findLatestData(member);
 //        int originStress = member.getStressLevel();
 //
@@ -148,8 +134,5 @@ public class FeedService {
 //
 //    }
 
-    @Transactional
-    public Member findById(Long id) {
-        return memberRepository.findById(id).orElseThrow(() -> new UserException(ExceptionMessage.USER_NOT_FOUND));
-    }
+
 }

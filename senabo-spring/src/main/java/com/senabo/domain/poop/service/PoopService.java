@@ -1,15 +1,14 @@
 package com.senabo.domain.poop.service;
 
 import com.senabo.domain.member.entity.Member;
-import com.senabo.domain.report.entity.Report;
-import com.senabo.domain.member.repository.MemberRepository;
-import com.senabo.domain.report.repository.ReportRepository;
+import com.senabo.domain.member.service.MemberService;
 import com.senabo.domain.poop.dto.response.PoopResponse;
 import com.senabo.domain.poop.entity.Poop;
 import com.senabo.domain.poop.repository.PoopRepository;
+import com.senabo.domain.report.entity.Report;
+import com.senabo.domain.report.service.ReportService;
 import com.senabo.exception.message.ExceptionMessage;
 import com.senabo.exception.model.UserException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -19,19 +18,20 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PoopService {
-        private final PoopRepository poopRepository;
-        private final ReportRepository reportRepository;
-        private final MemberRepository memberRepository;
+    private final PoopRepository poopRepository;
+    private final ReportService reportService;
+    private final MemberService memberService;
 
     @Transactional
-    public PoopResponse createPoop(Long id) {
-        Member member = findById(id);
+    public PoopResponse createPoop(String email) {
+        Member member = memberService.findByEmail(email);
         Poop poop = poopRepository.save(
                 new Poop(member, false));
         try {
@@ -44,31 +44,29 @@ public class PoopService {
 
 
     @Transactional
-    public List<Poop> getPoop(Long id) {
-        Member member = findById(id);
+    public List<Poop> getPoop(String email) {
+        Member member = memberService.findByEmail(email);
         List<Poop> poopList = poopRepository.findByMemberId(member);
-        if (poopList.isEmpty()) {
-            throw new EntityNotFoundException("Poop에서 해당 MemberId를 찾을 수 없습니다.: " + id);
-        }
-        return poopList;
-    }
-    @Transactional
-    public List<Poop> getPoopWeek(Long id, int week) {
-        Member member = findById(id);
-        Report report = reportRepository.findByMemberIdAndWeek(member, week);
-        LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
-        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        List<Poop> poopList = poopRepository.findPoopWeek(member, endTime, startTime);
-        if (poopList.isEmpty()) {
-            throw new EntityNotFoundException("Poop에서 해당 주차를 찾을 수 없습니다.: " + id);
-        }
         return poopList;
     }
 
     @Transactional
-    public void removePoop(Long id) {
+    public List<Poop> getPoopWeek(String email, int week) {
+        List<Poop> poopList = null;
+        Member member = memberService.findByEmail(email);
+        Optional<Report> result = reportService.findReportWeek(member, week);
+        if (result.isEmpty()) return poopList;
+        Report report = result.get();
+        LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        poopList = poopRepository.findPoopWeek(member, endTime, startTime);
+        return poopList;
+    }
+
+    @Transactional
+    public void removePoop(String email) {
         try {
-            Member member = findById(id);
+            Member member = memberService.findByEmail(email);
             List<Poop> list = poopRepository.deleteByMemberId(member);
         } catch (DataIntegrityViolationException e) {
             throw new UserException(ExceptionMessage.FAIL_DELETE_DATA);
@@ -76,8 +74,8 @@ public class PoopService {
     }
 
     @Transactional
-    public PoopResponse updatePoop(Long id) {
-        Member member = findById(id);
+    public PoopResponse updatePoop(String email) {
+        Member member = memberService.findByEmail(email);
         Poop poop = poopRepository.findLatestData(member);
         if (!poop.getCleanYn()) {
             poop.update(true);
@@ -114,9 +112,4 @@ public class PoopService {
 //        }
 //    }
 
-
-    @Transactional
-    public Member findById(Long id) {
-        return memberRepository.findById(id).orElseThrow(() -> new UserException(ExceptionMessage.USER_NOT_FOUND));
-    }
 }

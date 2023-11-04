@@ -30,17 +30,17 @@ public class Member extends BaseEntity  {
     @Column(name = "id", updatable = false, unique = true)
     private Long id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Column(name = "dog_name", nullable = false)
+    private String dogName;
 
     @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "species", nullable = false)
-    private String species;
+    private Species species;
 
     @Column(name = "sex", nullable = false)
-    private String sex;
+    private Sex sex;
 
     @Column(name = "affection")
     private int affection;
@@ -103,8 +103,8 @@ public class Member extends BaseEntity  {
 
 
 
-    public Member(String name, String email, String species, String sex, BigDecimal houseLatitude, BigDecimal houseLongitude, String uid, String deviceToken) {
-        this.name = name;
+    public Member(String dogName, String email, Species species, Sex sex, BigDecimal houseLatitude, BigDecimal houseLongitude, String uid, String deviceToken) {
+        this.dogName = dogName;
         this.email = email;
         this.species = species;
         this.sex = sex;
@@ -117,7 +117,7 @@ public class Member extends BaseEntity  {
     }
 
     public void update(UpdateInfoRequest request){
-        this.name = request.name();
+        this.dogName = request.dogName();
         this.sex = request.sex();
         this.species = request.species();
         this.houseLatitude = request.houseLatitude();

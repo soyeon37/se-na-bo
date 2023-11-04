@@ -1,7 +1,7 @@
 package com.senabo.domain.affection.dto.response;
 
+import com.senabo.common.ActivityType;
 import com.senabo.domain.affection.entity.Affection;
-import com.senabo.domain.affection.entity.AffectionType;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public record AffectionResponse(
         Long id,
         Long memberId,
-        AffectionType type,
+        ActivityType type,
         int changeAmount,
         int score,
         LocalDateTime createTime,

@@ -24,61 +24,66 @@ import java.util.stream.Collectors;
 public class ExpenseController {
 
     private final ExpenseService expenseService;
-    @PostMapping("/expense")
-    @Operation(summary = "비용 생성", description = "비용을 저장한다.")
-    public ApiResponse<ExpenseResponse> createExpense(@RequestParam(name = "id") Long id, @RequestBody CreateExpenseRequest request) {
-        ExpenseResponse response = expenseService.createExpense(id, request);
-        return ApiResponse.success("비용 저장 완료", response);
+
+    @PostMapping("/save")
+    @Operation(summary = "비용 저장", description = "비용을 저장한다.")
+    public ApiResponse<ExpenseResponse> createExpense(@RequestParam String email, @RequestBody CreateExpenseRequest request) {
+        ExpenseResponse response = expenseService.createExpense(email, request);
+        return ApiResponse.success("비용 저장 성공", response);
     }
 
 
-    @GetMapping("/expense")
+    @GetMapping("/list")
     @Operation(summary = "비용 전체 조회", description = "비용 내역을 전체 조회한다.")
-    public ApiResponse<List<ExpenseResponse>> getExpense(@RequestParam(name = "id") Long id) {
-        List<Expense> response = expenseService.getExpense(id);
-        List<ExpenseResponse> responseList = response.stream()
+    public ApiResponse<Map<String ,Object>> getExpense(@RequestParam String email) {
+        List<Expense> expense = expenseService.getExpense(email);
+        if (expense.isEmpty()) return ApiResponse.fail("비용 전체 조회 실패", null);
+        Map<String, Object> response = new HashMap<>();
+        response.put("expenseList", expense.stream()
                 .map(ExpenseResponse::from)
-                .collect(Collectors.toList());
-        return ApiResponse.success("비용 전체 조회", responseList);
+                .collect(Collectors.toList()));
+        return ApiResponse.success("비용 전체 조회 성공", response);
     }
 
 
-    @GetMapping("/expense/{week}")
+    @GetMapping("/list/{week}")
     @Operation(summary = "비용 주간 조회", description = "비용 내역을 주간 조회한다.")
-    public ApiResponse<List<ExpenseResponse>> getExpense(@RequestParam(name = "id") Long id, @RequestParam(name = "week") int week) {
-        List<Expense> response = expenseService.getExpenseWeek(id, week);
-        List<ExpenseResponse> responseList = response.stream()
+    public ApiResponse<Map<String ,Object>> getExpenseWeek(@RequestParam String email, @RequestParam int week) {
+        List<Expense> expense = expenseService.getExpenseWeek(email, week);
+        if (expense.isEmpty()) return ApiResponse.fail("비용 "+ week + "주차 조회 실패", null);
+        Map<String, Object> response = new HashMap<>();
+        response.put("expenseList", expense.stream()
                 .map(ExpenseResponse::from)
-                .collect(Collectors.toList());
-        return ApiResponse.success("비용 주간 조회", responseList);
+                .collect(Collectors.toList()));
+        return ApiResponse.success("비용 " + week + "주차 조회 성공", response);
     }
 
 
-    @GetMapping("/expense/total")
+    @GetMapping("/total")
     @Operation(summary = "비용 총 금액 조회", description = "비용 총 금액을 조회한다.")
-    public ApiResponse<Map<String, Object>> getTotalExpense(@RequestParam(name = "id") Long id) {
-        Map<String, Object> map = new HashMap<>();
-        Long totalAmount = expenseService.getExpenseTotal(id);
-        map.put("totalAmount", totalAmount);
-        return ApiResponse.success("비용 총 금액 조회", map);
+    public ApiResponse<Map<String ,Object>> getTotalExpense(@RequestParam String email) {
+        Map<String, Object> response = new HashMap<>();
+        Double totalAmount = expenseService.getExpenseTotal(email);
+        response.put("totalAmount", totalAmount);
+        return ApiResponse.success("비용 총 금액 조회 성공", response);
     }
 
 
-    @GetMapping("/expense/total/{week}")
+    @GetMapping("/total/{week}")
     @Operation(summary = "비용 주간 총 금액 조회", description = "비용 주간 총 금액을 조회한다.")
-    public ApiResponse<Map<String, Object>> getTotalExpenseWeek(@RequestParam(name = "id") Long id, @RequestParam(name = "week") int week) {
-        Map<String, Object> map = new HashMap<>();
-        Long totalAmount = expenseService.getExpenseTotalWeek(id, week);
-        map.put("totalAmount", totalAmount);
-        return ApiResponse.success("비용 주간 총 금액 조회", map);
+    public ApiResponse<Map<String, Object>> getTotalExpenseWeek(@RequestParam String email, @RequestParam int week) {
+        Map<String, Object> response = new HashMap<>();
+        Double totalAmount = expenseService.getExpenseTotalWeek(email, week);
+        response.put("totalAmount", totalAmount);
+        return ApiResponse.success("비용 " + week + "주차 총 금액 조회 성공", response);
     }
 
 
-    @DeleteMapping("/expense")
+    @DeleteMapping("/remove")
     @Operation(summary = "비용 내역 삭제", description = "비용 내역을 삭제한다.")
-    public ApiResponse<Object> removeExpense(@RequestParam(name = "id") Long id) {
-        expenseService.removeExpense(id);
-        return ApiResponse.success("비용 삭제", true);
+    public ApiResponse<Object> removeExpense(@RequestParam String email) {
+        expenseService.removeExpense(email);
+        return ApiResponse.success("비용 삭제 성공", true);
     }
 
 }

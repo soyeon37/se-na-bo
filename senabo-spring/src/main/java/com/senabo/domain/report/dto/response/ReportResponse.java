@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public record ReportResponse(
         Long id,
         Long memberId,
+        String dogName,
         int week,
         int totalTime,
         int startAffectionScore,
@@ -28,6 +29,7 @@ public record ReportResponse(
         return ReportResponse.builder()
                 .id(report.getId())
                 .memberId(report.getMemberId().getId())
+                .dogName(report.getMemberId().getDogName())
                 .week(report.getWeek())
                 .totalTime(report.getTotalTime())
                 .startAffectionScore(report.getStartAffectionScore())

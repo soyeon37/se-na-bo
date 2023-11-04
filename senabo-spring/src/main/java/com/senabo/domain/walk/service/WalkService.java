@@ -1,19 +1,15 @@
 package com.senabo.domain.walk.service;
 
-import com.senabo.domain.affection.entity.AffectionType;
-import com.senabo.domain.stress.entity.StressType;
-import com.senabo.domain.walk.dto.request.UpdateWalkRequest;
 import com.senabo.domain.member.entity.Member;
-import com.senabo.domain.member.repository.MemberRepository;
+import com.senabo.domain.member.service.MemberService;
 import com.senabo.domain.report.entity.Report;
-import com.senabo.domain.report.repository.ReportRepository;
-import com.senabo.domain.walk.dto.request.CreateWalkRequest;
+import com.senabo.domain.report.service.ReportService;
+import com.senabo.domain.walk.dto.request.UpdateWalkRequest;
 import com.senabo.domain.walk.dto.response.WalkResponse;
 import com.senabo.domain.walk.entity.Walk;
 import com.senabo.domain.walk.repository.WalkRepository;
 import com.senabo.exception.message.ExceptionMessage;
 import com.senabo.exception.model.UserException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -30,14 +27,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WalkService {
     private final WalkRepository walkRepository;
-    private final MemberRepository memberRepository;
-    private final ReportRepository reportRepository;
+    private final MemberService memberService;
+    private final ReportService reportService;
 
     @Transactional
-    public WalkResponse createWalk(Long id, CreateWalkRequest request) {
-        Member member = findById(id);
+    public WalkResponse createWalk(String email) {
+        Member member = memberService.findByEmail(email);
+        LocalDateTime startTime = LocalDateTime.now();
         Walk walk = walkRepository.save(
-                new Walk(member, request.startTime(), null, 0.0));
+                new Walk(member, startTime, null, 0.0));
         try {
             walkRepository.flush();
         } catch (DataIntegrityViolationException e) {
@@ -47,34 +45,31 @@ public class WalkService {
     }
 
     @Transactional
-    public List<Walk> getWalk(Long id) {
-        Member member = findById(id);
+    public List<Walk> getWalk(String email) {
+        Member member = memberService.findByEmail(email);
         List<Walk> walkList = walkRepository.findByMemberId(member);
-        if (walkList.isEmpty()) {
-            throw new EntityNotFoundException("Walk에서 해당 MemberId를 찾을 수 없습니다.: " + id);
-        }
         return walkList;
     }
 
     @Transactional
-    public List<Walk> getWalkWeek(Long id, int week) {
-        Member member = findById(id);
-        Report report = reportRepository.findByMemberIdAndWeek(member, week);
+    public List<Walk> getWalkWeek(String email, int week) {
+        Member member = memberService.findByEmail(email);
+        List<Walk> walkList = null;
+        Optional<Report> result = reportService.findReportWeek(member, week);
+        if(result.isEmpty()) return walkList;
+        Report report = result.get();
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        List<Walk> walkList = walkRepository.findWalkWeek(member, endTime, startTime);
-        if (walkList.isEmpty()) {
-            throw new EntityNotFoundException("Walk에서 해당 주차를 찾을 수 없습니다.: " + id);
-        }
+        walkList = walkRepository.findWalkWeek(member, endTime, startTime);
         return walkList;
     }
 
     @Transactional
-    public WalkResponse updateWalk(Long id, UpdateWalkRequest request) {
-        Member member = findById(id);
+    public WalkResponse updateWalk(String email, UpdateWalkRequest request) {
+        Member member = memberService.findByEmail(email);
         Walk walk = walkRepository.findLatestData(member);
         if (walk.getEndTime() == null) {
-            walk.update(request.endTime(), request.distnace());
+            walk.update(LocalDateTime.now(), request.distnace());
         } else {
             throw new UserException(String.valueOf(ExceptionMessage.FAIL_UPDATE_DATA));
         }
@@ -82,9 +77,9 @@ public class WalkService {
     }
 
     @Transactional
-    public void removeWalk(Long id) {
+    public void removeWalk(String email) {
         try {
-            Member member = findById(id);
+            Member member = memberService.findByEmail(email);
             List<Walk> list = walkRepository.deleteByMemberId(member);
         } catch (DataIntegrityViolationException e) {
             throw new UserException(ExceptionMessage.FAIL_DELETE_DATA);
@@ -126,18 +121,11 @@ public class WalkService {
 //            saveStress(member, StressType.WALK, changeStressAmount);
 //        }
 //
-//
+//        // 재 계산 필요     if(originAffection >= 96) changeAmount = 100 - originAffection;
 //        // 미완료 + affection 감소 -> not 0
 //        // 완료 + affection 증가 -> not 100
-//        if ((!complete && originAffection != 0) || (complete && originAffection != 100)) {
+//        if ((!complete && originAffection >= 5) || (complete && originAffection <= 95)) {
 //            saveAffection(member, AffectionType.WALK, changeAffectionAmount);
 //        }
 //    }
-
-
-
-    @Transactional
-    public Member findById(Long id) {
-        return memberRepository.findById(id).orElseThrow(() -> new UserException(ExceptionMessage.USER_NOT_FOUND));
-    }
 }

@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -19,43 +21,47 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/disease")
 @Tag(name = "Disease", description = "Disease API Document")
 public class DiseaseController {
-    
+
     private final DiseaseService diseaseService;
-    
-    @PostMapping("/disease/{diseaseName}")
-    @Operation(summary = "질병 생성", description = "질병을 저장한다.")
-    public ApiResponse<DiseaseResponse> createDisease(@RequestParam(name = "id") Long id, @RequestParam(name = "diseaseName") String diseaseName) {
-        DiseaseResponse response = diseaseService.createDisease(id, diseaseName);
+
+    @PostMapping("/save/{diseaseName}")
+    @Operation(summary = "질병 내역 저장", description = "질병 내역을 저장한다.")
+    public ApiResponse<DiseaseResponse> createDisease(@RequestParam String email, @RequestParam String diseaseName) {
+        DiseaseResponse response = diseaseService.createDisease(email, diseaseName);
         return ApiResponse.success("질병 저장 완료", response);
     }
 
 
-    @GetMapping("/disease")
+    @GetMapping("/list")
     @Operation(summary = "질병 전체 조회", description = "질병 내역을 전체 조회한다.")
-    public ApiResponse<List<DiseaseResponse>> getDisease(@RequestParam(name = "id") Long id) {
-        List<Disease> response = diseaseService.getDisease(id);
-        List<DiseaseResponse> responseList = response.stream()
+    public ApiResponse<Map<String, Object>> getDisease(@RequestParam String email) {
+        List<Disease> disease = diseaseService.getDisease(email);
+        if (disease.isEmpty()) return ApiResponse.fail("질병 전체 조회 실패", null);
+        Map<String, Object> response = new HashMap<>();
+        response.put("diseaseList", disease.stream()
                 .map(DiseaseResponse::from)
-                .collect(Collectors.toList());
-        return ApiResponse.success("질병 전체 조회", responseList);
+                .collect(Collectors.toList()));
+        return ApiResponse.success("질병 전체 조회 성공", response);
     }
 
 
-    @GetMapping("/disease/{week}")
+    @GetMapping("/list/{week}")
     @Operation(summary = "질병 주간 조회", description = "질병 내역을 주간 조회한다.")
-    public ApiResponse<List<DiseaseResponse>> getDiseaseWeek(@RequestParam(name = "id") Long id, @RequestParam(name = "week") int week) {
-        List<Disease> response = diseaseService.getDiseaseWeek(id, week);
-        List<DiseaseResponse> responseList = response.stream()
+    public ApiResponse<Map<String, Object>> getDiseaseWeek(@RequestParam String email, @RequestParam int week) {
+        List<Disease> disease = diseaseService.getDiseaseWeek(email, week);
+        if (disease.isEmpty()) return ApiResponse.fail("질병 " + week + "주차 조회 실패", null);
+        Map<String, Object> response = new HashMap<>();
+        response.put("diseaseList", disease.stream()
                 .map(DiseaseResponse::from)
-                .collect(Collectors.toList());
-        return ApiResponse.success("질병 주간 조회", responseList);
+                .collect(Collectors.toList()));
+        return ApiResponse.success("질병 " + week + "주차 조회 성공", response);
     }
 
 
-    @DeleteMapping("/disease")
+    @DeleteMapping("/remove")
     @Operation(summary = "질병 내역 삭제", description = "질병 내역을 삭제한다.")
-    public ApiResponse<Object> removeDisease(@RequestParam(name = "id") Long id) {
-        diseaseService.removeDisease(id);
-        return ApiResponse.success("질병 삭제", true);
+    public ApiResponse<Object> removeDisease(@RequestParam String email) {
+        diseaseService.removeDisease(email);
+        return ApiResponse.success("질병 삭제 성공", true);
     }
 }

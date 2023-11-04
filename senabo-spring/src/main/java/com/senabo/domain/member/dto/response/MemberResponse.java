@@ -1,6 +1,8 @@
 package com.senabo.domain.member.dto.response;
 
 import com.senabo.domain.member.entity.Member;
+import com.senabo.domain.member.entity.Sex;
+import com.senabo.domain.member.entity.Species;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -9,10 +11,10 @@ import java.time.LocalDateTime;
 @Builder
 public record MemberResponse(
         Long id,
-        String name,
+        String dogName,
         String email,
-        String species,
-        String sex,
+        Species species,
+        Sex sex,
         int affection,
         int stressLevel,
         BigDecimal houseLatitude,
@@ -28,7 +30,7 @@ public record MemberResponse(
     public static MemberResponse from(Member member) {
         return MemberResponse.builder()
                 .id(member.getId())
-                .name(member.getName())
+                .dogName(member.getDogName())
                 .email(member.getEmail())
                 .species(member.getSpecies())
                 .sex(member.getSex())

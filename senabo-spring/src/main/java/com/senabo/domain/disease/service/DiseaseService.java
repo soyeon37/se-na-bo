@@ -4,12 +4,11 @@ import com.senabo.domain.disease.dto.response.DiseaseResponse;
 import com.senabo.domain.disease.entity.Disease;
 import com.senabo.domain.disease.repository.DiseaseRepository;
 import com.senabo.domain.member.entity.Member;
+import com.senabo.domain.member.service.MemberService;
 import com.senabo.domain.report.entity.Report;
-import com.senabo.domain.member.repository.MemberRepository;
-import com.senabo.domain.report.repository.ReportRepository;
+import com.senabo.domain.report.service.ReportService;
 import com.senabo.exception.message.ExceptionMessage;
 import com.senabo.exception.model.UserException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -19,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -26,12 +26,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DiseaseService {
     private final DiseaseRepository diseaseRepository;
-    private final MemberRepository memberRepository;
-    private final ReportRepository reportRepository;
+    private final MemberService memberService;
+    private final ReportService reportService;
 
     @Transactional
-    public DiseaseResponse createDisease(Long id, String diseaseName) {
-        Member member = findById(id);
+    public DiseaseResponse createDisease(String email, String diseaseName) {
+        Member member = memberService.findByEmail(email);
         Disease disease = diseaseRepository.save(
                 new Disease(member, diseaseName));
         try {
@@ -43,32 +43,29 @@ public class DiseaseService {
     }
 
     @Transactional
-    public List<Disease> getDisease(Long id) {
-        Member member = findById(id);
+    public List<Disease> getDisease(String email) {
+        Member member = memberService.findByEmail(email);
         List<Disease> diseaseList = diseaseRepository.findByMemberId(member);
-        if (diseaseList.isEmpty()) {
-            throw new EntityNotFoundException("Disease에서 해당 MemberId를 찾을 수 없습니다.: " + id);
-        }
         return diseaseList;
     }
 
     @Transactional
-    public List<Disease> getDiseaseWeek(Long id, int week) {
-        Member member = findById(id);
-        Report report = reportRepository.findByMemberIdAndWeek(member, week);
+    public List<Disease> getDiseaseWeek(String email, int week) {
+        List<Disease> diseaseList = null;
+        Member member = memberService.findByEmail(email);
+        Optional<Report> result = reportService.findReportWeek(member, week);
+        if(result.isEmpty()) return diseaseList;
+        Report report = result.get();
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        List<Disease> diseaseList = diseaseRepository.findDiseaseWeek(member, endTime, startTime);
-        if (diseaseList.isEmpty()) {
-            throw new EntityNotFoundException("Disease에서 해당 주차를 찾을 수 없습니다.: " + id);
-        }
+        diseaseList = diseaseRepository.findDiseaseWeek(member, endTime, startTime);
         return diseaseList;
     }
 
     @Transactional
-    public void removeDisease(Long id) {
+    public void removeDisease(String email) {
         try {
-            Member member = findById(id);
+            Member member = memberService.findByEmail(email);
             List<Disease> list = diseaseRepository.deleteByMemberId(member);
         } catch (DataIntegrityViolationException e) {
             throw new UserException(ExceptionMessage.FAIL_DELETE_DATA);
@@ -81,9 +78,5 @@ public class DiseaseService {
         return count;
     }
 
-    @Transactional
-    public Member findById(Long id) {
-        return memberRepository.findById(id).orElseThrow(() -> new UserException(ExceptionMessage.USER_NOT_FOUND));
-    }
 
 }

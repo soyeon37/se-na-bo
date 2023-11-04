@@ -1,6 +1,8 @@
 package com.senabo.domain.member.dto.response;
 
 //import com.senabo.config.security.jwt.TokenInfo;
+import com.senabo.domain.member.entity.Sex;
+import com.senabo.domain.member.entity.Species;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -9,10 +11,10 @@ import java.time.LocalDateTime;
 @Builder
 public record SignUpResponse(
         Long id,
-        String name,
+        String dogName,
         String email,
-        String species,
-        String sex,
+        Species species,
+        Sex sex,
         int affection,
         int stressLevel,
         BigDecimal houseLatitude,
