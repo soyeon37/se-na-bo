@@ -77,6 +77,10 @@ public class FeedService {
     @Transactional
     public CheckFeedResponse checkLastFeed(String email) {
         Member member = memberService.findByEmail(email);
+        if (!feedRepository.existsByMemberId(member)) {
+            LocalDateTime nowH = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
+            return CheckFeedResponse.from(true, nowH, nowH);
+        }
         Feed feed = feedRepository.findLatestData(member);
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime nowH = now.truncatedTo(ChronoUnit.HOURS);

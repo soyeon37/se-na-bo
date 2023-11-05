@@ -47,7 +47,7 @@ public class PoopController {
 
     @GetMapping("/list/{week}")
     @Operation(summary = "배변 주간 조회", description = "배변 내역을 주간 조회한다.")
-    public ApiResponse<Map<String,Object>> getPoopWeek(@RequestParam String email, @RequestParam int week){
+    public ApiResponse<Map<String,Object>> getPoopWeek(@RequestParam String email, @PathVariable int week){
         List<Poop> poop = poopService.getPoopWeek(email, week);
         if(poop.isEmpty()) return ApiResponse.fail("배변 " + week + "주차 조회 실패", null);
         Map<String,Object> response = new HashMap<>();

@@ -16,11 +16,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -66,6 +65,36 @@ public class WalkService {
     }
 
     @Transactional
+    public List<Walk> getTodayWalk(String email) {
+        Member member = memberService.findByEmail(email);
+        List<Walk> walkList = walkRepository.findTodayData(member, LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
+        return walkList;
+    }
+
+    public Map<String, Object> getTodayTotal(List<Walk> walkList){
+        Map<String, Object> map = new HashMap<>();
+        Duration totalTime = Duration.ofSeconds(0);
+        Double totalDistance = 0.0;
+        for(int i = 0; i < walkList.size(); i++){
+            Walk walk = walkList.get(i);
+            totalDistance += walk.getDistance();
+            Duration walkDuration = Duration.between(walk.getStartTime(), walk.getEndTime());
+            totalTime = totalTime.plus(walkDuration);
+        }
+        int hours = (int) totalTime.toHours();
+        int minutes = (int) (totalTime.toMinutes() % 60);
+        log.info("hours : "+hours);
+        log.info("minutes : "+minutes);
+        Map<String, Object> time = new HashMap<>();
+        time.put("totalWalkTime", totalTime.toMinutes());
+        time.put("hours", hours);
+        time.put("minutes", minutes);
+        map.put("todayTotalWalkTime", time);
+        map.put("todayTotalWalkDistance", totalDistance);
+        return map;
+    }
+
+    @Transactional
     public WalkResponse updateWalk(String email, UpdateWalkRequest request) {
         Member member = memberService.findByEmail(email);
         Walk walk = walkRepository.findLatestData(member);
@@ -86,6 +115,7 @@ public class WalkService {
             throw new UserException(ExceptionMessage.FAIL_DELETE_DATA);
         }
     }
+
 
 //    @Transactional
 //    public void scheduleCheckWalk(Long id) {

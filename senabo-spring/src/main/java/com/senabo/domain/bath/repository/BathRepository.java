@@ -8,8 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BathRepository extends JpaRepository<Bath, String> {
-    List<Bath> findByMemberId(Member memberId);
+public interface BathRepository extends JpaRepository<Bath, String>, BathRepositoryCustom {
 
     List<Bath> deleteByMemberId(Member memberId);
 }

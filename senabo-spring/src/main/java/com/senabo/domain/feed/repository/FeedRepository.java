@@ -10,14 +10,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface FeedRepository extends JpaRepository<Feed, String> {
-    List<Feed> findByMemberId(Member memberId);
+public interface FeedRepository extends JpaRepository<Feed, String>, FeedRepositoryCustom{
+    List<Feed> deleteByMemberId(Member member);
 
-    List<Feed> deleteByMemberId(Member memberId);
+    Boolean existsByMemberId(Member member);
 
-    @Query("SELECT f FROM Feed f WHERE f.updateTime = (SELECT MAX(f2.updateTime) FROM Feed f2 WHERE f2.memberId = ?1)")
-    Feed findLatestData(Member memberId);
-
-    @Query("select f from Feed f where f.memberId = ?1 and f.updateTime <= ?2 and f.createTime >= ?3 ")
-    List<Feed> findFeedWeek(Member member, LocalDateTime endTime, LocalDateTime startTime);
 }

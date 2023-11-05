@@ -81,7 +81,7 @@ public class AffectionService {
 
     @Transactional
     public Affection getLatestAffectionData(Member member) {
-        return affectionRepository.findLatestData(member);
+        return affectionRepository.findLatestDataByMemberId(member);
     }
 
 }
