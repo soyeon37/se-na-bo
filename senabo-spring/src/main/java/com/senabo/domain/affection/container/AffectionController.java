@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class AffectionController {
     private final AffectionService affectionService;
 
-    @PostMapping("/save/{type}")
+    @PostMapping("/save")
     @Operation(summary = "애정 지수 증가", description = "애정 지수가 입력한 수만큼 변화한다.")
     public ApiResponse<AffectionResponse> addAffection(@RequestParam String email, @RequestBody AddAffectionRequest request) {
         AffectionResponse response = affectionService.createAffection(email, request.type(), request.changeAmount());
