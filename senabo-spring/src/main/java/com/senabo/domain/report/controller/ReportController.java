@@ -29,13 +29,12 @@ public class ReportController {
     
     @GetMapping("/list")
     @Operation(summary = "주간 리포트 전체 조회", description = "주간 리포트 내역을 전체 조회한다.")
-    public ApiResponse<Map<String, Object>> getReport(@RequestParam String email) {
+    public ApiResponse<List<SimpleReportResponse>> getReport(@RequestParam String email) {
         List<Report> report = reportService.getReport(email);
         if (report.isEmpty()) return ApiResponse.fail("주간 리포트 전체 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("reportList", report.stream()
+        List<SimpleReportResponse> response = report.stream()
                 .map(SimpleReportResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("주간 리포트 전체 조회 성공", response);
     }
 

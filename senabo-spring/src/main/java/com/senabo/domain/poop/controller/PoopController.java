@@ -34,26 +34,24 @@ public class PoopController {
 
     @GetMapping("/list")
     @Operation(summary = "배변 전체 조회", description = "배변 내역을 전체 조회한다.")
-    public ApiResponse<Map<String,Object>> getPoop(@RequestParam String email){
+    public ApiResponse<List<PoopResponse>> getPoop(@RequestParam String email){
         List<Poop> poop = poopService.getPoop(email);
         if(poop.isEmpty()) return ApiResponse.fail("배변 전체 조회 실패", null);
-        Map<String,Object> response = new HashMap<>();
-        response.put("poopList", poop.stream()
+        List<PoopResponse> response = poop.stream()
                 .map(PoopResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("배변 전체 조회 성공", response);
     }
 
 
     @GetMapping("/list/{week}")
     @Operation(summary = "배변 주간 조회", description = "배변 내역을 주간 조회한다.")
-    public ApiResponse<Map<String,Object>> getPoopWeek(@RequestParam String email, @PathVariable int week){
+    public ApiResponse<List<PoopResponse>> getPoopWeek(@RequestParam String email, @PathVariable int week){
         List<Poop> poop = poopService.getPoopWeek(email, week);
         if(poop.isEmpty()) return ApiResponse.fail("배변 " + week + "주차 조회 실패", null);
-        Map<String,Object> response = new HashMap<>();
-        response.put("poopList", poop.stream()
+        List<PoopResponse> response = poop.stream()
                 .map(PoopResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("배변 " + week + "주차 조회 성공", response);
     }
 

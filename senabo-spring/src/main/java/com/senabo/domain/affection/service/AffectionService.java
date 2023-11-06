@@ -60,15 +60,15 @@ public class AffectionService {
     }
 
     @Transactional
-    public List<AffectionResponse> getAffection(String email) {
+    public List<Affection> getAffection(String email) {
         Member member = memberService.findByEmail(email);
-        List<AffectionResponse> affectionList = affectionRepository.findByMemberId(member);
+        List<Affection> affectionList = affectionRepository.findByMemberId(member);
         return affectionList;
     }
 
     @Transactional
-    public List<AffectionResponse> getAffectionWeek(String email, int week) {
-        List<AffectionResponse> affectionList = new ArrayList<>();
+    public List<Affection> getAffectionWeek(String email, int week) {
+        List<Affection> affectionList = new ArrayList<>();
         Member member = memberService.findByEmail(email);
         Optional<Report> result = reportService.findReportWeek(member, week);
         if (result.isEmpty()) return affectionList;

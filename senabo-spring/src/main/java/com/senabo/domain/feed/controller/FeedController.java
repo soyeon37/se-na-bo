@@ -35,26 +35,24 @@ public class FeedController {
 
     @GetMapping("/list")
     @Operation(summary = "배식 전체 조회", description = "배식 내역을 전체 조회한다.")
-    public ApiResponse<Map<String, Object>> getFeed(@RequestParam String email) {
+    public ApiResponse<List<FeedResponse>> getFeed(@RequestParam String email) {
         List<Feed> feed = feedService.getFeed(email);
         if (feed.isEmpty()) return ApiResponse.fail("배식 전체 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("feedList", feed.stream()
+        List<FeedResponse> response = feed.stream()
                 .map(FeedResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("배식 전체 조회 성공", response);
     }
 
 
     @GetMapping("/list/{week}")
     @Operation(summary = "배식 주간 조회", description = "배식 내역을 주간 조회한다.")
-    public ApiResponse<Map<String, Object>> getFeedWeek(@RequestParam String email, @PathVariable int week) {
+    public ApiResponse<List<FeedResponse>> getFeedWeek(@RequestParam String email, @PathVariable int week) {
         List<Feed> feed = feedService.getFeedWeek(email, week);
         if (feed.isEmpty()) return ApiResponse.fail("배식 " + week + "주차 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("feedList", feed.stream()
+        List<FeedResponse> response = feed.stream()
                 .map(FeedResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("배식 " + week + "주차 조회 성공", response);
     }
 

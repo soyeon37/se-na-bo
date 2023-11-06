@@ -5,6 +5,7 @@ import com.senabo.domain.member.service.MemberService;
 import com.senabo.domain.report.entity.Report;
 import com.senabo.domain.report.service.ReportService;
 import com.senabo.domain.walk.dto.request.UpdateWalkRequest;
+import com.senabo.domain.walk.dto.response.TodayWalkResponse;
 import com.senabo.domain.walk.dto.response.WalkResponse;
 import com.senabo.domain.walk.entity.Walk;
 import com.senabo.domain.walk.repository.WalkRepository;
@@ -71,8 +72,7 @@ public class WalkService {
         return walkList;
     }
 
-    public Map<String, Object> getTodayTotal(List<Walk> walkList){
-        Map<String, Object> map = new HashMap<>();
+    public TodayWalkResponse getTodayTotal(List<Walk> walkList){
         Duration totalTime = Duration.ofSeconds(0);
         Double totalDistance = 0.0;
         for(int i = 0; i < walkList.size(); i++){
@@ -81,17 +81,7 @@ public class WalkService {
             Duration walkDuration = Duration.between(walk.getStartTime(), walk.getEndTime());
             totalTime = totalTime.plus(walkDuration);
         }
-        int hours = (int) totalTime.toHours();
-        int minutes = (int) (totalTime.toMinutes() % 60);
-        log.info("hours : "+hours);
-        log.info("minutes : "+minutes);
-        Map<String, Object> time = new HashMap<>();
-        time.put("totalWalkTime", totalTime.toMinutes());
-        time.put("hours", hours);
-        time.put("minutes", minutes);
-        map.put("todayTotalWalkTime", time);
-        map.put("todayTotalWalkDistance", totalDistance);
-        return map;
+        return TodayWalkResponse.from((int) totalTime.toMinutes(), totalDistance);
     }
 
     @Transactional

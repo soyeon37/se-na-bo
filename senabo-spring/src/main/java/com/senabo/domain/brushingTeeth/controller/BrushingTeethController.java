@@ -34,26 +34,24 @@ public class BrushingTeethController {
 
     @GetMapping("/list")
     @Operation(summary = "양치 내역 전체 조회", description = "양치 내역을 전체 조회한다.")
-    public ApiResponse<Map<String,Object>> getBrushingTeeth(@RequestParam String email) {
+    public ApiResponse<List<BrushingTeethResponse>> getBrushingTeeth(@RequestParam String email) {
         List<BrushingTeeth> brushingTeeth = brushingTeethService.getBrushingTeeth(email);
         if (brushingTeeth.isEmpty()) return ApiResponse.fail("양치 전체 조회 실패", null);
-        Map<String ,Object> response = new HashMap<>();
-        response.put("brushingTeethList", brushingTeeth.stream()
+        List<BrushingTeethResponse> response =  brushingTeeth.stream()
                 .map(BrushingTeethResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("양치 전체 조회 성공", response);
     }
 
 
     @GetMapping("/list/{week}")
     @Operation(summary = "양치 내역 주간 조회", description = "양치 내역을 주간 조회한다.")
-    public ApiResponse<Map<String,Object>> getBrushingTeethWeek(@RequestParam String email, @PathVariable int week) {
+    public ApiResponse<List<BrushingTeethResponse>> getBrushingTeethWeek(@RequestParam String email, @PathVariable int week) {
         List<BrushingTeeth> brushingTeeth = brushingTeethService.getBrushingTeethWeek(email, week);
         if (brushingTeeth.isEmpty()) return ApiResponse.fail("양치 "+ week + "주차 조회 실패", null);
-        Map<String ,Object> response = new HashMap<>();
-        response.put("brushingTeethList", brushingTeeth.stream()
+      List<BrushingTeethResponse> response = brushingTeeth.stream()
                 .map(BrushingTeethResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("양치 " + week + "주차 조회 성공", response);
     }
 

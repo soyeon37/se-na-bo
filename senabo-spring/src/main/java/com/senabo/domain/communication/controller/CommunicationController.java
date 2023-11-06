@@ -36,25 +36,23 @@ public class CommunicationController {
 
     @GetMapping("/list")
     @Operation(summary = "교감 전체 조회", description = "교감 내역을 전체 조회한다.")
-    public ApiResponse<Map<String, Object>>  getCommunication(@RequestParam String email) {
+    public ApiResponse<List<CommunicationResponse>> getCommunication(@RequestParam String email) {
         List<Communication> communication = communicationService.getCommunication(email);
         if (communication.isEmpty()) return ApiResponse.fail("교감 전체 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("communicationList", communication.stream()
+        List<CommunicationResponse> response = communication.stream()
                 .map(CommunicationResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("교감 전체 조회 성공", response);
     }
 
     @GetMapping("/list/{week}")
     @Operation(summary = "교감 주간 조회", description = "교감 내역을 주간 조회한다.")
-    public ApiResponse<Map<String, Object>> getCommunication(@RequestParam String email, @PathVariable int week) {
+    public ApiResponse<List<CommunicationResponse>> getCommunication(@RequestParam String email, @PathVariable int week) {
         List<Communication> communication = communicationService.getCommunicationWeek(email, week);
         if (communication.isEmpty()) return ApiResponse.fail("교감 "+ week + "주차 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("communicationList", communication.stream()
+        List<CommunicationResponse> response = communication.stream()
                 .map(CommunicationResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("교감 " + week + "주차 조회 성공", response);
     }
 

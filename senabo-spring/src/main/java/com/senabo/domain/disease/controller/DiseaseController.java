@@ -34,26 +34,24 @@ public class DiseaseController {
 
     @GetMapping("/list")
     @Operation(summary = "질병 전체 조회", description = "질병 내역을 전체 조회한다.")
-    public ApiResponse<Map<String, Object>> getDisease(@RequestParam String email) {
+    public ApiResponse<List<DiseaseResponse>> getDisease(@RequestParam String email) {
         List<Disease> disease = diseaseService.getDisease(email);
         if (disease.isEmpty()) return ApiResponse.fail("질병 전체 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("diseaseList", disease.stream()
+        List<DiseaseResponse> response = disease.stream()
                 .map(DiseaseResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("질병 전체 조회 성공", response);
     }
 
 
     @GetMapping("/list/{week}")
     @Operation(summary = "질병 주간 조회", description = "질병 내역을 주간 조회한다.")
-    public ApiResponse<Map<String, Object>> getDiseaseWeek(@RequestParam String email, @PathVariable  int week) {
+    public ApiResponse<List<DiseaseResponse>> getDiseaseWeek(@RequestParam String email, @PathVariable  int week) {
         List<Disease> disease = diseaseService.getDiseaseWeek(email, week);
         if (disease.isEmpty()) return ApiResponse.fail("질병 " + week + "주차 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("diseaseList", disease.stream()
+        List<DiseaseResponse> response = disease.stream()
                 .map(DiseaseResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("질병 " + week + "주차 조회 성공", response);
     }
 

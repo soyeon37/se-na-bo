@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AffectionRepositoryCustom {
-    List<AffectionResponse> findByMemberId(Member memberId);
+    List<Affection> findByMemberId(Member memberId);
     Affection findLatestDataByMemberId(Member member);
-    List<AffectionResponse> findAffectionWeek(Member member, LocalDateTime endTime, LocalDateTime startTime);
+    List<Affection> findAffectionWeek(Member member, LocalDateTime endTime, LocalDateTime startTime);
 
 }

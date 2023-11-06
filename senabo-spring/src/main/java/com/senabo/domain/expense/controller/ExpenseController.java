@@ -35,26 +35,24 @@ public class ExpenseController {
 
     @GetMapping("/list")
     @Operation(summary = "비용 전체 조회", description = "비용 내역을 전체 조회한다.")
-    public ApiResponse<Map<String ,Object>> getExpense(@RequestParam String email) {
+    public ApiResponse<List<ExpenseResponse>> getExpense(@RequestParam String email) {
         List<Expense> expense = expenseService.getExpense(email);
         if (expense.isEmpty()) return ApiResponse.fail("비용 전체 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("expenseList", expense.stream()
+        List<ExpenseResponse> response = expense.stream()
                 .map(ExpenseResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("비용 전체 조회 성공", response);
     }
 
 
     @GetMapping("/list/{week}")
     @Operation(summary = "비용 주간 조회", description = "비용 내역을 주간 조회한다.")
-    public ApiResponse<Map<String ,Object>> getExpenseWeek(@RequestParam String email, @PathVariable  int week) {
+    public ApiResponse<List<ExpenseResponse>> getExpenseWeek(@RequestParam String email, @PathVariable  int week) {
         List<Expense> expense = expenseService.getExpenseWeek(email, week);
         if (expense.isEmpty()) return ApiResponse.fail("비용 "+ week + "주차 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("expenseList", expense.stream()
+        List<ExpenseResponse> response = expense.stream()
                 .map(ExpenseResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("비용 " + week + "주차 조회 성공", response);
     }
 

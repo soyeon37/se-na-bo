@@ -33,22 +33,20 @@ public class StressController {
 
     @GetMapping("/list")
     @Operation(summary = "스트레스 지수 전제 조회", description = "스트레스 지수 내역을 전체 조회한다.")
-    public ApiResponse<Map<String ,Object>> getStress(@RequestParam String email) {
+    public ApiResponse<List<StressResponse>> getStress(@RequestParam String email) {
         List<Stress> stress = stressService.getStress(email);
         if (stress.isEmpty()) return ApiResponse.fail("스트레스 지수 주간 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("stressList", stress.stream().map(StressResponse::from).collect(Collectors.toList()));
+        List<StressResponse> response = stress.stream().map(StressResponse::from).collect(Collectors.toList());
         return ApiResponse.success("스트레스 지수 전체 조회 성공", response);
     }
 
 
     @GetMapping("/list/{week}")
     @Operation(summary = "스트레스 지수 주간 조회", description = "스트레스 지수 내역을 주간 조회한다.")
-    public ApiResponse<Map<String ,Object>> getStress(@RequestParam String email, @PathVariable int week) {
+    public ApiResponse<List<StressResponse>> getStress(@RequestParam String email, @PathVariable int week) {
         List<Stress> stress = stressService.getStressWeek(email, week);
         if (stress.isEmpty()) return ApiResponse.fail("스트레스 지수 " + week + "주차 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("stressList", stress.stream().map(StressResponse::from).collect(Collectors.toList()));
+        List<StressResponse> response = stress.stream().map(StressResponse::from).collect(Collectors.toList());
         return ApiResponse.success("스트레스 지수 " + week + "주차 조회 성공", response);
     }
 }
