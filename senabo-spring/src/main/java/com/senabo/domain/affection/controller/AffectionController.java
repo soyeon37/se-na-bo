@@ -34,24 +34,18 @@ public class AffectionController {
 
     @GetMapping("/list")
     @Operation(summary = "애정 지수 전체 조회", description = "애정 지수 내역을 전체 조회한다.")
-    public ApiResponse<Map<String, Object>> getAffection(@RequestParam String email) {
-        List<Affection> affection = affectionService.getAffection(email);
-        if (affection.isEmpty()) return ApiResponse.fail("애정 지수 전체 조회 실패", null);
-        Map<String, Object> reponse = new HashMap<>();
-        reponse.put("affectionList", affection.stream()
-                .map(AffectionResponse::from)
-                .collect(Collectors.toList()));
-        return ApiResponse.success("애정 지수 전체 조회 성공", reponse);
+    public ApiResponse<List<AffectionResponse>> getAffection(@RequestParam String email) {
+        List<AffectionResponse> response = affectionService.getAffection(email);
+        if (response.isEmpty()) return ApiResponse.fail("애정 지수 전체 조회 실패", null);
+        return ApiResponse.success("애정 지수 전체 조회 성공", response);
     }
 
 
     @GetMapping("/list/{week}")
     @Operation(summary = "애정 지수 주간 조회", description = "애정 지수 내역을 주간 조회한다.")
-    public ApiResponse<Map<String, Object>> getAffectionWeek(@RequestParam String email, @PathVariable  int week) {
-        List<Affection> affection = affectionService.getAffectionWeek(email, week);
-        if (affection.isEmpty()) return ApiResponse.fail("애정 지수 " + week + "주차 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("affectionList", affection.stream().map(AffectionResponse::from).collect(Collectors.toList()));
+    public ApiResponse<List<AffectionResponse>> getAffectionWeek(@RequestParam String email, @PathVariable  int week) {
+        List<AffectionResponse> response = affectionService.getAffectionWeek(email, week);
+        if (response.isEmpty()) return ApiResponse.fail("애정 지수 " + week + "주차 조회 실패", null);
         return ApiResponse.success("애정 지수 " + week + "주차 조회 성공", response);
     }
 

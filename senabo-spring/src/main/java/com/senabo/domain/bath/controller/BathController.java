@@ -34,13 +34,12 @@ public class BathController {
 
     @GetMapping("/list")
     @Operation(summary = "목욕 조회", description = "목욕 내역을 전체 조회한다.")
-    public ApiResponse<Map<String, Object>>  getBath(@RequestParam String email){
+    public ApiResponse<List<BathResponse>>  getBath(@RequestParam String email){
         List<Bath> bath = bathService.getBath(email);
         if(bath.isEmpty()) return ApiResponse.fail("목욕 전체 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("bathList", bath.stream()
+        List<BathResponse> response = bath.stream()
                 .map(BathResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("목욕 전체 조회 성공", response);
     }
 
