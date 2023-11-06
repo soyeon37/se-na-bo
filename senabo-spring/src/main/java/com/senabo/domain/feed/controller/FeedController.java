@@ -1,11 +1,16 @@
 package com.senabo.domain.feed.controller;
 
 import com.senabo.common.api.ApiResponse;
+import com.senabo.domain.expense.dto.response.ExpenseResponse;
+import com.senabo.domain.expense.dto.response.TotalAmountExpenseResponse;
 import com.senabo.domain.feed.dto.response.CheckFeedResponse;
 import com.senabo.domain.feed.dto.response.FeedResponse;
 import com.senabo.domain.feed.entity.Feed;
 import com.senabo.domain.feed.service.FeedService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +38,13 @@ public class FeedController {
     }
 
     @GetMapping("/list")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = FeedResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "배식 전체 조회", description = "배식 내역을 전체 조회한다.")
     public ApiResponse<List<FeedResponse>> getFeed(@RequestParam String email) {
         List<Feed> feed = feedService.getFeed(email);
@@ -44,6 +56,13 @@ public class FeedController {
     }
 
     @GetMapping("/list/{week}")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = FeedResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "배식 주간 조회", description = "배식 내역을 주간 조회한다.")
     public ApiResponse<List<FeedResponse>> getFeedWeek(@RequestParam String email, @PathVariable int week) {
         List<Feed> feed = feedService.getFeedWeek(email, week);
@@ -55,11 +74,16 @@ public class FeedController {
     }
 
     @GetMapping("/check")
-    @Operation(summary = "배식 가능 여부 확인", description = "마지막 배식시간이 현재 시각으로 부터 12시간이 경과했는지 확인한다. 가능하면 ture, 불가능하면 false를 return한다.")
-    public ApiResponse<Map<String, Object>> checkLastFeed(@RequestParam String email) {
-        CheckFeedResponse checkLastFeed = feedService.checkLastFeed(email);
-        Map<String, Object> response = new HashMap<>();
-        response.put("feedCheckList", checkLastFeed);
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "가능하면 possibleYn: ture, 불가능하면 possibleYn: false", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = CheckFeedResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
+    @Operation(summary = "배식 가능 여부 확인", description = "마지막 배식시간이 현재 시각으로 부터 12시간이 경과했는지 확인한다.")
+    public ApiResponse<CheckFeedResponse> checkLastFeed(@RequestParam String email) {
+        CheckFeedResponse response = feedService.checkLastFeed(email);
         return ApiResponse.success("배식 가능 여부 확인 성공", response);
     }
 

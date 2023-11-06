@@ -2,6 +2,7 @@ package com.senabo.domain.expense.service;
 
 import com.senabo.domain.expense.dto.request.CreateExpenseRequest;
 import com.senabo.domain.expense.dto.response.ExpenseResponse;
+import com.senabo.domain.expense.dto.response.TotalAmountExpenseResponse;
 import com.senabo.domain.expense.entity.Expense;
 import com.senabo.domain.expense.repository.ExpenseRepository;
 import com.senabo.domain.member.entity.Member;
@@ -52,24 +53,24 @@ public class ExpenseService {
     }
 
     @Transactional
-    public Double getExpenseTotal(String email) {
+    public TotalAmountExpenseResponse getExpenseTotal(String email) {
         Member member = memberService.findByEmail(email);
         Double totalAmount = expenseRepository.getTotalAmount(member);
         if (totalAmount == null) totalAmount = 0.0;
-        return totalAmount;
+        return TotalAmountExpenseResponse.from(0.0);
     }
 
     @Transactional
-    public Double getExpenseTotalWeek(String email, int week) {
+    public TotalAmountExpenseResponse getExpenseTotalWeek(String email, int week) {
         Member member = memberService.findByEmail(email);
         Optional<Report> result = reportService.findReportWeek(member, week);
-        if (result.isEmpty()) return 0.0;
+        if (result.isEmpty()) return TotalAmountExpenseResponse.from(0.0);
         Report report = result.get();
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
         Double totalAmount = expenseRepository.getTotalAmountWeek(member, endTime, startTime);
         if (totalAmount == null) totalAmount = 0.0;
-        return totalAmount;
+        return TotalAmountExpenseResponse.from(totalAmount);
     }
 
 

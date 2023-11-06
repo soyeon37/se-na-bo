@@ -1,10 +1,14 @@
 package com.senabo.domain.brushingTeeth.controller;
 
 import com.senabo.common.api.ApiResponse;
+import com.senabo.domain.affection.dto.response.AffectionResponse;
 import com.senabo.domain.brushingTeeth.dto.response.BrushingTeethResponse;
 import com.senabo.domain.brushingTeeth.entity.BrushingTeeth;
 import com.senabo.domain.brushingTeeth.service.BrushingTeethService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +37,13 @@ public class BrushingTeethController {
 
 
     @GetMapping("/list")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = BrushingTeethResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "양치 내역 전체 조회", description = "양치 내역을 전체 조회한다.")
     public ApiResponse<List<BrushingTeethResponse>> getBrushingTeeth(@RequestParam String email) {
         List<BrushingTeeth> brushingTeeth = brushingTeethService.getBrushingTeeth(email);
@@ -45,6 +56,13 @@ public class BrushingTeethController {
 
 
     @GetMapping("/list/{week}")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = BrushingTeethResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "양치 내역 주간 조회", description = "양치 내역을 주간 조회한다.")
     public ApiResponse<List<BrushingTeethResponse>> getBrushingTeethWeek(@RequestParam String email, @PathVariable int week) {
         List<BrushingTeeth> brushingTeeth = brushingTeethService.getBrushingTeethWeek(email, week);

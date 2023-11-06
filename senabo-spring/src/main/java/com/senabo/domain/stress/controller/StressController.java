@@ -1,11 +1,15 @@
 package com.senabo.domain.stress.controller;
 
 import com.senabo.common.api.ApiResponse;
+import com.senabo.domain.report.dto.response.ReportResponse;
 import com.senabo.domain.stress.dto.response.StressResponse;
 import com.senabo.domain.stress.entity.Stress;
 import com.senabo.domain.stress.entity.StressType;
 import com.senabo.domain.stress.service.StressService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +36,13 @@ public class StressController {
     }
 
     @GetMapping("/list")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = StressResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "스트레스 지수 전제 조회", description = "스트레스 지수 내역을 전체 조회한다.")
     public ApiResponse<List<StressResponse>> getStress(@RequestParam String email) {
         List<Stress> stress = stressService.getStress(email);
@@ -42,6 +53,13 @@ public class StressController {
 
 
     @GetMapping("/list/{week}")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = StressResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "스트레스 지수 주간 조회", description = "스트레스 지수 내역을 주간 조회한다.")
     public ApiResponse<List<StressResponse>> getStress(@RequestParam String email, @PathVariable int week) {
         List<Stress> stress = stressService.getStressWeek(email, week);

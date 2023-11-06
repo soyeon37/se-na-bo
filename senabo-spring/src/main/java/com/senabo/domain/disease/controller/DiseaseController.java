@@ -1,10 +1,14 @@
 package com.senabo.domain.disease.controller;
 
 import com.senabo.common.api.ApiResponse;
+import com.senabo.domain.communication.dto.response.CommunicationResponse;
 import com.senabo.domain.disease.dto.response.DiseaseResponse;
 import com.senabo.domain.disease.entity.Disease;
 import com.senabo.domain.disease.service.DiseaseService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +37,13 @@ public class DiseaseController {
 
 
     @GetMapping("/list")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = DiseaseResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "질병 전체 조회", description = "질병 내역을 전체 조회한다.")
     public ApiResponse<List<DiseaseResponse>> getDisease(@RequestParam String email) {
         List<Disease> disease = diseaseService.getDisease(email);
@@ -45,6 +56,13 @@ public class DiseaseController {
 
 
     @GetMapping("/list/{week}")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = DiseaseResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "질병 주간 조회", description = "질병 내역을 주간 조회한다.")
     public ApiResponse<List<DiseaseResponse>> getDiseaseWeek(@RequestParam String email, @PathVariable  int week) {
         List<Disease> disease = diseaseService.getDiseaseWeek(email, week);

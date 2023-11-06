@@ -1,10 +1,14 @@
 package com.senabo.domain.bath.controller;
 
 import com.senabo.common.api.ApiResponse;
+import com.senabo.domain.affection.dto.response.AffectionResponse;
 import com.senabo.domain.bath.dto.response.BathResponse;
 import com.senabo.domain.bath.entity.Bath;
 import com.senabo.domain.bath.service.BathService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +37,13 @@ public class BathController {
 
 
     @GetMapping("/list")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = BathResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "목욕 조회", description = "목욕 내역을 전체 조회한다.")
     public ApiResponse<List<BathResponse>>  getBath(@RequestParam String email){
         List<Bath> bath = bathService.getBath(email);
