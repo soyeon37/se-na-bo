@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/report")
+@RequestMapping("/report")
 @Tag(name = "Report", description = "Report API Document")
 public class ReportController {
     

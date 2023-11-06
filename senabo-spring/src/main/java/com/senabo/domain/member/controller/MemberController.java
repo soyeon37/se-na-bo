@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/member")
+@RequestMapping("/member")
 @Tag(name = "Member", description = "Member API Document")
 public class MemberController {
     private final MemberService memberService;

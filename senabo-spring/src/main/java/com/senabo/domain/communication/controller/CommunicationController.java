@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/communication")
+@RequestMapping("/communication")
 @Tag(name = "Communication", description = "Communication API Document")
 public class CommunicationController {
 

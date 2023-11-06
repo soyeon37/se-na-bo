@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/walk")
+@RequestMapping("/walk")
 @Tag(name = "Walk", description = "Walk API Document")
 public class WalkController {
     private final WalkService walkService;

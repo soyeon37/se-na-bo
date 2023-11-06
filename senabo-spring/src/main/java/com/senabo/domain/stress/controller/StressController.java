@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/stress")
+@RequestMapping("/stress")
 @Tag(name = "Stress", description = "Stress API Document")
 public class StressController {
     private final StressService stressService;

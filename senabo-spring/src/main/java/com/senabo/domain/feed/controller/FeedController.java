@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/feed")
+@RequestMapping("/feed")
 @Tag(name = "Feed", description = "Feed API Document")
 public class FeedController {
 
