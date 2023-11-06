@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/feed")
 @Tag(name = "Feed", description = "Feed API Document")
-public class FeedContainer {
+public class FeedController {
 
     private final FeedService feedService;
 
