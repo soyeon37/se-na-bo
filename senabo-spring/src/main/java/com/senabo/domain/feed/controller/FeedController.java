@@ -32,7 +32,6 @@ public class FeedController {
         return ApiResponse.success("배식 저장 성공", response);
     }
 
-
     @GetMapping("/list")
     @Operation(summary = "배식 전체 조회", description = "배식 내역을 전체 조회한다.")
     public ApiResponse<List<FeedResponse>> getFeed(@RequestParam String email) {
@@ -43,7 +42,6 @@ public class FeedController {
                 .collect(Collectors.toList());
         return ApiResponse.success("배식 전체 조회 성공", response);
     }
-
 
     @GetMapping("/list/{week}")
     @Operation(summary = "배식 주간 조회", description = "배식 내역을 주간 조회한다.")
@@ -56,7 +54,6 @@ public class FeedController {
         return ApiResponse.success("배식 " + week + "주차 조회 성공", response);
     }
 
-
     @GetMapping("/check")
     @Operation(summary = "배식 가능 여부 확인", description = "마지막 배식시간이 현재 시각으로 부터 12시간이 경과했는지 확인한다. 가능하면 ture, 불가능하면 false를 return한다.")
     public ApiResponse<Map<String, Object>> checkLastFeed(@RequestParam String email) {
@@ -65,7 +62,6 @@ public class FeedController {
         response.put("feedCheckList", checkLastFeed);
         return ApiResponse.success("배식 가능 여부 확인 성공", response);
     }
-
 
     @DeleteMapping("/remove")
     @Operation(summary = "배식 내역 삭제", description = "배식 내역을 삭제한다.")
