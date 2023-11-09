@@ -2,11 +2,16 @@ package com.senabo.domain.walk.controller;
 
 import com.senabo.common.api.ApiResponse;
 import com.senabo.domain.member.service.MemberService;
+import com.senabo.domain.stress.dto.response.StressResponse;
 import com.senabo.domain.walk.dto.request.UpdateWalkRequest;
+import com.senabo.domain.walk.dto.response.TodayWalkResponse;
 import com.senabo.domain.walk.dto.response.WalkResponse;
 import com.senabo.domain.walk.entity.Walk;
 import com.senabo.domain.walk.service.WalkService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/walk")
+@RequestMapping("/walk")
 @Tag(name = "Walk", description = "Walk API Document")
 public class WalkController {
     private final WalkService walkService;
@@ -43,42 +48,55 @@ public class WalkController {
 
 
     @GetMapping("/list")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = WalkResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "산책 전체 조회", description = "산책 내역을 전체 조회한다.")
-    public ApiResponse<Map<String ,Object>> getWalk(@RequestParam String email) {
+    public ApiResponse<List<WalkResponse>> getWalk(@RequestParam String email) {
         List<Walk> walk = walkService.getWalk(email);
         if (walk.isEmpty()) return ApiResponse.fail("산책 전체 조회 성공", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("walkList", walk.stream()
+        List<WalkResponse> response = walk.stream()
                 .map(WalkResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("산책 전체 조회 성공", response);
     }
 
     @GetMapping("/list/{week}")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = WalkResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "산책 주간 조회", description = "산책 내역을 주간 조회한다.")
-    public ApiResponse<Map<String ,Object>>  getWalkWeek(@RequestParam String email, @PathVariable int week) {
+    public ApiResponse<List<WalkResponse>>  getWalkWeek(@RequestParam String email, @PathVariable int week) {
         List<Walk> walk = walkService.getWalkWeek(email, week);
         if (walk.isEmpty()) return ApiResponse.fail("산책 " + week + "주차 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("walkList", walk.stream()
+        List<WalkResponse> response = walk.stream()
                 .map(WalkResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("산책 " + week + "주차 조회 성공", response);
     }
 
     @GetMapping("/today")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = WalkResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "산책 당일 조회", description = "산책 내역을 당일 조회한다.")
-    public ApiResponse<Map<String ,Object>>  getTodayWalk(@RequestParam String email) {
+    public ApiResponse<TodayWalkResponse>  getTodayWalk(@RequestParam String email) {
         List<Walk> walk = walkService.getTodayWalk(email);
         if (walk.isEmpty()) return ApiResponse.fail("산책 당일 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("walkList", walk.stream()
-                .map(WalkResponse::from)
-                .collect(Collectors.toList()));
-        Map<String, Object> todayTotalList = walkService.getTodayTotal(walk);
-        response.put("todayTotalWalkTime", todayTotalList.get("todayTotalWalkTime"));
-        response.put("todayTotalWalkDistance", todayTotalList.get("todayTotalWalkDistance"));
-        return ApiResponse.success("산책 당일 조회 성공", response);
+        TodayWalkResponse todayTotalList = walkService.getTodayTotal(walk);
+        return ApiResponse.success("산책 당일 조회 성공", todayTotalList);
     }
 
     @DeleteMapping("/remove")

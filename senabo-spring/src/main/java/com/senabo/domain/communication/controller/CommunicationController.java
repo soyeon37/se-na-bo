@@ -1,11 +1,15 @@
 package com.senabo.domain.communication.controller;
 
 import com.senabo.common.api.ApiResponse;
+import com.senabo.domain.brushingTeeth.dto.response.BrushingTeethResponse;
 import com.senabo.domain.communication.dto.response.CommunicationResponse;
 import com.senabo.domain.communication.entity.Communication;
 import com.senabo.domain.communication.service.CommunicationService;
 import com.senabo.common.ActivityType;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/communication")
+@RequestMapping("/communication")
 @Tag(name = "Communication", description = "Communication API Document")
 public class CommunicationController {
 
@@ -35,26 +39,38 @@ public class CommunicationController {
 
 
     @GetMapping("/list")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = CommunicationResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "교감 전체 조회", description = "교감 내역을 전체 조회한다.")
-    public ApiResponse<Map<String, Object>>  getCommunication(@RequestParam String email) {
+    public ApiResponse<List<CommunicationResponse>> getCommunication(@RequestParam String email) {
         List<Communication> communication = communicationService.getCommunication(email);
         if (communication.isEmpty()) return ApiResponse.fail("교감 전체 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("communicationList", communication.stream()
+        List<CommunicationResponse> response = communication.stream()
                 .map(CommunicationResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("교감 전체 조회 성공", response);
     }
 
     @GetMapping("/list/{week}")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = CommunicationResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "교감 주간 조회", description = "교감 내역을 주간 조회한다.")
-    public ApiResponse<Map<String, Object>> getCommunication(@RequestParam String email, @PathVariable int week) {
+    public ApiResponse<List<CommunicationResponse>> getCommunication(@RequestParam String email, @PathVariable int week) {
         List<Communication> communication = communicationService.getCommunicationWeek(email, week);
         if (communication.isEmpty()) return ApiResponse.fail("교감 "+ week + "주차 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("communicationList", communication.stream()
+        List<CommunicationResponse> response = communication.stream()
                 .map(CommunicationResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("교감 " + week + "주차 조회 성공", response);
     }
 

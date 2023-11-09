@@ -1,10 +1,14 @@
 package com.senabo.domain.brushingTeeth.controller;
 
 import com.senabo.common.api.ApiResponse;
+import com.senabo.domain.affection.dto.response.AffectionResponse;
 import com.senabo.domain.brushingTeeth.dto.response.BrushingTeethResponse;
 import com.senabo.domain.brushingTeeth.entity.BrushingTeeth;
 import com.senabo.domain.brushingTeeth.service.BrushingTeethService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +22,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/brushing-teeth")
+@RequestMapping("/brushing-teeth")
 @Tag(name = "BrushingTeeth", description = "BrushingTeeth API Document")
 public class BrushingTeethController {
 
@@ -33,27 +37,39 @@ public class BrushingTeethController {
 
 
     @GetMapping("/list")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = BrushingTeethResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "양치 내역 전체 조회", description = "양치 내역을 전체 조회한다.")
-    public ApiResponse<Map<String,Object>> getBrushingTeeth(@RequestParam String email) {
+    public ApiResponse<List<BrushingTeethResponse>> getBrushingTeeth(@RequestParam String email) {
         List<BrushingTeeth> brushingTeeth = brushingTeethService.getBrushingTeeth(email);
         if (brushingTeeth.isEmpty()) return ApiResponse.fail("양치 전체 조회 실패", null);
-        Map<String ,Object> response = new HashMap<>();
-        response.put("brushingTeethList", brushingTeeth.stream()
+        List<BrushingTeethResponse> response =  brushingTeeth.stream()
                 .map(BrushingTeethResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("양치 전체 조회 성공", response);
     }
 
 
     @GetMapping("/list/{week}")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = BrushingTeethResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "양치 내역 주간 조회", description = "양치 내역을 주간 조회한다.")
-    public ApiResponse<Map<String,Object>> getBrushingTeethWeek(@RequestParam String email, @PathVariable int week) {
+    public ApiResponse<List<BrushingTeethResponse>> getBrushingTeethWeek(@RequestParam String email, @PathVariable int week) {
         List<BrushingTeeth> brushingTeeth = brushingTeethService.getBrushingTeethWeek(email, week);
         if (brushingTeeth.isEmpty()) return ApiResponse.fail("양치 "+ week + "주차 조회 실패", null);
-        Map<String ,Object> response = new HashMap<>();
-        response.put("brushingTeethList", brushingTeeth.stream()
+      List<BrushingTeethResponse> response = brushingTeeth.stream()
                 .map(BrushingTeethResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("양치 " + week + "주차 조회 성공", response);
     }
 

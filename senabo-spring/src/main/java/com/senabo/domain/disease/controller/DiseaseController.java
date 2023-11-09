@@ -1,10 +1,14 @@
 package com.senabo.domain.disease.controller;
 
 import com.senabo.common.api.ApiResponse;
+import com.senabo.domain.communication.dto.response.CommunicationResponse;
 import com.senabo.domain.disease.dto.response.DiseaseResponse;
 import com.senabo.domain.disease.entity.Disease;
 import com.senabo.domain.disease.service.DiseaseService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +22,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/disease")
+@RequestMapping("/disease")
 @Tag(name = "Disease", description = "Disease API Document")
 public class DiseaseController {
 
@@ -33,27 +37,39 @@ public class DiseaseController {
 
 
     @GetMapping("/list")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = DiseaseResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "질병 전체 조회", description = "질병 내역을 전체 조회한다.")
-    public ApiResponse<Map<String, Object>> getDisease(@RequestParam String email) {
+    public ApiResponse<List<DiseaseResponse>> getDisease(@RequestParam String email) {
         List<Disease> disease = diseaseService.getDisease(email);
         if (disease.isEmpty()) return ApiResponse.fail("질병 전체 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("diseaseList", disease.stream()
+        List<DiseaseResponse> response = disease.stream()
                 .map(DiseaseResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("질병 전체 조회 성공", response);
     }
 
 
     @GetMapping("/list/{week}")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = DiseaseResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "질병 주간 조회", description = "질병 내역을 주간 조회한다.")
-    public ApiResponse<Map<String, Object>> getDiseaseWeek(@RequestParam String email, @PathVariable  int week) {
+    public ApiResponse<List<DiseaseResponse>> getDiseaseWeek(@RequestParam String email, @PathVariable  int week) {
         List<Disease> disease = diseaseService.getDiseaseWeek(email, week);
         if (disease.isEmpty()) return ApiResponse.fail("질병 " + week + "주차 조회 실패", null);
-        Map<String, Object> response = new HashMap<>();
-        response.put("diseaseList", disease.stream()
+        List<DiseaseResponse> response = disease.stream()
                 .map(DiseaseResponse::from)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         return ApiResponse.success("질병 " + week + "주차 조회 성공", response);
     }
 
