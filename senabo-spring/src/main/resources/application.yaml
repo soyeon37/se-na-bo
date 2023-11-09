@@ -41,7 +41,7 @@ logging:
       SQL: DEBUG
 
 fcm:
-  service-account-file: src/main/resources/senabo-account-key.json #비밀 키 경로
+  service-account-file: /app/senabo-account-key.json #비밀 키 경로
 
 jwt:
   secret: o79wfnSC9mNCkN6xKfAinMH4Zh9WZCnby/zNpPa9Yi2FiXy+cbqZUho6/gWNWVWj
