@@ -1,6 +1,6 @@
 server:
   port:
-    5000
+    8080
 springdoc:
   packages-to-scan: com.senabo
   default-consumes-media-type: application/json;charset=UTF-8
@@ -18,8 +18,8 @@ springdoc:
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3307/SENABO?characterEncoding=UTF-8&serverTimezone=UTC
-    username: root
+    url: jdbc:mariadb://ssafy-db:3306/SENABO?characterEncoding=UTF-8&serverTimezone=UTC
+    username: ssafy
     password: ssafy
 
   jpa:
@@ -45,6 +45,3 @@ fcm:
 
 jwt:
   secret: o79wfnSC9mNCkN6xKfAinMH4Zh9WZCnby/zNpPa9Yi2FiXy+cbqZUho6/gWNWVWj
-
-#exchange:
-#  key: 801421925fd59c4a9b9fb2fa00a51d2c
