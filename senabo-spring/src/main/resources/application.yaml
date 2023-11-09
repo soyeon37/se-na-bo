@@ -40,11 +40,8 @@ logging:
       type.descriptor.sql: trace #show parameter binding
       SQL: DEBUG
 
-#fcm:
-#  service-account-file: /app/donnearound-java-access-key.json #비밀 키 경로
+fcm:
+  service-account-file: src/main/resources/senabo-account-key.json #비밀 키 경로
 
 jwt:
   secret: o79wfnSC9mNCkN6xKfAinMH4Zh9WZCnby/zNpPa9Yi2FiXy+cbqZUho6/gWNWVWj
-
-#exchange:
-#  key: 801421925fd59c4a9b9fb2fa00a51d2c

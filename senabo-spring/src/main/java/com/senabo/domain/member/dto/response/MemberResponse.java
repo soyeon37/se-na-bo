@@ -20,7 +20,6 @@ public record MemberResponse(
         BigDecimal houseLatitude,
         BigDecimal houseLongitude,
         int totalTime,
-        String uid,
         String deviceToken,
         LocalDateTime exitTime,
         LocalDateTime enterTime,
@@ -36,7 +35,6 @@ public record MemberResponse(
                 .sex(member.getSex())
                 .houseLatitude(member.getHouseLatitude())
                 .houseLongitude(member.getHouseLongitude())
-                .uid(member.getUid())
                 .deviceToken(member.getDeviceToken())
                 .affection(member.getAffection())
                 .stressLevel(member.getStressLevel())

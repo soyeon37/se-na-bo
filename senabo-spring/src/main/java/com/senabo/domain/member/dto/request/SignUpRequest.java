@@ -24,10 +24,7 @@ public record SignUpRequest(
         BigDecimal houseLatitude,
         @Schema(description = "경도", nullable = true, example = "0")
         BigDecimal houseLongitude,
-        String uid,
         String deviceToken
-
-
 ) {
 
 }
