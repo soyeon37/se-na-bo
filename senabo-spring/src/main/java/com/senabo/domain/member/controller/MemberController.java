@@ -38,17 +38,15 @@ public class MemberController {
 
     @GetMapping("/check")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "REMOVE USER", content =
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = MemberResponse.class))}),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
     }
     )
     @Operation(summary = "이메일 중복 확인", description = "이미 저장된 이메일인지 중복확인 한다.")
-    public ApiResponse<Map<String, Object>> checkEmail(@RequestParam String email) {
-        boolean duplicateYn = memberService.checkEmail(email);
-        Map<String, Object> response = new HashMap<>();
-        response.put("duplicateYn", duplicateYn);
+    public ApiResponse<CheckEmailResponse> checkEmail(@RequestParam String email) {
+        CheckEmailResponse response = memberService.checkEmail(email);
         return ApiResponse.success("이메일 중복 확인 성공", response);
     }
 

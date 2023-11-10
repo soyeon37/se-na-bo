@@ -9,6 +9,7 @@ import com.senabo.domain.member.dto.request.FirebaseAuthRequest;
 import com.senabo.domain.member.dto.request.SignOutRequest;
 import com.senabo.domain.member.dto.request.SignUpRequest;
 import com.senabo.domain.member.dto.request.UpdateInfoRequest;
+import com.senabo.domain.member.dto.response.CheckEmailResponse;
 import com.senabo.domain.member.dto.response.FirebaseAuthResponse;
 import com.senabo.domain.member.dto.response.MemberResponse;
 import com.senabo.domain.member.dto.response.ReIssueResponse;
@@ -49,8 +50,8 @@ public class MemberService {
     private final TokenProvider tokenProvider;
 //    private final FirebaseAuth firebaseAuth;
 
-    public boolean checkEmail(String email) {
-        return memberRepository.existsByEmail(email);
+    public CheckEmailResponse checkEmail(String email) {
+        return CheckEmailResponse.from(memberRepository.existsByEmail(email));
     }
 
     public MemberResponse signUp(SignUpRequest request) {
