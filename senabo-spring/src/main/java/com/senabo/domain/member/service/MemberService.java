@@ -104,12 +104,13 @@ public class MemberService {
 
     @Transactional
     public SignInResponse signIn(SignInRequest request) {
-        Optional<Member> member = memberRepository.findByEmail(request.email());
-        if (member.isEmpty()) {
+        Optional<Member> memberOptional = memberRepository.findByEmail(request.email());
+        if (memberOptional.isEmpty()) {
             // 미 가입자
-            return new SignInResponse(false);
+            return SignInResponse.emptyMember(false);
         }
 
+        Member member = memberOptional.get();
         // 유효한 가입자 -> jwt 발급 및 로그인 진행
         List<GrantedAuthority> roles = new ArrayList<>();
         roles.add(new SimpleGrantedAuthority(Role.ROLE_USER.toString()));
@@ -119,25 +120,8 @@ public class MemberService {
         TokenInfo tokenInfo = tokenProvider.generateToken(authentication);
 
         refreshTokenService.setValues(tokenInfo.getRefreshToken(), request.email());
-        return new SignInResponse(true,
-                SignInResponse.SignInInfoResponse.builder()
-                        .id(member.get().getId())
-                        .dogName(member.get().getDogName())
-                        .email(member.get().getEmail())
-                        .species(member.get().getSpecies())
-                        .sex(member.get().getSex())
-                        .houseLatitude(member.get().getHouseLatitude())
-                        .houseLongitude(member.get().getHouseLongitude())
-                        .affection(member.get().getAffection())
-                        .stressLevel(member.get().getStressLevel())
-                        .totalTime(member.get().getTotalTime())
-                        .exitTime(member.get().getExitTime())
-                        .enterTime(member.get().getEnterTime())
-                        .createTime(member.get().getCreateTime())
-                        .updateTime(member.get().getUpdateTime())
-                        .token(tokenInfo)
-                        .build()
-        );
+
+        return SignInResponse.from(member, tokenInfo, true);
     }
 
     @Transactional

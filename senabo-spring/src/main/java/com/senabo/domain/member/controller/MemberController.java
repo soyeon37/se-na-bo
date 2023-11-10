@@ -50,15 +50,15 @@ public class MemberController {
     // 로그인
     @PostMapping("/sign-in")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "사용자를 삭제한다.", content =
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "로그인을 한다. 회원가입을 하지 않았다면 isMember: false / 회원가입을 했다면 isMember: true", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = SignInResponse.class))}),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
     }
     )
     @Operation(summary = "회원 로그인", description = "구글 OAuth로 로그인을 한다.")
-    public SignInResponse firebaseToken(@RequestBody SignInRequest firebaseAuthRequest) {
-        return memberService.signIn(firebaseAuthRequest);
+    public ApiResponse<SignInResponse> signIn(@RequestBody SignInRequest firebaseAuthRequest) {
+        return ApiResponse.success("회원 로그인", memberService.signIn(firebaseAuthRequest));
     }
 
 

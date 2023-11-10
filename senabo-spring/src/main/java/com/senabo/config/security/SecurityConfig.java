@@ -25,7 +25,7 @@ public class SecurityConfig {
             "/member/sign-up",
             "/member/sign-in",
             "/member/reissue",
-            "/swagger-ui/**"
+            "/swagger-ui.html"
     };
 
     @Bean
