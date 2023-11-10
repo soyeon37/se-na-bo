@@ -7,6 +7,7 @@ import com.senabo.domain.feed.dto.response.CheckFeedResponse;
 import com.senabo.domain.feed.dto.response.FeedResponse;
 import com.senabo.domain.feed.entity.Feed;
 import com.senabo.domain.feed.service.FeedService;
+import com.senabo.domain.poop.dto.response.PoopResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -97,13 +98,20 @@ public class FeedController {
     }
 
     // 가장 최신 Feed 조회
-//    @GetMapping("/latest")
-//    @Operation(summary = "최신 Feed 내역 조회", description = "최신 Feed 내역를 조회한다.")
-//    public ApiResponse<FeedResponse> getFeedLatest(@AuthenticationPrincipal UserDetails principal){
-//        FeedResponse response = feedService.getFeedLatest(principal.getUsername());
-//        return ApiResponse.success("최신 Feed 내역 조회 성공", response);
-//    }
-    // 배변 Clean PUT
+    @GetMapping("/latest")
+    @Operation(summary = "최신 Feed 내역 조회", description = "최신 Feed 내역를 조회한다.")
+    public ApiResponse<FeedResponse> getFeedLatest(@AuthenticationPrincipal UserDetails principal){
+        FeedResponse response = feedService.getFeedLatest(principal.getUsername());
+        return ApiResponse.success("최신 Feed 내역 조회 성공", response);
+    }
 
+
+    // 배변 Clean PUT
+    @PatchMapping("/clean")
+    @Operation(summary = "배변 청소 완료", description = "배변 청소 여부(cleanYn)를 true로 수정한다.")
+    public ApiResponse<FeedResponse> updatePoop(@AuthenticationPrincipal UserDetails principal){
+        FeedResponse response = feedService.updatePoop(principal.getUsername());
+        return ApiResponse.success("배변 청소 성공", response);
+    }
 
 }

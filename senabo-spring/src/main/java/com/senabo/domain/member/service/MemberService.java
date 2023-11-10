@@ -8,9 +8,9 @@ import com.senabo.domain.member.dto.request.SignOutRequest;
 import com.senabo.domain.member.dto.request.SignUpRequest;
 import com.senabo.domain.member.dto.request.UpdateInfoRequest;
 import com.senabo.domain.member.dto.response.CheckEmailResponse;
-import com.senabo.domain.member.dto.response.SignInResponse;
 import com.senabo.domain.member.dto.response.MemberResponse;
 import com.senabo.domain.member.dto.response.ReIssueResponse;
+import com.senabo.domain.member.dto.response.SignInResponse;
 import com.senabo.domain.member.entity.Member;
 import com.senabo.domain.member.entity.Role;
 import com.senabo.domain.member.repository.MemberRepository;
@@ -41,16 +41,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberService {
 
-
     private final MemberRepository memberRepository;
     private final ReportRepository reportRepository;
     private final RefreshTokenService refreshTokenService;
     private final TokenProvider tokenProvider;
-//    private final FirebaseAuth firebaseAuth;
-
-    public CheckEmailResponse checkEmail(String email) {
-        return CheckEmailResponse.from(memberRepository.existsByEmail(email));
-    }
 
     public MemberResponse signUp(SignUpRequest request) {
         Member member = memberRepository.save(

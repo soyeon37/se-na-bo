@@ -105,7 +105,7 @@ public class ReportService {
 //            feedStressCnt = getCountLastWeekList(member, lastStart, StressType.FEED);
 //            int feedScore = (int) (1 - feedStressCnt / 14) * 100;
 //
-//            // 양치 score
+//            // 교감 score // 교감으로 고쳐야 함
 //            Long brusingStressCnt = 0L;
 //            brusingStressCnt = getCountLastWeekList(member, lastStart, StressType.BRUSHING_TEETH);
 //            int brushingScore = (int) (1 - brusingStressCnt / 7) * 100;

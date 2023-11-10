@@ -1,7 +1,6 @@
 package com.senabo.domain.report.controller;
 
 import com.senabo.common.api.ApiResponse;
-import com.senabo.domain.poop.dto.response.PoopResponse;
 import com.senabo.domain.report.dto.request.UpdateTotalTimeRequest;
 import com.senabo.domain.report.dto.response.ReportResponse;
 import com.senabo.domain.report.dto.response.SimpleReportResponse;
@@ -18,9 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -72,6 +69,4 @@ public class ReportController {
         ReportResponse response = reportService.updateTotalTime(principal.getUsername(), request);
         return ApiResponse.success("총 사용 시간 업데이트 성공", response);
     }
-
-
 }

@@ -89,10 +89,21 @@ public class FeedService {
         return CheckFeedResponse.from(now.isAfter(twelveAfter), lastFeedH, nowH);
     }
 
-//    public FeedResponse getFeedLatest(String email) {
-//        Member member = memberService.findByEmail(email);
-//
-//    }
+    public FeedResponse getFeedLatest(String email) {
+        Member member = memberService.findByEmail(email);
+        Feed feed = feedRepository.findLatestData(member);
+        return FeedResponse.from(feed);
+    }
+
+    @Transactional
+    public FeedResponse updatePoop(String email) {
+        Member member = memberService.findByEmail(email);
+        Feed feed = feedRepository.findLatestData(member);
+        if (!feed.getCleanYn()) {
+            feed.update();
+        }
+        return FeedResponse.from(feed);
+    }
 
 //    @Transactional
 //    public void scheduleFeed(String email) {
@@ -142,6 +153,36 @@ public class FeedService {
 //            saveStress(member, StressType.FEED, changeAmount);
 //        }
 //
+//    }
+
+    //    @Transactional
+//    public void schedulePoop(String email) {
+//        Member member = memberService.findByEmail(email);
+//        int originStress = member.getStressLevel();
+//        Poop poop = poopRepository.findLatestData(member);
+//
+//        // 이미 스트레스가 100 or 똥을 치웠다면 return
+//        if (originStress == 100 || poop.getCleanYn()) return;
+//
+//        CheckFeedResponse response = feedService.checkLastFeed(email);
+//        LocalDateTime lastFeedH = response.lastFeedDateTime();
+//        LocalDateTime nowH = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
+//        log.info("마지막 밥 제공 시간: " + lastFeedH);
+//        LocalDateTime threeAfter = lastFeedH.plusHours(3);
+//        if(nowH.isEqual(threeAfter)) {
+//            // 배변 활동 푸시 알림
+//            /*
+//
+//            */
+//        } else if (nowH.isAfter(threeAfter)) {
+//            // 스트레스 1 증가
+//            Duration duration = Duration.between(nowH, lastFeedH);
+//            long hours = duration.toHours();
+//            log.info("배변 후 " + hours + "시간 경과: 스트레스 1 증가");
+//            int changeAmount = 1;
+//
+//            saveStress(member, StressType.POOP, changeAmount);
+//        }
 //    }
 
 

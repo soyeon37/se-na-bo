@@ -9,13 +9,16 @@ import java.time.LocalDateTime;
 public record FeedResponse(
         Long id,
         Long memberId,
+        Boolean cleanYn,
         LocalDateTime createTime,
         LocalDateTime updateTime
+
 ) {
     public static FeedResponse from(Feed feed){
         return FeedResponse.builder()
                 .id(feed.getId())
                 .memberId(feed.getMemberId().getId())
+                .cleanYn(feed.getCleanYn())
                 .createTime(feed.getCreateTime())
                 .updateTime(feed.getUpdateTime())
                 .build();

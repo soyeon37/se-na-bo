@@ -47,8 +47,8 @@ public class Report extends BaseEntity {
     @Column(name = "feed_score")
     private int feedScore;
 
-    @Column(name = "brushing_teeth_score")
-    private int brushingTeethScore;
+    @Column(name = "communication_score")
+    private int communicationScore;
 
     @Column(name = "disease_score")
     private int diseaseScore;
@@ -67,7 +67,7 @@ public class Report extends BaseEntity {
         this.poopScore = 0;
         this.walkScore = 0;
         this.feedScore = 0;
-        this.brushingTeethScore = 0;
+        this.communicationScore = 0;
         this.diseaseScore = 0;
         this.complete = false;
     }
@@ -76,13 +76,13 @@ public class Report extends BaseEntity {
         this.totalTime = totalTime;
     }
 
-    public void update(int endAffectionScore, int endStressScore, int poopScore, int walkScore, int feedScore, int brushingTeethScore, int diseaseScore) {
+    public void update(int endAffectionScore, int endStressScore, int poopScore, int walkScore, int feedScore, int communicationScore, int diseaseScore) {
         this.endAffectionScore = endAffectionScore;
         this.endStressScore = endStressScore;
         this.poopScore = poopScore;
         this.walkScore = walkScore;
         this.feedScore = feedScore;
-        this.brushingTeethScore = brushingTeethScore;
+        this.communicationScore = communicationScore;
         this.diseaseScore = diseaseScore;
         this.complete = true;
     }

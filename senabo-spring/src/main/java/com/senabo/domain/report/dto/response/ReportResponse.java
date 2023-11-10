@@ -19,7 +19,7 @@ public record ReportResponse(
         int poopScore,
         int walkScore,
         int feedScore,
-        int brushingTeethScore,
+        int communicationScore,
         int diseaseScore,
         Boolean complete,
         LocalDateTime createTime,
@@ -39,7 +39,7 @@ public record ReportResponse(
                 .poopScore(report.getPoopScore())
                 .walkScore(report.getWalkScore())
                 .feedScore(report.getFeedScore())
-                .brushingTeethScore(report.getBrushingTeethScore())
+                .communicationScore(report.getCommunicationScore())
                 .diseaseScore(report.getDiseaseScore())
                 .complete(report.getComplete())
                 .createTime(report.getCreateTime())
