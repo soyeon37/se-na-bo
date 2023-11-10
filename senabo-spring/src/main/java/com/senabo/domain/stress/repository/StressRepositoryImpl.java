@@ -5,14 +5,10 @@ import com.senabo.domain.member.entity.Member;
 import com.senabo.domain.stress.entity.Stress;
 import com.senabo.domain.stress.entity.StressType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.senabo.domain.poop.entity.QPoop.poop;
 import static com.senabo.domain.stress.entity.QStress.stress;
 
 @RequiredArgsConstructor

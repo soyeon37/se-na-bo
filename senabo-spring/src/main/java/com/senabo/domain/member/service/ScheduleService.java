@@ -1,7 +1,6 @@
 package com.senabo.domain.member.service;
 
 import com.senabo.domain.feed.service.FeedService;
-import com.senabo.domain.poop.service.PoopService;
 import com.senabo.domain.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
-    private final PoopService poopService;
     private final ReportService reportService;
     private final FeedService feedService;
 

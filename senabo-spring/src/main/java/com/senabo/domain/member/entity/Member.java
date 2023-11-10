@@ -8,7 +8,6 @@ import com.senabo.domain.disease.entity.Disease;
 import com.senabo.domain.expense.entity.Expense;
 import com.senabo.domain.feed.entity.Feed;
 import com.senabo.domain.member.dto.request.UpdateInfoRequest;
-import com.senabo.domain.poop.entity.Poop;
 import com.senabo.domain.stress.entity.Stress;
 import com.senabo.domain.walk.entity.Walk;
 import jakarta.persistence.*;
@@ -91,9 +90,6 @@ public class Member extends BaseEntity  {
 
     @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Feed> feedList;
-
-    @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Poop> poopList;
 
     @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Stress> stressList;

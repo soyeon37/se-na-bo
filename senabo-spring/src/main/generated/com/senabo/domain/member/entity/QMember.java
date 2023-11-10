@@ -55,8 +55,6 @@ public class QMember extends EntityPathBase<Member> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final ListPath<com.senabo.domain.poop.entity.Poop, com.senabo.domain.poop.entity.QPoop> poopList = this.<com.senabo.domain.poop.entity.Poop, com.senabo.domain.poop.entity.QPoop>createList("poopList", com.senabo.domain.poop.entity.Poop.class, com.senabo.domain.poop.entity.QPoop.class, PathInits.DIRECT2);
-
     public final ListPath<Role, EnumPath<Role>> roles = this.<Role, EnumPath<Role>>createList("roles", Role.class, EnumPath.class, PathInits.DIRECT2);
 
     public final EnumPath<Sex> sex = createEnum("sex", Sex.class);

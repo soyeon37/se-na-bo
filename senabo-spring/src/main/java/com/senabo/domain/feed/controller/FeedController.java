@@ -1,13 +1,10 @@
 package com.senabo.domain.feed.controller;
 
 import com.senabo.common.api.ApiResponse;
-import com.senabo.domain.expense.dto.response.ExpenseResponse;
-import com.senabo.domain.expense.dto.response.TotalAmountExpenseResponse;
 import com.senabo.domain.feed.dto.response.CheckFeedResponse;
 import com.senabo.domain.feed.dto.response.FeedResponse;
 import com.senabo.domain.feed.entity.Feed;
 import com.senabo.domain.feed.service.FeedService;
-import com.senabo.domain.poop.dto.response.PoopResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,9 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j

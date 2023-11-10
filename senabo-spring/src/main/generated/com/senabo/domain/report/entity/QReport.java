@@ -24,7 +24,7 @@ public class QReport extends EntityPathBase<Report> {
 
     public final com.senabo.common.audit.QBaseEntity _super = new com.senabo.common.audit.QBaseEntity(this);
 
-    public final NumberPath<Integer> brushingTeethScore = createNumber("brushingTeethScore", Integer.class);
+    public final NumberPath<Integer> communicationScore = createNumber("communicationScore", Integer.class);
 
     public final BooleanPath complete = createBoolean("complete");
 

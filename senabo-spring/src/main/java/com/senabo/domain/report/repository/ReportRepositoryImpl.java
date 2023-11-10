@@ -4,12 +4,10 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.senabo.domain.member.entity.Member;
 import com.senabo.domain.report.entity.Report;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.senabo.domain.poop.entity.QPoop.poop;
 import static com.senabo.domain.report.entity.QReport.report;
 
 @RequiredArgsConstructor
