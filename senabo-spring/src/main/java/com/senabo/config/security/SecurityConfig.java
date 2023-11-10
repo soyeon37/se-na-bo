@@ -22,7 +22,6 @@ public class SecurityConfig {
     private final TokenProvider tokenProvider;
 
     private static final String[] AUTH_WHITELIST = {
-            "/member/check/email",
             "/member/sign-up",
             "/member/sign-in",
             "/member/reissue"

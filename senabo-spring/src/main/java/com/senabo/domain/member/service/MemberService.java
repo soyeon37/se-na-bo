@@ -1,16 +1,14 @@
 package com.senabo.domain.member.service;
 
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.senabo.config.security.jwt.TokenInfo;
 import com.senabo.config.security.jwt.TokenProvider;
-import com.senabo.domain.member.dto.request.FirebaseAuthRequest;
+import com.senabo.domain.member.dto.request.SignInRequest;
 import com.senabo.domain.member.dto.request.SignOutRequest;
 import com.senabo.domain.member.dto.request.SignUpRequest;
 import com.senabo.domain.member.dto.request.UpdateInfoRequest;
 import com.senabo.domain.member.dto.response.CheckEmailResponse;
-import com.senabo.domain.member.dto.response.FirebaseAuthResponse;
+import com.senabo.domain.member.dto.response.SignInResponse;
 import com.senabo.domain.member.dto.response.MemberResponse;
 import com.senabo.domain.member.dto.response.ReIssueResponse;
 import com.senabo.domain.member.entity.Member;
@@ -105,23 +103,14 @@ public class MemberService {
 
 
     @Transactional
-    public FirebaseAuthResponse signIn(FirebaseAuthRequest request) {
-//        // Firebase Auth 검사
-//        try {
-//            firebaseAuth.verifyIdToken(request.idToken());
-//        } catch (FirebaseAuthException e) {
-//            // 유효하지 않은 Firebase Id Token
-//            return new FirebaseAuthResponse();
-//        }
-
-
+    public SignInResponse signIn(SignInRequest request) {
         Optional<Member> member = memberRepository.findByEmail(request.email());
         if (member.isEmpty()) {
-            // 유효한 Firebase Id Token + 미 가입자
-            return new FirebaseAuthResponse(false);
+            // 미 가입자
+            return new SignInResponse(false);
         }
 
-        // 유효한 Firebase Id Token + 가입자 -> jwt 발급 및 로그인 진행
+        // 유효한 가입자 -> jwt 발급 및 로그인 진행
         List<GrantedAuthority> roles = new ArrayList<>();
         roles.add(new SimpleGrantedAuthority(Role.ROLE_USER.toString()));
 
@@ -130,8 +119,8 @@ public class MemberService {
         TokenInfo tokenInfo = tokenProvider.generateToken(authentication);
 
         refreshTokenService.setValues(tokenInfo.getRefreshToken(), request.email());
-        return new FirebaseAuthResponse(true,
-                FirebaseAuthResponse.SignInResponse.builder()
+        return new SignInResponse(true,
+                SignInResponse.SignInInfoResponse.builder()
                         .id(member.get().getId())
                         .dogName(member.get().getDogName())
                         .email(member.get().getEmail())

@@ -9,14 +9,14 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
-public class FirebaseAuthResponse {
-    boolean firebaseAuthStatus;
+public class SignInResponse {
+
     boolean isMember;
-    SignInResponse signInResponse;
+    SignInInfoResponse signInInfoResponse;
 
     @Getter
     @Builder
-    public static class SignInResponse {
+    public static class SignInInfoResponse {
         Long id;
         String dogName;
         String email;
@@ -35,21 +35,21 @@ public class FirebaseAuthResponse {
     }
 
     // 파이어베이스 인증 오류
-    public FirebaseAuthResponse() {
-        firebaseAuthStatus = false;
+    public SignInResponse() {
+
         isMember = false;
     }
 
     // 파이어베이스 인증 성공 및 회원인 경우
-    public FirebaseAuthResponse(boolean isMember, SignInResponse signInResponse) {
-        firebaseAuthStatus = true;
+    public SignInResponse(boolean isMember, SignInInfoResponse signInResponse) {
+
         this.isMember = isMember;
-        this.signInResponse = signInResponse;
+        this.signInInfoResponse = signInResponse;
     }
 
     // 파이어베이스 인증 성공 및 회원이 아닌 경우
-    public FirebaseAuthResponse(boolean isMember) {
-        firebaseAuthStatus = true;
+    public SignInResponse(boolean isMember) {
+
         this.isMember = isMember;
     }
 }

@@ -1,32 +1,22 @@
 package com.senabo.domain.member.controller;
 
 import com.senabo.common.api.ApiResponse;
-import com.senabo.domain.expense.dto.response.ExpenseResponse;
 import com.senabo.domain.member.dto.request.*;
-import com.senabo.domain.member.dto.response.*;
-import com.senabo.domain.member.entity.*;
+import com.senabo.domain.member.dto.response.MemberResponse;
+import com.senabo.domain.member.dto.response.ReIssueResponse;
+import com.senabo.domain.member.dto.response.SignInResponse;
 import com.senabo.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-//import org.springframework.security.core.annotation.AuthenticationPrincipal;
-//import org.springframework.security.core.context.SecurityContextHolder;
-//import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,19 +25,6 @@ import java.util.stream.Collectors;
 @Tag(name = "Member", description = "Member API Document")
 public class MemberController {
     private final MemberService memberService;
-
-    @GetMapping("/check")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "이미 존재하는 사용자면 duplicateYn: true / 존재하지 않는 사용자면 duplicateYn: false", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = CheckEmailResponse.class))})
-    }
-    )
-    @Operation(summary = "이메일 중복 확인", description = "이미 저장된 이메일인지 중복확인 한다.")
-    public ApiResponse<CheckEmailResponse> checkEmail(@RequestParam String email) {
-        CheckEmailResponse response = memberService.checkEmail(email);
-        return ApiResponse.success("이메일 중복 확인 성공", response);
-    }
 
     @PostMapping("/sign-up")
     @ApiResponses(value = {
@@ -60,20 +37,11 @@ public class MemberController {
     @Operation(summary = "회원가입", description = "토큰과 정보를 받아 회원가입을 한다.")
     public ApiResponse<MemberResponse> signUp(@RequestBody SignUpRequest request) {
         MemberResponse response = memberService.signUp(request);
-
-
         return ApiResponse.success("회원가입 성공", response);
     }
 
 
     @DeleteMapping("/remove")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "사용자를 삭제한다.", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = MemberResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
-    }
-    )
     @Operation(summary = "회원 탈퇴", description = "회원정보를 전부 삭제한다.")
     public ApiResponse<Object> remove(@RequestBody SignOutRequest request, @AuthenticationPrincipal UserDetails principal) {
         memberService.removeMember(principal.getUsername(), request);
@@ -82,8 +50,15 @@ public class MemberController {
 
     // 로그인
     @PostMapping("/sign-in")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "사용자를 삭제한다.", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = SignInResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "회원 로그인", description = "구글 OAuth로 로그인을 한다.")
-    public FirebaseAuthResponse firebaseToken(@RequestBody FirebaseAuthRequest firebaseAuthRequest) {
+    public SignInResponse firebaseToken(@RequestBody SignInRequest firebaseAuthRequest) {
         return memberService.signIn(firebaseAuthRequest);
     }
 
@@ -112,6 +87,13 @@ public class MemberController {
     }
 
     @PutMapping("/update")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "사용자 정보를 수정한다.", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = MemberResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "회원 정보 수정", description = "강아지 이름, 성별, 종, 위도, 경도를 수정한다.")
     public ApiResponse<MemberResponse> updateInfo(@AuthenticationPrincipal UserDetails principal, @RequestBody UpdateInfoRequest request) {
         MemberResponse response = memberService.updateInfo(principal.getUsername(), request);
@@ -119,6 +101,13 @@ public class MemberController {
     }
 
     @PostMapping("/reissue")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "재발급한 토큰을 가져온다.", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = ReIssueResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+    }
+    )
     @Operation(summary = "토큰 재발급", description = "만료된 토큰을 받아서 재발급한다.")
     public ApiResponse<ReIssueResponse> reissue(@RequestBody ReIssueRequest request) {
         return ApiResponse.success("토큰 재발급 성공", memberService.reissue(request.refreshToken(), SecurityContextHolder.getContext().getAuthentication()));
