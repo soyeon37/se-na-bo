@@ -24,7 +24,8 @@ public class SecurityConfig {
     private static final String[] AUTH_WHITELIST = {
             "/member/sign-up",
             "/member/sign-in",
-            "/member/reissue"
+            "/member/reissue",
+            "/swagger-ui/**"
     };
 
     @Bean
