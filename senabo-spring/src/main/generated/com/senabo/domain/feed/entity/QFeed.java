@@ -24,6 +24,8 @@ public class QFeed extends EntityPathBase<Feed> {
 
     public final com.senabo.common.audit.QBaseEntity _super = new com.senabo.common.audit.QBaseEntity(this);
 
+    public final BooleanPath cleanYn = createBoolean("cleanYn");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createTime = _super.createTime;
 

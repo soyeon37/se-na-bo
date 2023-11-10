@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -32,8 +34,8 @@ public class FeedController {
 
     @PostMapping("/save")
     @Operation(summary = "배식 저장", description = "배식을 저장한다.")
-    public ApiResponse<FeedResponse> createFeed(@RequestParam String email) {
-        FeedResponse response = feedService.createFeed(email);
+    public ApiResponse<FeedResponse> createFeed(@AuthenticationPrincipal UserDetails principal) {
+        FeedResponse response = feedService.createFeed(principal.getUsername());
         return ApiResponse.success("배식 저장 성공", response);
     }
 
@@ -46,8 +48,8 @@ public class FeedController {
     }
     )
     @Operation(summary = "배식 전체 조회", description = "배식 내역을 전체 조회한다.")
-    public ApiResponse<List<FeedResponse>> getFeed(@RequestParam String email) {
-        List<Feed> feed = feedService.getFeed(email);
+    public ApiResponse<List<FeedResponse>> getFeed(@AuthenticationPrincipal UserDetails principal) {
+        List<Feed> feed = feedService.getFeed(principal.getUsername());
         if (feed.isEmpty()) return ApiResponse.fail("배식 전체 조회 실패", null);
         List<FeedResponse> response = feed.stream()
                 .map(FeedResponse::from)
@@ -64,8 +66,8 @@ public class FeedController {
     }
     )
     @Operation(summary = "배식 주간 조회", description = "배식 내역을 주간 조회한다.")
-    public ApiResponse<List<FeedResponse>> getFeedWeek(@RequestParam String email, @PathVariable int week) {
-        List<Feed> feed = feedService.getFeedWeek(email, week);
+    public ApiResponse<List<FeedResponse>> getFeedWeek(@AuthenticationPrincipal UserDetails principal, @PathVariable int week) {
+        List<Feed> feed = feedService.getFeedWeek(principal.getUsername(), week);
         if (feed.isEmpty()) return ApiResponse.fail("배식 " + week + "주차 조회 실패", null);
         List<FeedResponse> response = feed.stream()
                 .map(FeedResponse::from)
@@ -82,15 +84,15 @@ public class FeedController {
     }
     )
     @Operation(summary = "배식 가능 여부 확인", description = "마지막 배식시간이 현재 시각으로 부터 12시간이 경과했는지 확인한다.")
-    public ApiResponse<CheckFeedResponse> checkLastFeed(@RequestParam String email) {
-        CheckFeedResponse response = feedService.checkLastFeed(email);
+    public ApiResponse<CheckFeedResponse> checkLastFeed(@AuthenticationPrincipal UserDetails principal) {
+        CheckFeedResponse response = feedService.checkLastFeed(principal.getUsername());
         return ApiResponse.success("배식 가능 여부 확인 성공", response);
     }
 
     @DeleteMapping("/remove")
     @Operation(summary = "배식 내역 삭제", description = "배식 내역을 삭제한다.")
-    public ApiResponse<Object> removeFeed(@RequestParam String email) {
-        feedService.removeFeed(email);
+    public ApiResponse<Object> removeFeed(@AuthenticationPrincipal UserDetails principal) {
+        feedService.removeFeed(principal.getUsername());
         return ApiResponse.success("배식 삭제 성공", true);
     }
 }

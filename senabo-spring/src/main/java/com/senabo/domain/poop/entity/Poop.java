@@ -28,7 +28,7 @@ public class Poop extends BaseEntity {
         this.cleanYn = cleanYn;
     }
 
-    public void update (Boolean cleanYn){
+    public void update(Boolean cleanYn){
         this.cleanYn = cleanYn;
     }
 

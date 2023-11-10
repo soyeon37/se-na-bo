@@ -1,5 +1,8 @@
 package com.senabo.domain.poop.service;
 
+import com.senabo.domain.feed.dto.response.CheckFeedResponse;
+import com.senabo.domain.feed.entity.Feed;
+import com.senabo.domain.feed.service.FeedService;
 import com.senabo.domain.member.entity.Member;
 import com.senabo.domain.member.service.MemberService;
 import com.senabo.domain.poop.dto.response.PoopResponse;
@@ -7,6 +10,7 @@ import com.senabo.domain.poop.entity.Poop;
 import com.senabo.domain.poop.repository.PoopRepository;
 import com.senabo.domain.report.entity.Report;
 import com.senabo.domain.report.service.ReportService;
+import com.senabo.domain.stress.entity.StressType;
 import com.senabo.exception.message.ExceptionMessage;
 import com.senabo.exception.model.UserException;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +19,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -29,6 +35,7 @@ public class PoopService {
     private final PoopRepository poopRepository;
     private final ReportService reportService;
     private final MemberService memberService;
+    private final FeedService feedService;
 
     @Transactional
     public PoopResponse createPoop(String email) {
@@ -85,23 +92,24 @@ public class PoopService {
     }
 
 //    @Transactional
-//    public void schedulePoop(Long id) {
-//        Member member = findById(id);
+//    public void schedulePoop(String email) {
+//        Member member = memberService.findByEmail(email);
 //        int originStress = member.getStressLevel();
 //        Poop poop = poopRepository.findLatestData(member);
 //
+//        // 이미 스트레스가 100 or 똥을 치웠다면 return
 //        if (originStress == 100 || poop.getCleanYn()) return;
 //
-//        Map<String, Object> map = checkLastFeed(1L);
-//        LocalDateTime lastFeedH = (LocalDateTime) map.get("lastFeedDateTime");
+//        CheckFeedResponse response = feedService.checkLastFeed(email);
+//        LocalDateTime lastFeedH = response.lastFeedDateTime();
 //        LocalDateTime nowH = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
 //        log.info("마지막 밥 제공 시간: " + lastFeedH);
 //        LocalDateTime threeAfter = lastFeedH.plusHours(3);
-//        if (nowH.isEqual(threeAfter)) {
+//        if(nowH.isEqual(threeAfter)) {
 //            // 배변 활동 푸시 알림
 //            /*
 //
-//             */
+//            */
 //        } else if (nowH.isAfter(threeAfter)) {
 //            // 스트레스 1 증가
 //            Duration duration = Duration.between(nowH, lastFeedH);

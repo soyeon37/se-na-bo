@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -32,8 +34,8 @@ public class ExpenseController {
 
     @PostMapping("/save")
     @Operation(summary = "비용 저장", description = "비용을 저장한다.")
-    public ApiResponse<ExpenseResponse> createExpense(@RequestParam String email, @RequestBody CreateExpenseRequest request) {
-        ExpenseResponse response = expenseService.createExpense(email, request);
+    public ApiResponse<ExpenseResponse> createExpense(@AuthenticationPrincipal UserDetails principal, @RequestBody CreateExpenseRequest request) {
+        ExpenseResponse response = expenseService.createExpense(principal.getUsername(), request);
         return ApiResponse.success("비용 저장 성공", response);
     }
 
@@ -47,8 +49,8 @@ public class ExpenseController {
     }
     )
     @Operation(summary = "비용 전체 조회", description = "비용 내역을 전체 조회한다.")
-    public ApiResponse<List<ExpenseResponse>> getExpense(@RequestParam String email) {
-        List<Expense> expense = expenseService.getExpense(email);
+    public ApiResponse<List<ExpenseResponse>> getExpense(@AuthenticationPrincipal UserDetails principal) {
+        List<Expense> expense = expenseService.getExpense(principal.getUsername());
         if (expense.isEmpty()) return ApiResponse.fail("비용 전체 조회 실패", null);
         List<ExpenseResponse> response = expense.stream()
                 .map(ExpenseResponse::from)
@@ -66,8 +68,8 @@ public class ExpenseController {
     }
     )
     @Operation(summary = "비용 주간 조회", description = "비용 내역을 주간 조회한다.")
-    public ApiResponse<List<ExpenseResponse>> getExpenseWeek(@RequestParam String email, @PathVariable  int week) {
-        List<Expense> expense = expenseService.getExpenseWeek(email, week);
+    public ApiResponse<List<ExpenseResponse>> getExpenseWeek(@AuthenticationPrincipal UserDetails principal, @PathVariable  int week) {
+        List<Expense> expense = expenseService.getExpenseWeek(principal.getUsername(), week);
         if (expense.isEmpty()) return ApiResponse.fail("비용 "+ week + "주차 조회 실패", null);
         List<ExpenseResponse> response = expense.stream()
                 .map(ExpenseResponse::from)
@@ -85,8 +87,8 @@ public class ExpenseController {
     }
     )
     @Operation(summary = "비용 총 금액 조회", description = "비용 총 금액을 조회한다.")
-    public ApiResponse<TotalAmountExpenseResponse> getTotalExpense(@RequestParam String email) {
-        TotalAmountExpenseResponse response = expenseService.getExpenseTotal(email);
+    public ApiResponse<TotalAmountExpenseResponse> getTotalExpense(@AuthenticationPrincipal UserDetails principal) {
+        TotalAmountExpenseResponse response = expenseService.getExpenseTotal(principal.getUsername());
         return ApiResponse.success("비용 총 금액 조회 성공", response);
     }
 
@@ -100,16 +102,16 @@ public class ExpenseController {
     }
     )
     @Operation(summary = "비용 주간 총 금액 조회", description = "비용 주간 총 금액을 조회한다.")
-    public ApiResponse<TotalAmountExpenseResponse> getTotalExpenseWeek(@RequestParam String email, @PathVariable int week) {
-        TotalAmountExpenseResponse response = expenseService.getExpenseTotalWeek(email, week);
+    public ApiResponse<TotalAmountExpenseResponse> getTotalExpenseWeek(@AuthenticationPrincipal UserDetails principal, @PathVariable int week) {
+        TotalAmountExpenseResponse response = expenseService.getExpenseTotalWeek(principal.getUsername(), week);
         return ApiResponse.success("비용 " + week + "주차 총 금액 조회 성공", response);
     }
 
 
     @DeleteMapping("/remove")
     @Operation(summary = "비용 내역 삭제", description = "비용 내역을 삭제한다.")
-    public ApiResponse<Object> removeExpense(@RequestParam String email) {
-        expenseService.removeExpense(email);
+    public ApiResponse<Object> removeExpense(@AuthenticationPrincipal UserDetails principal) {
+        expenseService.removeExpense(principal.getUsername());
         return ApiResponse.success("비용 삭제 성공", true);
     }
 

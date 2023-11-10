@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -29,8 +31,8 @@ public class AffectionController {
 
     @PostMapping("/save")
     @Operation(summary = "애정 지수 증가", description = "애정 지수가 입력한 수만큼 변화한다.")
-    public ApiResponse<AffectionResponse> addAffection(@RequestParam String email, @RequestBody AddAffectionRequest request) {
-        AffectionResponse response = affectionService.createAffection(email, request.type(), request.changeAmount());
+    public ApiResponse<AffectionResponse> addAffection(@AuthenticationPrincipal UserDetails principal, @RequestBody AddAffectionRequest request) {
+        AffectionResponse response = affectionService.createAffection(principal.getUsername(), request.type(), request.changeAmount());
         return ApiResponse.success("애정 지수 " + request.changeAmount() + " 변화 성공", response);
     }
 
@@ -44,8 +46,8 @@ public class AffectionController {
         }
     )
     @Operation(summary = "애정 지수 전체 조회", description = "애정 지수 내역을 전체 조회한다.")
-    public ApiResponse<List<AffectionResponse>> getAffection(@RequestParam String email) {
-        List<Affection> affection = affectionService.getAffection(email);
+    public ApiResponse<List<AffectionResponse>> getAffection(@AuthenticationPrincipal UserDetails principal) {
+        List<Affection> affection = affectionService.getAffection(principal.getUsername());
         if (affection.isEmpty()) return ApiResponse.fail("애정 지수 전체 조회 실패", null);
         List<AffectionResponse> reponse = affection.stream()
                 .map(AffectionResponse::from)
@@ -63,8 +65,8 @@ public class AffectionController {
     }
     )
     @Operation(summary = "애정 지수 주간 조회", description = "애정 지수 내역을 주간 조회한다.")
-    public ApiResponse<List<AffectionResponse>> getAffectionWeek(@RequestParam String email, @PathVariable int week) {
-        List<Affection> affection = affectionService.getAffectionWeek(email, week);
+    public ApiResponse<List<AffectionResponse>> getAffectionWeek(@AuthenticationPrincipal UserDetails principal, @PathVariable int week) {
+        List<Affection> affection = affectionService.getAffectionWeek(principal.getUsername(), week);
         if (affection.isEmpty()) return ApiResponse.fail("애정 지수 " + week + "주차 조회 실패", null);
         List<AffectionResponse> response = affection.stream().map(AffectionResponse::from).collect(Collectors.toList());
         return ApiResponse.success("애정 지수 " + week + "주차 조회 성공", response);

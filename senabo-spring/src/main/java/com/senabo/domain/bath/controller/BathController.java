@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -30,8 +32,8 @@ public class BathController {
 
     @PostMapping("/save")
     @Operation(summary = "목욕 생성", description = "목욕을 한 시각을 저장한다.")
-    public ApiResponse<BathResponse> createBath(@RequestParam String email){
-        BathResponse response = bathService.createBath(email);
+    public ApiResponse<BathResponse> createBath(@AuthenticationPrincipal UserDetails principal){
+        BathResponse response = bathService.createBath(principal.getUsername());
         return ApiResponse.success("목욕 저장 완료", response);
     }
 
@@ -45,8 +47,8 @@ public class BathController {
     }
     )
     @Operation(summary = "목욕 조회", description = "목욕 내역을 전체 조회한다.")
-    public ApiResponse<List<BathResponse>>  getBath(@RequestParam String email){
-        List<Bath> bath = bathService.getBath(email);
+    public ApiResponse<List<BathResponse>>  getBath(@AuthenticationPrincipal UserDetails principal){
+        List<Bath> bath = bathService.getBath(principal.getUsername());
         if(bath.isEmpty()) return ApiResponse.fail("목욕 전체 조회 실패", null);
         List<BathResponse> response = bath.stream()
                 .map(BathResponse::from)
@@ -57,8 +59,8 @@ public class BathController {
 
     @DeleteMapping("/remove")
     @Operation(summary = "목욕 내역 삭제", description = "목욕 내역을 삭제한다.")
-    public ApiResponse<Object> removeBath(@RequestParam String email) {
-        bathService.removeBath(email);
+    public ApiResponse<Object> removeBath(@AuthenticationPrincipal UserDetails principal) {
+        bathService.removeBath(principal.getUsername());
         return ApiResponse.success("목욕 삭제 성공", null);
     }
 }

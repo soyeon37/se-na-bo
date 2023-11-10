@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -30,8 +32,8 @@ public class BrushingTeethController {
 
     @PostMapping("/save")
     @Operation(summary = "양치 내역 저장", description = "양치 완료 시각을 저장한다.")
-    public ApiResponse<BrushingTeethResponse> createBrushingTeeth(@RequestParam String email) {
-        BrushingTeethResponse response = brushingTeethService.createBrushingTeeth(email);
+    public ApiResponse<BrushingTeethResponse> createBrushingTeeth(@AuthenticationPrincipal UserDetails principal) {
+        BrushingTeethResponse response = brushingTeethService.createBrushingTeeth(principal.getUsername());
         return ApiResponse.success("양치 내역 저장 성공", response);
     }
 
@@ -45,8 +47,8 @@ public class BrushingTeethController {
     }
     )
     @Operation(summary = "양치 내역 전체 조회", description = "양치 내역을 전체 조회한다.")
-    public ApiResponse<List<BrushingTeethResponse>> getBrushingTeeth(@RequestParam String email) {
-        List<BrushingTeeth> brushingTeeth = brushingTeethService.getBrushingTeeth(email);
+    public ApiResponse<List<BrushingTeethResponse>> getBrushingTeeth(@AuthenticationPrincipal UserDetails principal) {
+        List<BrushingTeeth> brushingTeeth = brushingTeethService.getBrushingTeeth(principal.getUsername());
         if (brushingTeeth.isEmpty()) return ApiResponse.fail("양치 전체 조회 실패", null);
         List<BrushingTeethResponse> response =  brushingTeeth.stream()
                 .map(BrushingTeethResponse::from)
@@ -64,8 +66,8 @@ public class BrushingTeethController {
     }
     )
     @Operation(summary = "양치 내역 주간 조회", description = "양치 내역을 주간 조회한다.")
-    public ApiResponse<List<BrushingTeethResponse>> getBrushingTeethWeek(@RequestParam String email, @PathVariable int week) {
-        List<BrushingTeeth> brushingTeeth = brushingTeethService.getBrushingTeethWeek(email, week);
+    public ApiResponse<List<BrushingTeethResponse>> getBrushingTeethWeek(@AuthenticationPrincipal UserDetails principal, @PathVariable int week) {
+        List<BrushingTeeth> brushingTeeth = brushingTeethService.getBrushingTeethWeek(principal.getUsername(), week);
         if (brushingTeeth.isEmpty()) return ApiResponse.fail("양치 "+ week + "주차 조회 실패", null);
       List<BrushingTeethResponse> response = brushingTeeth.stream()
                 .map(BrushingTeethResponse::from)
@@ -76,8 +78,8 @@ public class BrushingTeethController {
 
     @DeleteMapping("/remove")
     @Operation(summary = "양치 삭제", description = "양치 내역을 삭제한다.")
-    public ApiResponse<Object> removeBrushingTeeth(@RequestParam String email) {
-        brushingTeethService.removeBrushingTeeth(email);
+    public ApiResponse<Object> removeBrushingTeeth(@AuthenticationPrincipal UserDetails principal) {
+        brushingTeethService.removeBrushingTeeth(principal.getUsername());
         return ApiResponse.success("양치 삭제 성공", true);
     }
 

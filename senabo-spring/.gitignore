@@ -33,9 +33,6 @@ out/
 /nbdist/
 /.nb-gradle/
 
-### Secret Key File ###
-**/src/main/resources/firebase/senabopj-firebase-adminsdk-oolpz-5e1dc3eef1.json
-
 ### VS Code ###
 .vscode/
 

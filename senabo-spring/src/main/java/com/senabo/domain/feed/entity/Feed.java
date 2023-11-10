@@ -20,12 +20,16 @@ public class Feed extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member memberId;
 
+    @Column(name = "clean_yn")
+    private Boolean cleanYn;
+
     public Feed(Member memberId) {
         this.memberId = memberId;
+        this.cleanYn = false;
     }
 
-    public Member getMemberId() {
-        return memberId;
+    public void update(){
+        this.cleanYn = true;
     }
 
     public void setMemberId(Member memberId) {

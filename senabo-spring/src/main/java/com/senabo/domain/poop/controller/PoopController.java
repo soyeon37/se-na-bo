@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -39,8 +41,8 @@ public class PoopController {
     }
     )
     @Operation(summary = "배변 생성", description = "배변 생성 시각을 저장한다.")
-    public ApiResponse<PoopResponse> createPoop(@RequestParam String email){
-        PoopResponse response = poopService.createPoop(email);
+    public ApiResponse<PoopResponse> createPoop(@AuthenticationPrincipal UserDetails principal){
+        PoopResponse response = poopService.createPoop(principal.getUsername());
         return ApiResponse.success("배변 저장 성공", response);
     }
 
@@ -54,8 +56,8 @@ public class PoopController {
     }
     )
     @Operation(summary = "배변 전체 조회", description = "배변 내역을 전체 조회한다.")
-    public ApiResponse<List<PoopResponse>> getPoop(@RequestParam String email){
-        List<Poop> poop = poopService.getPoop(email);
+    public ApiResponse<List<PoopResponse>> getPoop(@AuthenticationPrincipal UserDetails principal){
+        List<Poop> poop = poopService.getPoop(principal.getUsername());
         if(poop.isEmpty()) return ApiResponse.fail("배변 전체 조회 실패", null);
         List<PoopResponse> response = poop.stream()
                 .map(PoopResponse::from)
@@ -73,8 +75,8 @@ public class PoopController {
     }
     )
     @Operation(summary = "배변 주간 조회", description = "배변 내역을 주간 조회한다.")
-    public ApiResponse<List<PoopResponse>> getPoopWeek(@RequestParam String email, @PathVariable int week){
-        List<Poop> poop = poopService.getPoopWeek(email, week);
+    public ApiResponse<List<PoopResponse>> getPoopWeek(@AuthenticationPrincipal UserDetails principal, @PathVariable int week){
+        List<Poop> poop = poopService.getPoopWeek(principal.getUsername(), week);
         if(poop.isEmpty()) return ApiResponse.fail("배변 " + week + "주차 조회 실패", null);
         List<PoopResponse> response = poop.stream()
                 .map(PoopResponse::from)
@@ -85,16 +87,16 @@ public class PoopController {
 
     @DeleteMapping("/remove")
     @Operation(summary = "배변 내역 삭제", description = "배변 내역을 삭제한다.")
-    public ApiResponse<Object> removePoop(@RequestParam String email) {
-        poopService.removePoop(email);
+    public ApiResponse<Object> removePoop(@AuthenticationPrincipal UserDetails principal) {
+        poopService.removePoop(principal.getUsername());
         return ApiResponse.success("배변 삭제 성공", true);
     }
 
 
     @PatchMapping("/clean")
     @Operation(summary = "배변 청소 완료", description = "배변 청소 여부(cleanYn)를 true로 수정한다.")
-    public ApiResponse<PoopResponse> updatePoop(@RequestParam String email){
-        PoopResponse response = poopService.updatePoop(email);
+    public ApiResponse<PoopResponse> updatePoop(@AuthenticationPrincipal UserDetails principal){
+        PoopResponse response = poopService.updatePoop(principal.getUsername());
         return ApiResponse.success("배변 청소 성공", response);
     }
 }

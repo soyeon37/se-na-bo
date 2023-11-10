@@ -1,11 +1,10 @@
 package com.senabo.domain.communication.controller;
 
+import com.senabo.common.ActivityType;
 import com.senabo.common.api.ApiResponse;
-import com.senabo.domain.brushingTeeth.dto.response.BrushingTeethResponse;
 import com.senabo.domain.communication.dto.response.CommunicationResponse;
 import com.senabo.domain.communication.entity.Communication;
 import com.senabo.domain.communication.service.CommunicationService;
-import com.senabo.common.ActivityType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,11 +12,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,9 +30,9 @@ public class CommunicationController {
 
     @PostMapping("/save/{type}")
     @Operation(summary = "교감 내역 저장", description = "교감 내역을 저장한다. WAIT(기다려), SIT(앉아), HAND(손), PAT(쓰다듬기), TUG(터그놀이) 5가지 타입이 있다.")
-    public ApiResponse<CommunicationResponse> createCommunication(@RequestParam String email, @PathVariable ActivityType type) {
+    public ApiResponse<CommunicationResponse> createCommunication(@AuthenticationPrincipal UserDetails principal, @PathVariable ActivityType type) {
         if (type == ActivityType.WALK) return ApiResponse.fail("WALK(산책)는 저장 할 수 없습니다.", null);
-        CommunicationResponse response = communicationService.createCommunication(email, type);
+        CommunicationResponse response = communicationService.createCommunication(principal.getUsername(), type);
         return ApiResponse.success("교감 내역 저장 성공", response);
     }
 
@@ -47,8 +46,8 @@ public class CommunicationController {
     }
     )
     @Operation(summary = "교감 전체 조회", description = "교감 내역을 전체 조회한다.")
-    public ApiResponse<List<CommunicationResponse>> getCommunication(@RequestParam String email) {
-        List<Communication> communication = communicationService.getCommunication(email);
+    public ApiResponse<List<CommunicationResponse>> getCommunication(@AuthenticationPrincipal UserDetails principal) {
+        List<Communication> communication = communicationService.getCommunication(principal.getUsername());
         if (communication.isEmpty()) return ApiResponse.fail("교감 전체 조회 실패", null);
         List<CommunicationResponse> response = communication.stream()
                 .map(CommunicationResponse::from)
@@ -65,8 +64,8 @@ public class CommunicationController {
     }
     )
     @Operation(summary = "교감 주간 조회", description = "교감 내역을 주간 조회한다.")
-    public ApiResponse<List<CommunicationResponse>> getCommunication(@RequestParam String email, @PathVariable int week) {
-        List<Communication> communication = communicationService.getCommunicationWeek(email, week);
+    public ApiResponse<List<CommunicationResponse>> getCommunication(@AuthenticationPrincipal UserDetails principal, @PathVariable int week) {
+        List<Communication> communication = communicationService.getCommunicationWeek(principal.getUsername(), week);
         if (communication.isEmpty()) return ApiResponse.fail("교감 "+ week + "주차 조회 실패", null);
         List<CommunicationResponse> response = communication.stream()
                 .map(CommunicationResponse::from)
@@ -77,8 +76,8 @@ public class CommunicationController {
 
     @DeleteMapping("/remove")
     @Operation(summary = "교감 내역 삭제", description = "교감 내역을 삭제한다.")
-    public ApiResponse<Object> removeCommunication(@RequestParam String email) {
-        communicationService.removeCommunication(email);
+    public ApiResponse<Object> removeCommunication(@AuthenticationPrincipal UserDetails principal) {
+        communicationService.removeCommunication(principal.getUsername());
         return ApiResponse.success("교감 삭제 성공", true);
     }
 

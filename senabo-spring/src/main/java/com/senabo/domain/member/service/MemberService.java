@@ -47,7 +47,7 @@ public class MemberService {
     private final ReportRepository reportRepository;
     private final RefreshTokenService refreshTokenService;
     private final TokenProvider tokenProvider;
-    private final FirebaseAuth firebaseAuth;
+//    private final FirebaseAuth firebaseAuth;
 
     public boolean checkEmail(String email) {
         return memberRepository.existsByEmail(email);
@@ -105,13 +105,13 @@ public class MemberService {
 
     @Transactional
     public FirebaseAuthResponse signIn(FirebaseAuthRequest request) {
-        // Firebase Auth 검사
-        try {
-            firebaseAuth.verifyIdToken(request.idToken());
-        } catch (FirebaseAuthException e) {
-            // 유효하지 않은 Firebase Id Token
-            return new FirebaseAuthResponse();
-        }
+//        // Firebase Auth 검사
+//        try {
+//            firebaseAuth.verifyIdToken(request.idToken());
+//        } catch (FirebaseAuthException e) {
+//            // 유효하지 않은 Firebase Id Token
+//            return new FirebaseAuthResponse();
+//        }
 
 
         Optional<Member> member = memberRepository.findByEmail(request.email());

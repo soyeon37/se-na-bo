@@ -2,7 +2,6 @@ package com.senabo.domain.walk.controller;
 
 import com.senabo.common.api.ApiResponse;
 import com.senabo.domain.member.service.MemberService;
-import com.senabo.domain.stress.dto.response.StressResponse;
 import com.senabo.domain.walk.dto.request.UpdateWalkRequest;
 import com.senabo.domain.walk.dto.response.TodayWalkResponse;
 import com.senabo.domain.walk.dto.response.WalkResponse;
@@ -15,11 +14,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,16 +32,16 @@ public class WalkController {
 
     @PostMapping("/start")
     @Operation(summary = "산책 시작", description = "산책을 시작한다. 시작 시간(startTime)을 저장한다.")
-    public ApiResponse<WalkResponse> createWalk(@RequestParam String email) {
-        WalkResponse response = walkService.createWalk(email);
+    public ApiResponse<WalkResponse> createWalk(@AuthenticationPrincipal UserDetails principal) {
+        WalkResponse response = walkService.createWalk(principal.getUsername());
         return ApiResponse.success("산책 시작 성공", response);
     }
 
 
     @PatchMapping("/end")
     @Operation(summary = "산책 종료", description = "산책을 종료한다. 종료 시간(endTime)과 거리(distance)를 저장한다.")
-    public ApiResponse<WalkResponse> updateWalk(@RequestParam String email, @RequestBody UpdateWalkRequest request) {
-        WalkResponse response = walkService.updateWalk(email, request);
+    public ApiResponse<WalkResponse> updateWalk(@AuthenticationPrincipal UserDetails principal, @RequestBody UpdateWalkRequest request) {
+        WalkResponse response = walkService.updateWalk(principal.getUsername(), request);
         return ApiResponse.success("산책 종료 성공", response);
     }
 
@@ -56,8 +55,8 @@ public class WalkController {
     }
     )
     @Operation(summary = "산책 전체 조회", description = "산책 내역을 전체 조회한다.")
-    public ApiResponse<List<WalkResponse>> getWalk(@RequestParam String email) {
-        List<Walk> walk = walkService.getWalk(email);
+    public ApiResponse<List<WalkResponse>> getWalk(@AuthenticationPrincipal UserDetails principal) {
+        List<Walk> walk = walkService.getWalk(principal.getUsername());
         if (walk.isEmpty()) return ApiResponse.fail("산책 전체 조회 성공", null);
         List<WalkResponse> response = walk.stream()
                 .map(WalkResponse::from)
@@ -74,8 +73,8 @@ public class WalkController {
     }
     )
     @Operation(summary = "산책 주간 조회", description = "산책 내역을 주간 조회한다.")
-    public ApiResponse<List<WalkResponse>>  getWalkWeek(@RequestParam String email, @PathVariable int week) {
-        List<Walk> walk = walkService.getWalkWeek(email, week);
+    public ApiResponse<List<WalkResponse>>  getWalkWeek(@AuthenticationPrincipal UserDetails principal, @PathVariable int week) {
+        List<Walk> walk = walkService.getWalkWeek(principal.getUsername(), week);
         if (walk.isEmpty()) return ApiResponse.fail("산책 " + week + "주차 조회 실패", null);
         List<WalkResponse> response = walk.stream()
                 .map(WalkResponse::from)
@@ -92,8 +91,8 @@ public class WalkController {
     }
     )
     @Operation(summary = "산책 당일 조회", description = "산책 내역을 당일 조회한다.")
-    public ApiResponse<TodayWalkResponse>  getTodayWalk(@RequestParam String email) {
-        List<Walk> walk = walkService.getTodayWalk(email);
+    public ApiResponse<TodayWalkResponse>  getTodayWalk(@AuthenticationPrincipal UserDetails principal) {
+        List<Walk> walk = walkService.getTodayWalk(principal.getUsername());
         if (walk.isEmpty()) return ApiResponse.fail("산책 당일 조회 실패", null);
         TodayWalkResponse todayTotalList = walkService.getTodayTotal(walk);
         return ApiResponse.success("산책 당일 조회 성공", todayTotalList);
@@ -101,8 +100,8 @@ public class WalkController {
 
     @DeleteMapping("/remove")
     @Operation(summary = "산책 내역 삭제", description = "산책 내역을 삭제한다.")
-    public ApiResponse<Object> removeWalk(@RequestParam String email) {
-        walkService.removeWalk(email);
+    public ApiResponse<Object> removeWalk(@AuthenticationPrincipal UserDetails principal) {
+        walkService.removeWalk(principal.getUsername());
         return ApiResponse.success("산책 삭제 성공", true);
     }
 }

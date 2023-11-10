@@ -48,7 +48,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // firebase fcm 설정
-    implementation 'com.google.firebase:firebase-admin:9.1.1'
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
     implementation 'com.squareup.okhttp3:okhttp:4.11.0'
 
     // QueryDSL 설정
