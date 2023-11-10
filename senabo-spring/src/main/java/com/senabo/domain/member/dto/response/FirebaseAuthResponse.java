@@ -1,7 +1,4 @@
 package com.senabo.domain.member.dto.response;
-
-
-import com.senabo.config.security.jwt.TokenInfo;
 import com.senabo.config.security.jwt.TokenInfo;
 import com.senabo.domain.member.entity.Sex;
 import com.senabo.domain.member.entity.Species;
@@ -34,8 +31,6 @@ public class FirebaseAuthResponse {
         LocalDateTime enterTime;
         LocalDateTime createTime;
         LocalDateTime updateTime;
-        String uid;
-        String deviceToken;
         TokenInfo token;
     }
 

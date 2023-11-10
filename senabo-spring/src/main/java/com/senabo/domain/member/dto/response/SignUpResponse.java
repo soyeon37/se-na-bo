@@ -1,6 +1,6 @@
 package com.senabo.domain.member.dto.response;
 
-//import com.senabo.config.security.jwt.TokenInfo;
+import com.senabo.config.security.jwt.TokenInfo;
 import com.senabo.domain.member.entity.Sex;
 import com.senabo.domain.member.entity.Species;
 import lombok.Builder;
@@ -23,7 +23,7 @@ public record SignUpResponse(
         LocalDateTime exitTime,
         LocalDateTime enterTime,
         LocalDateTime createTime,
-        LocalDateTime updateTime
-//        TokenInfo token
+        LocalDateTime updateTime,
+        TokenInfo token
 ) {
 }

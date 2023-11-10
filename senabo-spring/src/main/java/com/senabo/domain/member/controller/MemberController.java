@@ -18,6 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 //import org.springframework.security.core.annotation.AuthenticationPrincipal;
 //import org.springframework.security.core.context.SecurityContextHolder;
 //import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -42,7 +45,7 @@ public class MemberController {
     }
     )
     @Operation(summary = "이메일 중복 확인", description = "이미 저장된 이메일인지 중복확인 한다.")
-    public ApiResponse<Map<String, Object>> checkEmail(@RequestParam String email){
+    public ApiResponse<Map<String, Object>> checkEmail(@RequestParam String email) {
         boolean duplicateYn = memberService.checkEmail(email);
         Map<String, Object> response = new HashMap<>();
         response.put("duplicateYn", duplicateYn);
@@ -66,13 +69,6 @@ public class MemberController {
     }
 
 
-//    @DeleteMapping("/remove")
-//    @Operation(summary = "회원 탈퇴", description = "회원정보를 전부 삭제한다.")
-//    public ApiResponse<Object> remove(@RequestBody SignOutRequest request, @AuthenticationPrincipal  UserDetails principal) {
-//        memberService.removeMember(principal.getUsername(), request);
-//        return ApiResponse.success("회원탈퇴 완료", true);
-//    }
-
     @DeleteMapping("/remove")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "사용자를 삭제한다.", content =
@@ -82,8 +78,8 @@ public class MemberController {
     }
     )
     @Operation(summary = "회원 탈퇴", description = "회원정보를 전부 삭제한다.")
-    public ApiResponse<Object> remove(@RequestBody SignOutRequest request, @RequestParam String email) {
-        memberService.removeMember(email, request);
+    public ApiResponse<Object> remove(@RequestBody SignOutRequest request, @AuthenticationPrincipal UserDetails principal) {
+        memberService.removeMember(principal.getUsername(), request);
         return ApiResponse.success("회원탈퇴 성공", true);
     }
 
@@ -96,20 +92,13 @@ public class MemberController {
 
 
     // 로그아웃
-//    @PostMapping("/sign-out")
-//    @Operation(summary = "로그아웃", description = "로그아웃을 한다.")
-//    public ApiResponse<Object> signOut(@RequestBody SignOutRequest request, String email) {
-//        memberService.signOut(request, email);
-//        return ApiResponse.success("로그아웃 성공", null);
-//    }
+    @PostMapping("/sign-out")
+    @Operation(summary = "로그아웃", description = "로그아웃을 한다.")
+    public ApiResponse<Object> signOut(@RequestBody SignOutRequest request, @AuthenticationPrincipal UserDetails principal) {
+        memberService.signOut(request, principal.getUsername());
+        return ApiResponse.success("로그아웃 성공", null);
+    }
 
-
-//    @GetMapping("/get")
-//    @Operation(summary = "회원 정보 조회", description = "회원 정보를 조회한다.")
-//    public ApiResponse<MemberResponse> getInfo(@AuthenticationPrincipal UserDetails principal) {
-//        MemberResponse response = memberService.getInfo(principal.getUsername());
-//        return ApiResponse.success("회원정보 조회", response);
-//    }
 
     @GetMapping("/get")
     @ApiResponses(value = {
@@ -120,37 +109,21 @@ public class MemberController {
     }
     )
     @Operation(summary = "회원 정보 조회", description = "회원 정보를 조회한다.")
-    public ApiResponse<MemberResponse> getInfo(@RequestParam(name = "email") String email) {
-        MemberResponse response = memberService.getInfo(email);
+    public ApiResponse<MemberResponse> getInfo(@AuthenticationPrincipal UserDetails principal) {
+        MemberResponse response = memberService.getInfo(principal.getUsername());
         return ApiResponse.success("회원정보 조회 성공", response);
     }
 
-
-    @PatchMapping("/update")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "사용자 정보를 가져온다.", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = MemberResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
-    }
-    )
+    @PutMapping("/update")
     @Operation(summary = "회원 정보 수정", description = "강아지 이름, 성별, 종, 위도, 경도를 수정한다.")
-    public ApiResponse<MemberResponse> updateInfo(@RequestParam String email, @RequestBody UpdateInfoRequest request) {
-        MemberResponse response = memberService.updateInfo(email, request);
+    public ApiResponse<MemberResponse> updateInfo(@AuthenticationPrincipal UserDetails principal, @RequestBody UpdateInfoRequest request) {
+        MemberResponse response = memberService.updateInfo(principal.getUsername(), request);
         return ApiResponse.success("회원정보 수정 성공", response);
     }
-//    @PatchMapping("/update")
-//    @Operation(summary = "회원 정보 수정", description = "강아지 이름, 성별, 종, 위도, 경도를 수정한다.")
-//    public ApiResponse<MemberResponse> updateInfo(@AuthenticationPrincipal UserDetails principal, @RequestBody UpdateInfoRequest request) {
-//        MemberResponse response = memberService.updateInfo(principal.getUsername(), request);
-//        return ApiResponse.success("회원정보 수정", response);
-//    }
 
-//    @PostMapping("/reissue")
-//    @Operation(summary = "토큰 재발급", description = "만료된 토큰을 받아서 재발급한다.")
-//    public ApiResponse<ReIssueResponse> reissue(@RequestBody ReIssueRequest request) {
-//        return ApiResponse.success("토큰 재발급 성공", memberService.reissue(request.refreshToken(), SecurityContextHolder.getContext().getAuthentication()));
-//    }
-
-
+    @PostMapping("/reissue")
+    @Operation(summary = "토큰 재발급", description = "만료된 토큰을 받아서 재발급한다.")
+    public ApiResponse<ReIssueResponse> reissue(@RequestBody ReIssueRequest request) {
+        return ApiResponse.success("토큰 재발급 성공", memberService.reissue(request.refreshToken(), SecurityContextHolder.getContext().getAuthentication()));
+    }
 }

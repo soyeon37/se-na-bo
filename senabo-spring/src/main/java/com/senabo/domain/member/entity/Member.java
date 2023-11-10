@@ -11,8 +11,11 @@ import com.senabo.domain.member.dto.request.UpdateInfoRequest;
 import com.senabo.domain.poop.entity.Poop;
 import com.senabo.domain.stress.entity.Stress;
 import com.senabo.domain.walk.entity.Walk;
-import lombok.*;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -100,7 +103,8 @@ public class Member extends BaseEntity  {
 
 
 
-    public Member(String dogName, String email, Species species, Sex sex, BigDecimal houseLatitude, BigDecimal houseLongitude, String deviceToken) {
+
+    public Member(String dogName, String email, Species species, Sex sex, BigDecimal houseLatitude, BigDecimal houseLongitude,String deviceToken) {
         this.dogName = dogName;
         this.email = email;
         this.species = species;
@@ -122,7 +126,6 @@ public class Member extends BaseEntity  {
     public void updateStress(int stressLevel){
         this.stressLevel = stressLevel;
     }
-
 
     public void updateAffection(int affection) {
         this.affection = affection;
