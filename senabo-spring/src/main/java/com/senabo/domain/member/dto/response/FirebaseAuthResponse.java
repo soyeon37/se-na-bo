@@ -1,7 +1,8 @@
 package com.senabo.domain.member.dto.response;
 
 
-//import com.senabo.config.security.jwt.TokenInfo;
+import com.senabo.config.security.jwt.TokenInfo;
+import com.senabo.config.security.jwt.TokenInfo;
 import com.senabo.domain.member.entity.Sex;
 import com.senabo.domain.member.entity.Species;
 import lombok.Builder;
@@ -35,7 +36,7 @@ public class FirebaseAuthResponse {
         LocalDateTime updateTime;
         String uid;
         String deviceToken;
-//        TokenInfo token;
+        TokenInfo token;
     }
 
     // 파이어베이스 인증 오류

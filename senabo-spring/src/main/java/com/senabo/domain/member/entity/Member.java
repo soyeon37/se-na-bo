@@ -64,9 +64,6 @@ public class Member extends BaseEntity  {
     private LocalDateTime enterTime;
 
     @Column(nullable = true)
-    private String uid;
-
-    @Column(nullable = true)
     private String deviceToken;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -103,14 +100,13 @@ public class Member extends BaseEntity  {
 
 
 
-    public Member(String dogName, String email, Species species, Sex sex, BigDecimal houseLatitude, BigDecimal houseLongitude, String uid, String deviceToken) {
+    public Member(String dogName, String email, Species species, Sex sex, BigDecimal houseLatitude, BigDecimal houseLongitude, String deviceToken) {
         this.dogName = dogName;
         this.email = email;
         this.species = species;
         this.sex = sex;
         this.houseLatitude = houseLatitude;
         this.houseLongitude = houseLongitude;
-        this.uid = uid;
         this.deviceToken = deviceToken;
         affection = 0;
         stressLevel = 50;
@@ -130,10 +126,6 @@ public class Member extends BaseEntity  {
 
     public void updateAffection(int affection) {
         this.affection = affection;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
     }
 
     public void setDeviceToken(String deviceToken) {

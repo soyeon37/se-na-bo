@@ -60,6 +60,8 @@ public class MemberController {
     @Operation(summary = "회원가입", description = "토큰과 정보를 받아 회원가입을 한다.")
     public ApiResponse<MemberResponse> signUp(@RequestBody SignUpRequest request) {
         MemberResponse response = memberService.signUp(request);
+
+
         return ApiResponse.success("회원가입 성공", response);
     }
 
@@ -86,11 +88,11 @@ public class MemberController {
     }
 
     // 로그인
-//    @PostMapping("/sign-in")
-//    @Operation(summary = "회원 로그인", description = "회원정보로 로그인을 한다.")
-//    public FirebaseAuthResponse firebaseToken(@RequestBody FirebaseAuthRequest firebaseAuthRequest) {
-//        return memberService.signIn(firebaseAuthRequest);
-//    }
+    @PostMapping("/sign-in")
+    @Operation(summary = "회원 로그인", description = "구글 OAuth로 로그인을 한다.")
+    public FirebaseAuthResponse firebaseToken(@RequestBody FirebaseAuthRequest firebaseAuthRequest) {
+        return memberService.signIn(firebaseAuthRequest);
+    }
 
 
     // 로그아웃

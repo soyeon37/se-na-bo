@@ -2,6 +2,11 @@ package com.senabo.domain.member.service;
 
 //import com.senabo.config.security.jwt.TokenInfo;
 //import com.senabo.config.security.jwt.TokenProvider;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.senabo.config.security.jwt.TokenInfo;
+import com.senabo.config.security.jwt.TokenProvider;
 import com.senabo.domain.member.dto.request.FirebaseAuthRequest;
 import com.senabo.domain.member.dto.request.SignOutRequest;
 import com.senabo.domain.member.dto.request.SignUpRequest;
@@ -9,6 +14,7 @@ import com.senabo.domain.member.dto.request.UpdateInfoRequest;
 import com.senabo.domain.member.dto.response.FirebaseAuthResponse;
 import com.senabo.domain.member.dto.response.MemberResponse;
 import com.senabo.domain.member.entity.Member;
+import com.senabo.domain.member.entity.Role;
 import com.senabo.domain.report.entity.Report;
 import com.senabo.domain.member.repository.MemberRepository;
 import com.senabo.domain.report.repository.ReportRepository;
@@ -22,9 +28,14 @@ import org.springframework.dao.DataIntegrityViolationException;
 //import org.springframework.security.core.Authentication;
 //import org.springframework.security.core.GrantedAuthority;
 //import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,8 +48,9 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final ReportRepository reportRepository;
-//    private final RefreshTokenService refreshTokenService;
-//    private final TokenProvider tokenProvider;
+    private final RefreshTokenService refreshTokenService;
+    private final TokenProvider tokenProvider;
+    private final FirebaseAuth firebaseAuth;
 
 
     public boolean checkEmail(String email) {
@@ -47,7 +59,7 @@ public class MemberService {
 
     public MemberResponse signUp(SignUpRequest request) {
         Member member = memberRepository.save(
-                new Member(request.dogName(), request.email(), request.species(), request.sex(), request.houseLatitude(), request.houseLongitude(), request.uid(), request.deviceToken()));
+                new Member(request.dogName(), request.email(), request.species(), request.sex(), request.houseLatitude(), request.houseLongitude(),request.deviceToken()));
 
         Report report = reportRepository.save(
                 new Report(member, 1, 0, 50)
@@ -59,14 +71,14 @@ public class MemberService {
             throw new UserAuthException(String.valueOf(ExceptionMessage.FAIL_SAVE_DATA));
         }
 
-//        List<GrantedAuthority> roles = new ArrayList<>();
-//        roles.add(new SimpleGrantedAuthority(Role.ROLE_USER.toString()));
-//
-//        Authentication authentication = new UsernamePasswordAuthenticationToken(member.getEmail(), null, roles);
-//
-//        TokenInfo tokenInfo = tokenProvider.generateToken(authentication);
-//
-//        refreshTokenService.setValues(tokenInfo.getRefreshToken(), member.getEmail());
+        List<GrantedAuthority> roles = new ArrayList<>();
+        roles.add(new SimpleGrantedAuthority(Role.ROLE_USER.toString()));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(member.getEmail(), null, roles);
+
+        TokenInfo tokenInfo = tokenProvider.generateToken(authentication);
+
+        refreshTokenService.setValues(tokenInfo.getRefreshToken(), member.getEmail());
 
         return MemberResponse.from(member);
     }
@@ -74,7 +86,7 @@ public class MemberService {
     @Transactional
     public void removeMember(String email, SignOutRequest request) {
         try {
-//            refreshTokenService.delValues(request.refreshToken());
+            refreshTokenService.delValues(request.refreshToken());
             memberRepository.deleteByEmail(email);
         } catch (DataIntegrityViolationException e) {
             throw new UserAuthException(ExceptionMessage.FAIL_DELETE_DATA);
@@ -97,29 +109,30 @@ public class MemberService {
 
     @Transactional
     public FirebaseAuthResponse signIn(FirebaseAuthRequest request) {
-//        try {
-//            firebaseAuth.verifyIdToken(request.idToken());
-//        } catch (FirebaseAuthException e) {
-//            return new FirebaseAuthResponse();
-//        }
+        // Firebase Auth 검사
+        try {
+            firebaseAuth.verifyIdToken(request.idToken());
+        } catch (FirebaseAuthException e) {
+            // 유효하지 않은 Firebase Id Token
+            return new FirebaseAuthResponse();
+        }
+
 
         Optional<Member> member = memberRepository.findByEmail(request.email());
         if (member.isEmpty()) {
+            // 유효한 Firebase Id Token + 미 가입자
             return new FirebaseAuthResponse(false);
         }
 
-//        List<GrantedAuthority> roles = new ArrayList<>();
-//        roles.add(new SimpleGrantedAuthority(Role.ROLE_USER.toString()));
-//
-//        Authentication authentication = new UsernamePasswordAuthenticationToken(request.email(), null, roles);
-//
-//        TokenInfo tokenInfo = tokenProvider.generateToken(authentication);
+        // 유효한 Firebase Id Token + 가입자 -> jwt 발급 및 로그인 진행
+        List<GrantedAuthority> roles = new ArrayList<>();
+        roles.add(new SimpleGrantedAuthority(Role.ROLE_USER.toString()));
 
-        member.get().setUid(request.uid());
-        member.get().setDeviceToken(request.deviceToken());
+        // jwt 발급
+        Authentication authentication = new UsernamePasswordAuthenticationToken(request.email(), null, roles);
+        TokenInfo tokenInfo = tokenProvider.generateToken(authentication);
 
-//        refreshTokenService.setValues(tokenInfo.getRefreshToken(), request.email());
-
+        refreshTokenService.setValues(tokenInfo.getRefreshToken(), request.email());
         return new FirebaseAuthResponse(true,
                 FirebaseAuthResponse.SignInResponse.builder()
                         .id(member.get().getId())
@@ -138,7 +151,7 @@ public class MemberService {
                         .enterTime(member.get().getEnterTime())
                         .createTime(member.get().getCreateTime())
                         .updateTime(member.get().getUpdateTime())
-//                        .token(tokenInfo)
+                        .token(tokenInfo)
                         .build()
         );
     }
