@@ -95,4 +95,15 @@ public class FeedController {
         feedService.removeFeed(principal.getUsername());
         return ApiResponse.success("배식 삭제 성공", true);
     }
+
+    // 가장 최신 Feed 조회
+//    @GetMapping("/latest")
+//    @Operation(summary = "최신 Feed 내역 조회", description = "최신 Feed 내역를 조회한다.")
+//    public ApiResponse<FeedResponse> getFeedLatest(@AuthenticationPrincipal UserDetails principal){
+//        FeedResponse response = feedService.getFeedLatest(principal.getUsername());
+//        return ApiResponse.success("최신 Feed 내역 조회 성공", response);
+//    }
+    // 배변 Clean PUT
+
+
 }

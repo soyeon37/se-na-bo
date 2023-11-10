@@ -40,8 +40,8 @@ logging:
       type.descriptor.sql: trace #show parameter binding
       SQL: DEBUG
 
-#fcm:
-#  service-account-file: senabo-account-key.json
+fcm:
+  service-account-file: senabo-account-key.json
 
 jwt:
   secret: o79wfnSC9mNCkN6xKfAinMH4Zh9WZCnby/zNpPa9Yi2FiXy+cbqZUho6/gWNWVWj

@@ -89,6 +89,11 @@ public class FeedService {
         return CheckFeedResponse.from(now.isAfter(twelveAfter), lastFeedH, nowH);
     }
 
+//    public FeedResponse getFeedLatest(String email) {
+//        Member member = memberService.findByEmail(email);
+//
+//    }
+
 //    @Transactional
 //    public void scheduleFeed(String email) {
 //        Member member = memberService.findByEmail(email);

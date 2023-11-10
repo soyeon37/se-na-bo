@@ -34,22 +34,15 @@ public class SignInResponse {
         TokenInfo token;
     }
 
-    // 파이어베이스 인증 오류
-    public SignInResponse() {
 
-        isMember = false;
-    }
-
-    // 파이어베이스 인증 성공 및 회원인 경우
+    // 회원인 경우
     public SignInResponse(boolean isMember, SignInInfoResponse signInResponse) {
-
         this.isMember = isMember;
         this.signInInfoResponse = signInResponse;
     }
 
-    // 파이어베이스 인증 성공 및 회원이 아닌 경우
+    // 회원이 아닌 경우
     public SignInResponse(boolean isMember) {
-
         this.isMember = isMember;
     }
 }
