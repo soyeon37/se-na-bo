@@ -38,10 +38,9 @@ public class MemberController {
 
     @GetMapping("/check")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "", content =
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "이미 존재하는 사용자면 duplicateYn: true / 존재하지 않는 사용자면 duplicateYn: false", content =
                     {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = MemberResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+                    @Schema(implementation = CheckEmailResponse.class))})
     }
     )
     @Operation(summary = "이메일 중복 확인", description = "이미 저장된 이메일인지 중복확인 한다.")

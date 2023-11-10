@@ -23,10 +23,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
 
     private static final String[] AUTH_WHITELIST = {
-            "/api/member/check/email",
-            "/api/member/sign-up",
-            "/api/member/sign-in",
-            "/api/member/reissue"
+            "/member/check/email",
+            "/member/sign-up",
+            "/member/sign-in",
+            "/member/reissue"
     };
 
     @Override
