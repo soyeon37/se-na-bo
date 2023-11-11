@@ -42,7 +42,7 @@ public class AffectionController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = AffectionResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
         }
     )
     @Operation(summary = "애정 지수 전체 조회", description = "애정 지수 내역을 전체 조회한다.")
@@ -61,7 +61,7 @@ public class AffectionController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = AffectionResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
     }
     )
     @Operation(summary = "애정 지수 주간 조회", description = "애정 지수 내역을 주간 조회한다.")

@@ -40,7 +40,7 @@ public class FeedController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = FeedResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
     }
     )
     @Operation(summary = "배식 전체 조회", description = "배식 내역을 전체 조회한다.")
@@ -58,7 +58,7 @@ public class FeedController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = FeedResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
     }
     )
     @Operation(summary = "배식 주간 조회", description = "배식 내역을 주간 조회한다.")
@@ -76,7 +76,7 @@ public class FeedController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "가능하면 possibleYn: ture, 불가능하면 possibleYn: false", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = CheckFeedResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
     }
     )
     @Operation(summary = "배식 가능 여부 확인", description = "마지막 배식시간이 현재 시각으로 부터 12시간이 경과했는지 확인한다.")

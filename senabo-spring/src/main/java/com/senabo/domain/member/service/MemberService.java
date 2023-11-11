@@ -1,6 +1,7 @@
 package com.senabo.domain.member.service;
 
 
+import com.senabo.config.firebase.FCMService;
 import com.senabo.config.security.jwt.TokenInfo;
 import com.senabo.config.security.jwt.TokenProvider;
 import com.senabo.domain.member.dto.request.SignInRequest;
@@ -31,6 +32,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +47,7 @@ public class MemberService {
     private final ReportRepository reportRepository;
     private final RefreshTokenService refreshTokenService;
     private final TokenProvider tokenProvider;
+    private final FCMService fcmService;
 
     public MemberResponse signUp(SignUpRequest request) {
         Member member = memberRepository.save(
@@ -165,4 +168,7 @@ public class MemberService {
         return memberRepository.findAll();
     }
 
+    public void fcmTest(String deviceToken) {
+        fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", LocalDateTime.now() + ": FCM 테스트", deviceToken);
+    }
 }

@@ -40,7 +40,7 @@ public class DiseaseController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = DiseaseResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
     }
     )
     @Operation(summary = "질병 전체 조회", description = "질병 내역을 전체 조회한다.")
@@ -59,7 +59,7 @@ public class DiseaseController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = DiseaseResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
     }
     )
     @Operation(summary = "질병 주간 조회", description = "질병 내역을 주간 조회한다.")

@@ -43,7 +43,7 @@ public class BathController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = BathResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
     }
     )
     @Operation(summary = "목욕 조회", description = "목욕 내역을 전체 조회한다.")

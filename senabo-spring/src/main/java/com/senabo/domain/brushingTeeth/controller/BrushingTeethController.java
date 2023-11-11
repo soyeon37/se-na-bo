@@ -90,7 +90,9 @@ public class BrushingTeethController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "가능하면 possibleYn: true / 불가능하면 possibleYn: false", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = CheckBrushingTeethResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "DATA NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "DATA NOT FOUND", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = Exception.class))})
     }
     )
     @Operation(summary = "양치 가능 여부 확인", description = "일주일에 3번 미만, 하루에 1번 미만인지 확인하고 가능하면 possibleYn: true / 불가능하면 possibleYn: false를 준다.")

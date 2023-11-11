@@ -1,5 +1,6 @@
 package com.senabo.domain.member.controller;
 
+import com.google.protobuf.Api;
 import com.senabo.common.api.ApiResponse;
 import com.senabo.domain.member.dto.request.*;
 import com.senabo.domain.member.dto.response.MemberResponse;
@@ -31,7 +32,7 @@ public class MemberController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "사용자 정보를 받아 회원가입을 한다.", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = MemberResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
     }
     )
     @Operation(summary = "회원가입", description = "토큰과 정보를 받아 회원가입을 한다.")
@@ -53,7 +54,7 @@ public class MemberController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "로그인을 한다. 회원가입을 하지 않았다면 isMember: false / 회원가입을 했다면 isMember: true", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = SignInResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
     }
     )
     @Operation(summary = "회원 로그인", description = "구글 OAuth로 로그인을 한다.")
@@ -76,7 +77,7 @@ public class MemberController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "사용자 정보를 가져온다.", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = MemberResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
     }
     )
     @Operation(summary = "회원 정보 조회", description = "회원 정보를 조회한다.")
@@ -90,7 +91,7 @@ public class MemberController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "사용자 정보를 수정한다.", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = MemberResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
     }
     )
     @Operation(summary = "회원 정보 수정", description = "강아지 이름, 성별, 종, 위도, 경도를 수정한다.")
@@ -104,11 +105,17 @@ public class MemberController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "재발급한 토큰을 가져온다.", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = ReIssueResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
     }
     )
     @Operation(summary = "토큰 재발급", description = "만료된 토큰을 받아서 재발급한다.")
     public ApiResponse<ReIssueResponse> reissue(@RequestBody ReIssueRequest request) {
         return ApiResponse.success("토큰 재발급 성공", memberService.reissue(request.refreshToken(), SecurityContextHolder.getContext().getAuthentication()));
+    }
+
+    @GetMapping("/fcm")
+    public ApiResponse<Object> fcmTest(@RequestBody FcmTokenRequest request){
+        memberService.fcmTest(request.deviceToken());
+        return ApiResponse.success("FCM 발송 성공", true);
     }
 }
