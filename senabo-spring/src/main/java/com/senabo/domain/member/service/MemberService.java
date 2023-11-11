@@ -143,6 +143,9 @@ public class MemberService {
         }
 
         String email = refreshTokenService.getValues(refreshToken);
+        log.info("Redis {}",email);
+        log.info("Auth {}",authentication.getName());
+
         if (email == null || !email.equals(authentication.getName())) {
             throw new TokenCheckFailException(ExceptionMessage.MISMATCH_TOKEN);
         }
