@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -111,9 +110,9 @@ public class MemberController {
     }
     )
     @Operation(summary = "토큰 재발급", description = "만료된 토큰을 받아서 재발급한다.")
-    public ApiResponse<ReIssueResponse> reissue(@RequestBody ReIssueRequest request, @AuthenticationPrincipal Authentication authentication) {
-        log.info("재발급 시작: {}",SecurityContextHolder.getContext().getAuthentication().toString());
-        return ApiResponse.success("토큰 재발급 성공", memberService.reissue(request.refreshToken(), authentication));
+    public ApiResponse<ReIssueResponse> reissue(@RequestBody ReIssueRequest request) {
+//        log.info("재발급 시작: {}",SecurityContextHolder.getContext().getAuthentication().toString());
+        return ApiResponse.success("토큰 재발급 성공", memberService.reissue(request.refreshToken(), SecurityContextHolder.getContext().getAuthentication()));
     }
 
     @PostMapping("/fcm")
