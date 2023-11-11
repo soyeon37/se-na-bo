@@ -51,13 +51,12 @@ public class StressService {
     }
 
 
-    @Transactional
     public StressResponse createStress(String email, StressType type, int changeAmount) {
         Member member = memberService.findByEmail(email);
         return saveStress(member, type, changeAmount);
     }
 
-    @Transactional
+
     public List<Stress> getStress(String email) {
         Member member = memberService.findByEmail(email);
         List<Stress> stressList = stressRepository.findByMemberId(member);

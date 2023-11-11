@@ -26,9 +26,8 @@ public class FCMService {
 
     @Value("${fcm.service-account-file}")
     private String serviceAccountFilePath;
-            //= "/firebase/donnearound-java-access-key.json";
 
-    private String API_URL = "https://fcm.googleapis.com/v1/projects/donnearroundfirebase/messages:send";
+    private String API_URL = "https://fcm.googleapis.com/v1/projects/senabo-k9a108t/messages:send";
 
     private final ObjectMapper objectMapper;
 
@@ -36,6 +35,7 @@ public class FCMService {
         Notification notification = Notification.builder()
                 .setTitle(title)
                 .setBody(body)
+//                .setImage('')
                 .build();
 
         Message message = Message.builder()

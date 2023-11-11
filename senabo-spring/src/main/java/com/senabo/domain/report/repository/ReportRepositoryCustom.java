@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface ReportRepositoryCustom  {
     List<Report> findByMemberId(Member member);
-    Report findLatestData(Member member);
+    Optional<Report> findLatestData(Member member);
     List<Report> findCompleteReport(Member member);
     Optional<Report> findCompleteReportWeek(Member member, int week);
 

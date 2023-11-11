@@ -8,10 +8,11 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 public interface FeedRepositoryCustom {
     List<Feed> findByMemberId(Member member);
-    Feed findLatestData(Member member);
+    Optional<Feed> findLatestData(Member member);
     List<Feed> findFeedWeek(Member member, LocalDateTime endTime, LocalDateTime startTime);
 }

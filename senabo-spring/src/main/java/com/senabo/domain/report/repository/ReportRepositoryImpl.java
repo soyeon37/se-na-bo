@@ -11,7 +11,7 @@ import java.util.Optional;
 import static com.senabo.domain.report.entity.QReport.report;
 
 @RequiredArgsConstructor
-public class ReportRepositoryImpl implements ReportRepositoryCustom{
+public class ReportRepositoryImpl implements ReportRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
 
@@ -25,13 +25,13 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom{
     }
 
     @Override
-    public Report findLatestData(Member member) {
-        return queryFactory
+    public Optional<Report> findLatestData(Member member) {
+        return Optional.ofNullable(queryFactory
                 .selectFrom(report)
                 .where(report.memberId.eq(member))
                 .orderBy(report.updateTime.desc())
                 .limit(1)
-                .fetchOne();
+                .fetchOne());
     }
 
     @Override

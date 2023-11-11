@@ -6,6 +6,8 @@ import com.senabo.domain.report.dto.request.UpdateTotalTimeRequest;
 import com.senabo.domain.report.dto.response.ReportResponse;
 import com.senabo.domain.report.entity.Report;
 import com.senabo.domain.report.repository.ReportRepository;
+import com.senabo.exception.message.ExceptionMessage;
+import com.senabo.exception.model.DataException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,6 +44,12 @@ public class ReportService {
         return report;
     }
 
+    public Report findLatestData(Member member){
+        Optional<Report> reportOptional = reportRepository.findLatestData(member);
+        if(reportOptional.isEmpty()){ throw new DataException(ExceptionMessage.DATA_NOT_FOUND);}
+        return reportOptional.get();
+    }
+
 
     // 앱 사용 시간 저장
     @Transactional
@@ -49,7 +57,7 @@ public class ReportService {
         Member member = memberService.findByEmail(email);
         Duration duration = Duration.between(request.startTime(), request.endTime());
         int hour = (int) duration.toHours();
-        Report report = reportRepository.findLatestData(member);
+        Report report = findLatestData(member);
         report.updateTotalTime(hour);
         return  ReportResponse.from(report);
     }

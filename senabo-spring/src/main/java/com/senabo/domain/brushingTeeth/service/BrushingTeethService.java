@@ -1,6 +1,7 @@
 package com.senabo.domain.brushingTeeth.service;
 
 import com.senabo.domain.brushingTeeth.dto.response.BrushingTeethResponse;
+import com.senabo.domain.brushingTeeth.dto.response.CheckBrushingTeethResponse;
 import com.senabo.domain.brushingTeeth.entity.BrushingTeeth;
 import com.senabo.domain.brushingTeeth.repository.BrushingTeethRepository;
 import com.senabo.domain.member.entity.Member;
@@ -8,6 +9,7 @@ import com.senabo.domain.member.service.MemberService;
 import com.senabo.domain.report.entity.Report;
 import com.senabo.domain.report.service.ReportService;
 import com.senabo.exception.message.ExceptionMessage;
+import com.senabo.exception.model.DataException;
 import com.senabo.exception.model.UserException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,4 +74,21 @@ public class BrushingTeethService {
         }
     }
 
+    public CheckBrushingTeethResponse checkBrushingTeeth(String email) {
+        try {
+            Member member = memberService.findByEmail(email);
+            // 최신 주간 리포트 확인 후 start Date 가져오기
+            Report report = reportService.findLatestData(member);
+            LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
+            int countWeek = brushingTeethRepository.countBrushingTeethWeek(member, startTime);
+            int countToday = brushingTeethRepository.countBrushingTeethToday(member);
+            boolean possibleYn = false;
+            if(countWeek < 3 && countToday == 0){
+                possibleYn = true;
+            }
+            return CheckBrushingTeethResponse.from(possibleYn);
+        } catch (DataIntegrityViolationException e) {
+            throw new DataException(ExceptionMessage.DATA_NOT_FOUND);
+        }
+    }
 }

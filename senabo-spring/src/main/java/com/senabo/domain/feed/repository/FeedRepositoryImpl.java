@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static com.senabo.domain.feed.entity.QFeed.feed;
 
@@ -27,13 +28,13 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
     }
 
     @Override
-    public Feed findLatestData(Member member) {
-        return queryFactory
+    public Optional<Feed> findLatestData(Member member) {
+        return Optional.ofNullable(queryFactory
                 .selectFrom(feed)
                 .where(feed.memberId.eq(member))
                 .orderBy(feed.updateTime.desc())
                 .limit(1)
-                .fetchOne();
+                .fetchOne());
     }
 
     @Override

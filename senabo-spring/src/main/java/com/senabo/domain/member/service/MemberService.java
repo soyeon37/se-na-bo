@@ -160,4 +160,9 @@ public class MemberService {
         return memberRepository.findByEmail(email).orElseThrow(() -> new UserException(ExceptionMessage.USER_NOT_FOUND));
     }
 
+    @Transactional
+    public List<Member> findAllMember(){
+        return memberRepository.findAll();
+    }
+
 }

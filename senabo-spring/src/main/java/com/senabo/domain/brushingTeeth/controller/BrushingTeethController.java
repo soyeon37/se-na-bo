@@ -3,6 +3,7 @@ package com.senabo.domain.brushingTeeth.controller;
 import com.senabo.common.api.ApiResponse;
 import com.senabo.domain.affection.dto.response.AffectionResponse;
 import com.senabo.domain.brushingTeeth.dto.response.BrushingTeethResponse;
+import com.senabo.domain.brushingTeeth.dto.response.CheckBrushingTeethResponse;
 import com.senabo.domain.brushingTeeth.entity.BrushingTeeth;
 import com.senabo.domain.brushingTeeth.service.BrushingTeethService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,7 +44,7 @@ public class BrushingTeethController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = BrushingTeethResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "DATA NOT FOUND")
     }
     )
     @Operation(summary = "양치 내역 전체 조회", description = "양치 내역을 전체 조회한다.")
@@ -62,7 +63,7 @@ public class BrushingTeethController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = BrushingTeethResponse.class))}),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "USER NOT FOUND")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "DATA NOT FOUND")
     }
     )
     @Operation(summary = "양치 내역 주간 조회", description = "양치 내역을 주간 조회한다.")
@@ -84,6 +85,19 @@ public class BrushingTeethController {
     }
 
     // 양치 횟수 일주일 3번 제한 체크
+    @GetMapping("/check")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "가능하면 possibleYn: true / 불가능하면 possibleYn: false", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = CheckBrushingTeethResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "DATA NOT FOUND")
+    }
+    )
+    @Operation(summary = "양치 가능 여부 확인", description = "일주일에 3번 미만, 하루에 1번 미만인지 확인하고 가능하면 possibleYn: true / 불가능하면 possibleYn: false를 준다.")
+    public ApiResponse<CheckBrushingTeethResponse> checkBrushingTeeth(@AuthenticationPrincipal UserDetails principal){
+        CheckBrushingTeethResponse response = brushingTeethService.checkBrushingTeeth(principal.getUsername());
+        return ApiResponse.success("양치 가능 여부 확인 성공", response);
+    }
 
 
 }
