@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveAccessToken(request);
         log.info("headerToken = {}", token);
 
-        if (request.getRequestURI().equals("/api/member/reissue") || (token != null && tokenProvider.validateToken(token))) {
+        if (request.getRequestURI().equals("/member/reissue") || (token != null && tokenProvider.validateToken(token))) {
             log.info("유효한 토큰입니다.");
 
             Authentication authentication = tokenProvider.getAuthentication(token);
