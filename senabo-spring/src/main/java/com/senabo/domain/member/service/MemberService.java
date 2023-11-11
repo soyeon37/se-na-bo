@@ -104,6 +104,7 @@ public class MemberService {
         Optional<Member> memberOptional = memberRepository.findByEmail(request.email());
         if (memberOptional.isEmpty()) {
             // 미 가입자
+            log.info("미 가입자");
             return SignInResponse.emptyMember(false);
         }
 
@@ -111,12 +112,14 @@ public class MemberService {
         // 유효한 가입자 -> jwt 발급 및 로그인 진행
         List<GrantedAuthority> roles = new ArrayList<>();
         roles.add(new SimpleGrantedAuthority(Role.ROLE_USER.toString()));
-
+        log.info("JWT 발급 시작");
         // jwt 발급
         Authentication authentication = new UsernamePasswordAuthenticationToken(request.email(), null, roles);
         TokenInfo tokenInfo = tokenProvider.generateToken(authentication);
-
+        log.info("Token 발급");
+        
         refreshTokenService.setValues(tokenInfo.getRefreshToken(), request.email());
+        log.info("레디스 저장");
 
         return SignInResponse.from(member, tokenInfo, true);
     }
@@ -164,7 +167,7 @@ public class MemberService {
     }
 
     @Transactional
-    public List<Member> findAllMember(){
+    public List<Member> findAllMember() {
         return memberRepository.findAll();
     }
 
