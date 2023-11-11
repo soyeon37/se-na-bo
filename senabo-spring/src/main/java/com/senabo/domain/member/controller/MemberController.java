@@ -6,6 +6,7 @@ import com.senabo.domain.member.dto.request.*;
 import com.senabo.domain.member.dto.response.MemberResponse;
 import com.senabo.domain.member.dto.response.ReIssueResponse;
 import com.senabo.domain.member.dto.response.SignInResponse;
+import com.senabo.domain.member.dto.response.SignUpResponse;
 import com.senabo.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,13 +32,13 @@ public class MemberController {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "사용자 정보를 받아 회원가입을 한다.", content =
                     {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = MemberResponse.class))}),
+                    @Schema(implementation = SignUpResponse.class))}),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
     }
     )
     @Operation(summary = "회원가입", description = "토큰과 정보를 받아 회원가입을 한다.")
-    public ApiResponse<MemberResponse> signUp(@RequestBody SignUpRequest request) {
-        MemberResponse response = memberService.signUp(request);
+    public ApiResponse<SignUpResponse> signUp(@RequestBody SignUpRequest request) {
+        SignUpResponse response = memberService.signUp(request);
         return ApiResponse.success("회원가입 성공", response);
     }
 

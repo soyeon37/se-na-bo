@@ -8,10 +8,7 @@ import com.senabo.domain.member.dto.request.SignInRequest;
 import com.senabo.domain.member.dto.request.SignOutRequest;
 import com.senabo.domain.member.dto.request.SignUpRequest;
 import com.senabo.domain.member.dto.request.UpdateInfoRequest;
-import com.senabo.domain.member.dto.response.CheckEmailResponse;
-import com.senabo.domain.member.dto.response.MemberResponse;
-import com.senabo.domain.member.dto.response.ReIssueResponse;
-import com.senabo.domain.member.dto.response.SignInResponse;
+import com.senabo.domain.member.dto.response.*;
 import com.senabo.domain.member.entity.Member;
 import com.senabo.domain.member.entity.Role;
 import com.senabo.domain.member.repository.MemberRepository;
@@ -49,7 +46,7 @@ public class MemberService {
     private final TokenProvider tokenProvider;
     private final FCMService fcmService;
 
-    public MemberResponse signUp(SignUpRequest request) {
+    public SignUpResponse signUp(SignUpRequest request) {
         Member member = memberRepository.save(
                 new Member(request.dogName(), request.email(), request.species(), request.sex(), request.houseLatitude(), request.houseLongitude(), request.deviceToken()));
 
@@ -72,7 +69,7 @@ public class MemberService {
 
         refreshTokenService.setValues(tokenInfo.getRefreshToken(), member.getEmail());
 
-        return MemberResponse.from(member);
+        return SignUpResponse.from(member, tokenInfo);
     }
 
     @Transactional
@@ -113,6 +110,7 @@ public class MemberService {
         List<GrantedAuthority> roles = new ArrayList<>();
         roles.add(new SimpleGrantedAuthority(Role.ROLE_USER.toString()));
         log.info("JWT 발급 시작");
+
         // jwt 발급
         Authentication authentication = new UsernamePasswordAuthenticationToken(request.email(), null, roles);
         TokenInfo tokenInfo = tokenProvider.generateToken(authentication);
