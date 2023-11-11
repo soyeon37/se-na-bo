@@ -59,7 +59,8 @@ public class TokenProvider {
         /*
             access token 유효시간 수정 필요
          */
-        Date accessTokenExpiresIn = new Date(now + 60*60*24*1000);
+//        Date accessTokenExpiresIn = new Date(now + 60*60*24*1000);
+        Date accessTokenExpiresIn = new Date(now);
 
         return Jwts.builder()
                 .setSubject(authentication.getName()) // 사용자 전화번호

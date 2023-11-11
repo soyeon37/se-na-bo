@@ -1,9 +1,13 @@
 package com.senabo.domain.walk.service;
 
+import com.senabo.common.ActivityType;
+import com.senabo.domain.affection.service.AffectionService;
 import com.senabo.domain.member.entity.Member;
 import com.senabo.domain.member.service.MemberService;
 import com.senabo.domain.report.entity.Report;
 import com.senabo.domain.report.service.ReportService;
+import com.senabo.domain.stress.entity.StressType;
+import com.senabo.domain.stress.service.StressService;
 import com.senabo.domain.walk.dto.request.UpdateWalkRequest;
 import com.senabo.domain.walk.dto.response.TodayWalkResponse;
 import com.senabo.domain.walk.dto.response.WalkResponse;
@@ -30,6 +34,8 @@ public class WalkService {
     private final WalkRepository walkRepository;
     private final MemberService memberService;
     private final ReportService reportService;
+    private final StressService stressService;
+    private final AffectionService affectionService;
 
     @Transactional
     public WalkResponse createWalk(String email) {
@@ -107,46 +113,46 @@ public class WalkService {
     }
 
 
-//    @Transactional
-//    public void scheduleCheckWalk(Long id) {
-//        Member member = findById(id);
-//        int originAffection = member.getAffection();
-//        int originStress = member.getStressLevel();
-//        int changeAffectionAmount = 0;
-//        int changeStressAmount = 0;
-//
-//        LocalDateTime startToday = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
-//        List<Walk> list = walkRepository.findTodayData(member, startToday);
-//        double totalDistance = 0.0;
-//        for (int i = 0; i < list.size(); i++) {
-//            totalDistance += list.get(i).getDistance();
-//        }
-//
-//        log.info("총 산책 거리: " + totalDistance);
-//
-//        boolean complete = false;
-//
-//        if (totalDistance < 5.0) {
-//            changeAffectionAmount = -5;
-//            changeStressAmount = 10;
-//        } else {
-//            complete = true;
-//            changeAffectionAmount = 5;
-//            changeStressAmount = -10;
-//        }
-//
-//
-//        // !complete 미완료 + stress 증가 -> not 100
-//        // complete 완료 + stress 감소 -> not 0
-//        if ((!complete && originStress != 100) || (complete && originStress != 0)) {
-//            saveStress(member, StressType.WALK, changeStressAmount);
-//        }
-//
-//        // 재 계산 필요     if(originAffection >= 96) changeAmount = 100 - originAffection;
-//        // 미완료 + affection 감소 -> not 0
-//        // 완료 + affection 증가 -> not 100
-//        if ((!complete && originAffection >= 5) || (complete && originAffection <= 95)) {
-//            saveAffection(member, AffectionType.WALK, changeAffectionAmount);
-//        }
-//    }
+    @Transactional
+    public void scheduleCheckWalk(Member member) {
+        int originAffection = member.getAffection();
+        int originStress = member.getStressLevel();
+        int changeAffectionAmount = 0;
+        int changeStressAmount = 0;
+
+        LocalDateTime startToday = LocalDateTime.now().minus(Duration.ofDays(1)).truncatedTo(ChronoUnit.DAYS);
+
+        List<Walk> list = walkRepository.findTodayData(member, startToday);
+        double totalDistance = 0.0;
+        for(Walk walk : list){
+            totalDistance += walk.getDistance();
+        }
+
+        log.info("총 산책 거리: " + totalDistance);
+
+        boolean complete = false;
+
+        if (totalDistance < 5.0) {
+            changeAffectionAmount = -5;
+            changeStressAmount = 10;
+        } else {
+            complete = true;
+            changeAffectionAmount = 5;
+            changeStressAmount = -10;
+        }
+
+
+        // !complete 미완료 + stress 증가 -> not 100
+        // complete 완료 + stress 감소 -> not 0
+        if ((!complete && originStress != 100) || (complete && originStress != 0)) {
+            stressService.saveStress(member, StressType.WALK, changeStressAmount);
+        }
+
+        // 재 계산 필요     if(originAffection >= 96) changeAmount = 100 - originAffection;
+        // 미완료 + affection 감소 -> not 0
+        // 완료 + affection 증가 -> not 100
+        if ((!complete && originAffection >= 5) || (complete && originAffection <= 95)) {
+            affectionService.saveAffection(member, ActivityType.WALK, changeAffectionAmount);
+        }
+    }
 }
