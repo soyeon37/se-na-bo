@@ -113,7 +113,7 @@ public class MemberController {
         return ApiResponse.success("토큰 재발급 성공", memberService.reissue(request.refreshToken(), SecurityContextHolder.getContext().getAuthentication()));
     }
 
-    @GetMapping("/fcm")
+    @PostMapping("/fcm")
     public ApiResponse<Object> fcmTest(@RequestBody FcmTokenRequest request){
         memberService.fcmTest(request.deviceToken());
         return ApiResponse.success("FCM 발송 성공", true);
