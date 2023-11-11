@@ -32,6 +32,7 @@ public class FCMService {
     private final ObjectMapper objectMapper;
 
     public void sendNotificationByToken(String title, String body, String token) {
+        log.info("sendNotificationByToken");
         Notification notification = Notification.builder()
                 .setTitle(title)
                 .setBody(body)

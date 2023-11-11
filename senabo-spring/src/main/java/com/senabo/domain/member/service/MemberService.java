@@ -169,6 +169,7 @@ public class MemberService {
     }
 
     public void fcmTest(String deviceToken) {
+        log.info("FCM 테스트 시작");
         fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", LocalDateTime.now() + ": FCM 테스트", deviceToken);
     }
 }
