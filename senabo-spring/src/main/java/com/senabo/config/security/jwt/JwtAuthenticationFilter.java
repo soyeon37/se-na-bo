@@ -25,7 +25,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String[] AUTH_WHITELIST = {
             "/member/sign-up",
             "/member/sign-in",
-            "/member/reissue"
+            "/member/reissue",
+            "/member/fcm"
     };
 
     @Override
