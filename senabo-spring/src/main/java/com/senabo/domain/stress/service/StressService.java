@@ -30,7 +30,6 @@ import java.util.Optional;
 public class StressService {
     private final StressRepository stressRepository;
     private final MemberService memberService;
-    private final ReportService reportService;
 
     @Transactional
     public StressResponse saveStress(Member member, StressType type, int changeAmount) {
@@ -65,15 +64,10 @@ public class StressService {
     }
 
     @Transactional
-    public List<Stress> getStressWeek(String email, int week) {
-        Member member = memberService.findByEmail(email);
-        List<Stress> stressList = new ArrayList<>();
-        Optional<Report> result = reportService.findReportWeek(member, week);
-        if (result.isEmpty()) return stressList;
-        Report report = result.get();
+    public List<Stress> getStressWeek(Report report, Member member) {
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        stressList = stressRepository.findStressWeek(member, endTime, startTime);
+        List<Stress> stressList = stressRepository.findStressWeek(member, endTime, startTime);
         return stressList;
     }
 

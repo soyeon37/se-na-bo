@@ -30,7 +30,6 @@ import java.util.Optional;
 public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final MemberService memberService;
-    private final ReportService reportService;
 
     @Transactional
     public ExpenseResponse createExpense(String email, CreateExpenseRequest request) {
@@ -61,11 +60,7 @@ public class ExpenseService {
     }
 
     @Transactional
-    public TotalAmountExpenseResponse getExpenseTotalWeek(String email, int week) {
-        Member member = memberService.findByEmail(email);
-        Optional<Report> result = reportService.findReportWeek(member, week);
-        if (result.isEmpty()) return TotalAmountExpenseResponse.from(0.0);
-        Report report = result.get();
+    public TotalAmountExpenseResponse getExpenseTotalWeek(Report report, Member member) {
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
         Double totalAmount = expenseRepository.getTotalAmountWeek(member, endTime, startTime);
@@ -75,15 +70,10 @@ public class ExpenseService {
 
 
     @Transactional
-    public List<Expense> getExpenseWeek(String email, int week) {
-        List<Expense> expenseList = new ArrayList<>();
-        Member member = memberService.findByEmail(email);
-        Optional<Report> result = reportService.findReportWeek(member, week);
-        if (result.isEmpty()) return expenseList;
-        Report report = result.get();
+    public List<Expense> getExpenseWeek(Report report, Member member) {
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        expenseList = expenseRepository.findExpenseWeek(member, endTime, startTime);
+        List<Expense> expenseList = expenseRepository.findExpenseWeek(member, endTime, startTime);
         return expenseList;
     }
 

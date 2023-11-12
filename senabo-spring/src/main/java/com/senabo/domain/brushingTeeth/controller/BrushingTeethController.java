@@ -1,11 +1,14 @@
 package com.senabo.domain.brushingTeeth.controller;
 
 import com.senabo.common.api.ApiResponse;
-import com.senabo.domain.affection.dto.response.AffectionResponse;
 import com.senabo.domain.brushingTeeth.dto.response.BrushingTeethResponse;
 import com.senabo.domain.brushingTeeth.dto.response.CheckBrushingTeethResponse;
 import com.senabo.domain.brushingTeeth.entity.BrushingTeeth;
 import com.senabo.domain.brushingTeeth.service.BrushingTeethService;
+import com.senabo.domain.member.entity.Member;
+import com.senabo.domain.member.service.MemberService;
+import com.senabo.domain.report.entity.Report;
+import com.senabo.domain.report.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,9 +20,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,6 +32,8 @@ import java.util.stream.Collectors;
 public class BrushingTeethController {
 
     private final BrushingTeethService brushingTeethService;
+    private final MemberService memberService;
+    private final ReportService reportService;
 
     @PostMapping("/save")
     @Operation(summary = "양치 내역 저장", description = "양치 완료 시각을 저장한다.")
@@ -51,7 +55,7 @@ public class BrushingTeethController {
     public ApiResponse<List<BrushingTeethResponse>> getBrushingTeeth(@AuthenticationPrincipal UserDetails principal) {
         List<BrushingTeeth> brushingTeeth = brushingTeethService.getBrushingTeeth(principal.getUsername());
         if (brushingTeeth.isEmpty()) return ApiResponse.fail("양치 전체 조회 실패", null);
-        List<BrushingTeethResponse> response =  brushingTeeth.stream()
+        List<BrushingTeethResponse> response = brushingTeeth.stream()
                 .map(BrushingTeethResponse::from)
                 .collect(Collectors.toList());
         return ApiResponse.success("양치 전체 조회 성공", response);
@@ -68,9 +72,11 @@ public class BrushingTeethController {
     )
     @Operation(summary = "양치 내역 주간 조회", description = "양치 내역을 주간 조회한다.")
     public ApiResponse<List<BrushingTeethResponse>> getBrushingTeethWeek(@AuthenticationPrincipal UserDetails principal, @PathVariable int week) {
-        List<BrushingTeeth> brushingTeeth = brushingTeethService.getBrushingTeethWeek(principal.getUsername(), week);
-        if (brushingTeeth.isEmpty()) return ApiResponse.fail("양치 "+ week + "주차 조회 실패", null);
-      List<BrushingTeethResponse> response = brushingTeeth.stream()
+        Member member = memberService.findByEmail(principal.getUsername());
+        Optional<Report> reportOptional = reportService.findReportWeek(member, week);
+        if (reportOptional.isEmpty()) return ApiResponse.fail("양치 " + week + "주차 조회 실패", null);
+        List<BrushingTeeth> brushingTeeth = brushingTeethService.getBrushingTeethWeek(reportOptional.get(), member);
+        List<BrushingTeethResponse> response = brushingTeeth.stream()
                 .map(BrushingTeethResponse::from)
                 .collect(Collectors.toList());
         return ApiResponse.success("양치 " + week + "주차 조회 성공", response);
@@ -96,10 +102,10 @@ public class BrushingTeethController {
     }
     )
     @Operation(summary = "양치 가능 여부 확인", description = "일주일에 3번 미만, 하루에 1번 미만인지 확인하고 가능하면 possibleYn: true / 불가능하면 possibleYn: false를 준다.")
-    public ApiResponse<CheckBrushingTeethResponse> checkBrushingTeeth(@AuthenticationPrincipal UserDetails principal){
-        CheckBrushingTeethResponse response = brushingTeethService.checkBrushingTeeth(principal.getUsername());
+    public ApiResponse<CheckBrushingTeethResponse> checkBrushingTeeth(@AuthenticationPrincipal UserDetails principal) {
+        Member member = memberService.findByEmail(principal.getUsername());
+        Report report = reportService.findLatestData(member);
+        CheckBrushingTeethResponse response = brushingTeethService.checkBrushingTeeth(report, member);
         return ApiResponse.success("양치 가능 여부 확인 성공", response);
     }
-
-
 }

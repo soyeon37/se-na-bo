@@ -35,7 +35,7 @@ import java.util.Optional;
 public class FeedService {
     private final FeedRepository feedRepository;
     private final MemberService memberService;
-    private final ReportService reportService;
+//    private final ReportService reportService;
 //    private final StressService stressService;
 //    private final ParsingMessageService parsingMessageService;
 //    private final FCMService fcmService;
@@ -61,15 +61,10 @@ public class FeedService {
     }
 
     @Transactional
-    public List<Feed> getFeedWeek(String email, int week) {
-        List<Feed> feedList = new ArrayList<>();
-        Member member = memberService.findByEmail(email);
-        Optional<Report> result = reportService.findReportWeek(member, week);
-        if (result.isEmpty()) return feedList;
-        Report report = result.get();
+    public List<Feed> getFeedWeek(Report report, Member member) {
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        feedList = feedRepository.findFeedWeek(member, endTime, startTime);
+        List<Feed> feedList = feedRepository.findFeedWeek(member, endTime, startTime);
         return feedList;
     }
 

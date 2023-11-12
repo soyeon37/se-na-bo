@@ -1,7 +1,10 @@
 package com.senabo.domain.walk.controller;
 
 import com.senabo.common.api.ApiResponse;
+import com.senabo.domain.member.entity.Member;
 import com.senabo.domain.member.service.MemberService;
+import com.senabo.domain.report.entity.Report;
+import com.senabo.domain.report.service.ReportService;
 import com.senabo.domain.walk.dto.request.UpdateWalkRequest;
 import com.senabo.domain.walk.dto.response.TodayWalkResponse;
 import com.senabo.domain.walk.dto.response.WalkResponse;
@@ -19,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,6 +33,7 @@ import java.util.stream.Collectors;
 public class WalkController {
     private final WalkService walkService;
     private final MemberService memberService;
+    private final ReportService reportService;
 
     @PostMapping("/start")
     @Operation(summary = "산책 시작", description = "산책을 시작한다. 시작 시간(startTime)을 저장한다.")
@@ -74,8 +79,10 @@ public class WalkController {
     )
     @Operation(summary = "산책 주간 조회", description = "산책 내역을 주간 조회한다.")
     public ApiResponse<List<WalkResponse>>  getWalkWeek(@AuthenticationPrincipal UserDetails principal, @PathVariable int week) {
-        List<Walk> walk = walkService.getWalkWeek(principal.getUsername(), week);
-        if (walk.isEmpty()) return ApiResponse.fail("산책 " + week + "주차 조회 실패", null);
+        Member member = memberService.findByEmail(principal.getUsername());
+        Optional<Report> reportOptional =  reportService.findReportWeek(member, week);
+        if(reportOptional.isEmpty()) return ApiResponse.fail("산책 " + week + "주차 조회 실패", null);
+        List<Walk> walk = walkService.getWalkWeek(reportOptional.get(), member);
         List<WalkResponse> response = walk.stream()
                 .map(WalkResponse::from)
                 .collect(Collectors.toList());

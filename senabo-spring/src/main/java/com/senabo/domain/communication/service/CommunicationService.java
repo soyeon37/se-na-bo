@@ -29,14 +29,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CommunicationService {
     private final CommunicationRepository communicationRepository;
-    private final ReportService reportService;
     private final MemberService memberService;
-    private final AffectionService affectionService;
 
     @Transactional
-    public CommunicationResponse createCommunication(String email, ActivityType type) {
-        Member member = memberService.findByEmail(email);
-        int changeAmount = 5;
+    public CommunicationResponse createCommunication(Member member, ActivityType type) {
         Communication communication = communicationRepository.save(
                 new Communication(member, type));
         try {
@@ -44,7 +40,7 @@ public class CommunicationService {
         } catch (DataIntegrityViolationException e) {
             throw new UserException(String.valueOf(ExceptionMessage.FAIL_SAVE_DATA));
         }
-        affectionService.saveAffection(member, type, changeAmount);
+
         return CommunicationResponse.from(communication);
     }
 
@@ -57,15 +53,10 @@ public class CommunicationService {
     }
 
     @Transactional
-    public List<Communication> getCommunicationWeek(String email, int week) {
-        List<Communication> communicationList = new ArrayList<>();
-        Member member = memberService.findByEmail(email);
-        Optional<Report> result = reportService.findReportWeek(member, week);
-        if (result.isEmpty()) return communicationList;
-        Report report = result.get();
+    public List<Communication> getCommunicationWeek(Report report, Member member) {
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        communicationList = communicationRepository.findCommunicationWeek(member, endTime, startTime);
+        List<Communication> communicationList = communicationRepository.findCommunicationWeek(member, endTime, startTime);
         return communicationList;
     }
 

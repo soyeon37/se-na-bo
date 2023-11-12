@@ -5,6 +5,10 @@ import com.senabo.domain.feed.dto.response.CheckFeedResponse;
 import com.senabo.domain.feed.dto.response.FeedResponse;
 import com.senabo.domain.feed.entity.Feed;
 import com.senabo.domain.feed.service.FeedService;
+import com.senabo.domain.member.entity.Member;
+import com.senabo.domain.member.service.MemberService;
+import com.senabo.domain.report.entity.Report;
+import com.senabo.domain.report.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -27,6 +32,8 @@ import java.util.stream.Collectors;
 public class FeedController {
 
     private final FeedService feedService;
+    private final ReportService reportService;
+    private final MemberService memberService;
 
     @PostMapping("/save")
     @Operation(summary = "배식 저장", description = "배식을 저장한다.")
@@ -63,8 +70,10 @@ public class FeedController {
     )
     @Operation(summary = "배식 주간 조회", description = "배식 내역을 주간 조회한다.")
     public ApiResponse<List<FeedResponse>> getFeedWeek(@AuthenticationPrincipal UserDetails principal, @PathVariable int week) {
-        List<Feed> feed = feedService.getFeedWeek(principal.getUsername(), week);
-        if (feed.isEmpty()) return ApiResponse.fail("배식 " + week + "주차 조회 실패", null);
+        Member member = memberService.findByEmail(principal.getUsername());
+        Optional<Report> reportOptional = reportService.findReportWeek(member, week);
+        if (reportOptional.isEmpty()) return ApiResponse.fail("배식 " + week + "주차 조회 실패", null);
+        List<Feed> feed = feedService.getFeedWeek(reportOptional.get(), member);
         List<FeedResponse> response = feed.stream()
                 .map(FeedResponse::from)
                 .collect(Collectors.toList());
@@ -95,7 +104,7 @@ public class FeedController {
     // 가장 최신 Feed 조회
     @GetMapping("/latest")
     @Operation(summary = "최신 Feed 내역 조회", description = "최신 Feed 내역를 조회한다.")
-    public ApiResponse<FeedResponse> getFeedLatest(@AuthenticationPrincipal UserDetails principal){
+    public ApiResponse<FeedResponse> getFeedLatest(@AuthenticationPrincipal UserDetails principal) {
         FeedResponse response = feedService.getFeedLatest(principal.getUsername());
         return ApiResponse.success("최신 Feed 내역 조회 성공", response);
     }
@@ -104,7 +113,7 @@ public class FeedController {
     // 배변 Clean PUT
     @PatchMapping("/clean")
     @Operation(summary = "배변 청소 완료", description = "배변 청소 여부(cleanYn)를 true로 수정한다.")
-    public ApiResponse<FeedResponse> updatePoop(@AuthenticationPrincipal UserDetails principal){
+    public ApiResponse<FeedResponse> updatePoop(@AuthenticationPrincipal UserDetails principal) {
         FeedResponse response = feedService.updatePoop(principal.getUsername());
         return ApiResponse.success("배변 청소 성공", response);
     }

@@ -29,7 +29,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BrushingTeethService {
     private final BrushingTeethRepository brushingTeethRepository;
-    private final ReportService reportService;
     private final MemberService memberService;
 
     @Transactional
@@ -52,15 +51,10 @@ public class BrushingTeethService {
         return brushingTeethList;
     }
     @Transactional
-    public List<BrushingTeeth> getBrushingTeethWeek(String email, int week) {
-        List<BrushingTeeth> brushingTeethList = new ArrayList<>();
-        Member member = memberService.findByEmail(email);
-        Optional<Report> result = reportService.findReportWeek(member, week);
-        if(result.isEmpty()) return brushingTeethList;
-        Report report = result.get();
+    public List<BrushingTeeth> getBrushingTeethWeek(Report report, Member member) {
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        brushingTeethList = brushingTeethRepository.findBrushingTeethWeek(member, endTime, startTime);
+        List<BrushingTeeth> brushingTeethList = brushingTeethRepository.findBrushingTeethWeek(member, endTime, startTime);
         return brushingTeethList;
     }
 
@@ -74,11 +68,9 @@ public class BrushingTeethService {
         }
     }
 
-    public CheckBrushingTeethResponse checkBrushingTeeth(String email) {
+    public CheckBrushingTeethResponse checkBrushingTeeth(Report report, Member member) {
         try {
-            Member member = memberService.findByEmail(email);
             // 최신 주간 리포트 확인 후 start Date 가져오기
-            Report report = reportService.findLatestData(member);
             LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
             int countWeek = brushingTeethRepository.countBrushingTeethWeek(member, startTime);
             int countToday = brushingTeethRepository.countBrushingTeethToday(member);

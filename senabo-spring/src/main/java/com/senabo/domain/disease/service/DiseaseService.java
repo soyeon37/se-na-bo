@@ -28,7 +28,6 @@ import java.util.Optional;
 public class DiseaseService {
     private final DiseaseRepository diseaseRepository;
     private final MemberService memberService;
-    private final ReportService reportService;
 
     @Transactional
     public DiseaseResponse createDisease(String email, String diseaseName) {
@@ -51,15 +50,10 @@ public class DiseaseService {
     }
 
     @Transactional
-    public List<Disease> getDiseaseWeek(String email, int week) {
-        List<Disease> diseaseList = new ArrayList<>();
-        Member member = memberService.findByEmail(email);
-        Optional<Report> result = reportService.findReportWeek(member, week);
-        if(result.isEmpty()) return diseaseList;
-        Report report = result.get();
+    public List<Disease> getDiseaseWeek(Report report, Member member) {
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        diseaseList = diseaseRepository.findDiseaseWeek(member, endTime, startTime);
+        List<Disease> diseaseList = diseaseRepository.findDiseaseWeek(member, endTime, startTime);
         return diseaseList;
     }
 

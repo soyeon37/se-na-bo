@@ -37,7 +37,6 @@ import java.util.Optional;
 public class WalkService {
     private final WalkRepository walkRepository;
     private final MemberService memberService;
-    private final ReportService reportService;
 //    private final StressService stressService;
 //    private final AffectionService affectionService;
 
@@ -64,15 +63,10 @@ public class WalkService {
     }
 
     @Transactional
-    public List<Walk> getWalkWeek(String email, int week) {
-        Member member = memberService.findByEmail(email);
-        List<Walk> walkList = new ArrayList<>();
-        Optional<Report> result = reportService.findReportWeek(member, week);
-        if (result.isEmpty()) return walkList;
-        Report report = result.get();
+    public List<Walk> getWalkWeek(Report report, Member member) {
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        walkList = walkRepository.findWalkWeek(member, endTime, startTime);
+        List<Walk> walkList = walkRepository.findWalkWeek(member, endTime, startTime);
         return walkList;
     }
 

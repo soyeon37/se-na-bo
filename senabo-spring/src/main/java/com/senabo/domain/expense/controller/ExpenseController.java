@@ -7,6 +7,10 @@ import com.senabo.domain.expense.dto.response.ExpenseResponse;
 import com.senabo.domain.expense.dto.response.TotalAmountExpenseResponse;
 import com.senabo.domain.expense.entity.Expense;
 import com.senabo.domain.expense.service.ExpenseService;
+import com.senabo.domain.member.entity.Member;
+import com.senabo.domain.member.service.MemberService;
+import com.senabo.domain.report.entity.Report;
+import com.senabo.domain.report.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,6 +36,8 @@ import java.util.stream.Collectors;
 public class ExpenseController {
 
     private final ExpenseService expenseService;
+    private final MemberService memberService;
+    private final ReportService reportService;
 
     @PostMapping("/save")
     @Operation(summary = "비용 저장", description = "비용을 저장한다.")
@@ -69,8 +76,11 @@ public class ExpenseController {
     )
     @Operation(summary = "비용 주간 조회", description = "비용 내역을 주간 조회한다.")
     public ApiResponse<List<ExpenseResponse>> getExpenseWeek(@AuthenticationPrincipal UserDetails principal, @PathVariable  int week) {
-        List<Expense> expense = expenseService.getExpenseWeek(principal.getUsername(), week);
-        if (expense.isEmpty()) return ApiResponse.fail("비용 "+ week + "주차 조회 실패", null);
+        Member member = memberService.findByEmail(principal.getUsername());
+        Optional<Report> reportOptional =  reportService.findReportWeek(member, week);
+
+        if(reportOptional.isEmpty()) return ApiResponse.fail("비용 "+ week + "주차 조회 실패", null);
+        List<Expense> expense = expenseService.getExpenseWeek(reportOptional.get(), member);
         List<ExpenseResponse> response = expense.stream()
                 .map(ExpenseResponse::from)
                 .collect(Collectors.toList());
@@ -103,7 +113,10 @@ public class ExpenseController {
     )
     @Operation(summary = "비용 주간 총 금액 조회", description = "비용 주간 총 금액을 조회한다.")
     public ApiResponse<TotalAmountExpenseResponse> getTotalExpenseWeek(@AuthenticationPrincipal UserDetails principal, @PathVariable int week) {
-        TotalAmountExpenseResponse response = expenseService.getExpenseTotalWeek(principal.getUsername(), week);
+        Member member = memberService.findByEmail(principal.getUsername());
+        Optional<Report> reportOptional =  reportService.findReportWeek(member, week);
+        if (reportOptional.isEmpty()) return ApiResponse.fail("비용 " + week + "주차 총 금액 조회 실패", TotalAmountExpenseResponse.from(0.0));
+        TotalAmountExpenseResponse response = expenseService.getExpenseTotalWeek(reportOptional.get(), member);
         return ApiResponse.success("비용 " + week + "주차 총 금액 조회 성공", response);
     }
 
