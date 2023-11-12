@@ -36,10 +36,10 @@ import java.util.Optional;
 public class ReportService {
     private final ReportRepository reportRepository;
     private final MemberService memberService;
-    private final AffectionService affectionService;
-    private final StressService stressService;
-    private final DiseaseService diseaseService;
-    private final CommunicationService communicationService;
+//    private final AffectionService affectionService;
+//    private final StressService stressService;
+//    private final DiseaseService diseaseService;
+//    private final CommunicationService communicationService;
 
     @Transactional
     public List<Report> getReport(String email) {

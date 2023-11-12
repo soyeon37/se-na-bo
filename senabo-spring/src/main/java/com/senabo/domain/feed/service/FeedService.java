@@ -36,9 +36,9 @@ public class FeedService {
     private final FeedRepository feedRepository;
     private final MemberService memberService;
     private final ReportService reportService;
-    private final StressService stressService;
-    private final ParsingMessageService parsingMessageService;
-    private final FCMService fcmService;
+//    private final StressService stressService;
+//    private final ParsingMessageService parsingMessageService;
+//    private final FCMService fcmService;
 
     @Transactional
     public FeedResponse createFeed(String email) {
@@ -123,60 +123,60 @@ public class FeedService {
         return FeedResponse.from(feed);
     }
 
-    @Transactional
-    public void scheduleFeed(Member member) {
-        try {
-            Feed feed = findLatestData(member);
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime nowH = now.truncatedTo(ChronoUnit.HOURS);
-            LocalDateTime lastFeedH = feed.getCreateTime().truncatedTo(ChronoUnit.HOURS);
-
-            LocalDateTime twelveAfter = lastFeedH.plusHours(12);
-            LocalDateTime fifteenAfter = lastFeedH.plusHours(15);
-
-            log.info("현재 시각: " + nowH);
-            log.info("마지막으로 먹이준 시간: " + lastFeedH);
-            log.info("마지막으로 먹이준 시간 + 12: " + twelveAfter);
-
-            // 배식 12시간 경과
-            if (nowH.equals(twelveAfter)) {
-                log.info("배식 후 12시간 경과: 밥 푸시 알림 실행");
-                // 밥 푸시 알림
-                if (member.getDeviceToken() != null) {
-                    // FCM
-                    String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
-                    fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", dogName + "의 밥을 줄 시간이에요!", member.getDeviceToken());
-                }
-            }
-            // 배식 13시간 경과 이후 : 스트레스 1 씩 증가
-            else if (nowH.isAfter(twelveAfter)) {
-                log.info("배식 후 13시간 경과: 스트레스 증가");
-                int originStress = member.getStressLevel();
-                if (originStress == 100) return;
-                // 스트레스 1 증가
-                Duration duration = Duration.between(nowH, lastFeedH);
-                long hours = duration.toHours();
-                int changeAmount = 1;
-                // 배식 15시간 경과 : 스트레스 3 증가 (1회)
-                if (nowH.isEqual(fifteenAfter)) {
-                    log.info("배식 " + hours + "시간 경과: 공복 토 푸시 알림 및 스트레스 3 증가");
-                    // 공복 토 푸시 알림
-                    if (member.getDeviceToken() != null) {
-                        // FCM
-                        String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
-                        fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", dogName + "가 공복이어서 토를 했어요.", member.getDeviceToken());
-                    }
-                    // 스트레스 3 증가
-                    changeAmount = 3;
-                }
-                stressService.saveStress(member, StressType.FEED, changeAmount);
-            }
-        } catch (DataException e) {
-            log.error("Member ID: " + member.getId() + " 에러 발생: {}", e.getMessage());
-        }
-
-
-    }
+//    @Transactional
+//    public void scheduleFeed(Member member) {
+//        try {
+//            Feed feed = findLatestData(member);
+//            LocalDateTime now = LocalDateTime.now();
+//            LocalDateTime nowH = now.truncatedTo(ChronoUnit.HOURS);
+//            LocalDateTime lastFeedH = feed.getCreateTime().truncatedTo(ChronoUnit.HOURS);
+//
+//            LocalDateTime twelveAfter = lastFeedH.plusHours(12);
+//            LocalDateTime fifteenAfter = lastFeedH.plusHours(15);
+//
+//            log.info("현재 시각: " + nowH);
+//            log.info("마지막으로 먹이준 시간: " + lastFeedH);
+//            log.info("마지막으로 먹이준 시간 + 12: " + twelveAfter);
+//
+//            // 배식 12시간 경과
+//            if (nowH.equals(twelveAfter)) {
+//                log.info("배식 후 12시간 경과: 밥 푸시 알림 실행");
+//                // 밥 푸시 알림
+//                if (member.getDeviceToken() != null) {
+//                    // FCM
+//                    String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
+//                    fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", dogName + "의 밥을 줄 시간이에요!", member.getDeviceToken());
+//                }
+//            }
+//            // 배식 13시간 경과 이후 : 스트레스 1 씩 증가
+//            else if (nowH.isAfter(twelveAfter)) {
+//                log.info("배식 후 13시간 경과: 스트레스 증가");
+//                int originStress = member.getStressLevel();
+//                if (originStress == 100) return;
+//                // 스트레스 1 증가
+//                Duration duration = Duration.between(nowH, lastFeedH);
+//                long hours = duration.toHours();
+//                int changeAmount = 1;
+//                // 배식 15시간 경과 : 스트레스 3 증가 (1회)
+//                if (nowH.isEqual(fifteenAfter)) {
+//                    log.info("배식 " + hours + "시간 경과: 공복 토 푸시 알림 및 스트레스 3 증가");
+//                    // 공복 토 푸시 알림
+//                    if (member.getDeviceToken() != null) {
+//                        // FCM
+//                        String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
+//                        fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", dogName + "가 공복이어서 토를 했어요.", member.getDeviceToken());
+//                    }
+//                    // 스트레스 3 증가
+//                    changeAmount = 3;
+//                }
+//                stressService.saveStress(member, StressType.FEED, changeAmount);
+//            }
+//        } catch (DataException e) {
+//            log.error("Member ID: " + member.getId() + " 에러 발생: {}", e.getMessage());
+//        }
+//
+//
+//    }
 
 //    @Transactional
 //    public void schedulePoop(Member member) {

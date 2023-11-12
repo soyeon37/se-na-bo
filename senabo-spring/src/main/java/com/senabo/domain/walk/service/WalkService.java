@@ -38,8 +38,8 @@ public class WalkService {
     private final WalkRepository walkRepository;
     private final MemberService memberService;
     private final ReportService reportService;
-    private final StressService stressService;
-    private final AffectionService affectionService;
+//    private final StressService stressService;
+//    private final AffectionService affectionService;
 
 
     @Transactional
