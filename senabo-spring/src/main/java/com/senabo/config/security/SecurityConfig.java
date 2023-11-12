@@ -26,7 +26,9 @@ public class SecurityConfig {
             "/member/sign-in",
             "/member/reissue",
             "/swagger-ui.html",
-            "/member/fcm"
+            "/member/fcm",
+            "/member/throw/token-check",
+            "/member/throw/not-found"
 
     };
 

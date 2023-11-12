@@ -101,7 +101,7 @@ public class Member extends BaseEntity  {
 
     @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Walk> walkList;
-    
+
     @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Report> reportList;
 
