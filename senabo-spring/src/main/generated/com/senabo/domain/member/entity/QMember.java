@@ -24,6 +24,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final NumberPath<Integer> affection = createNumber("affection", Integer.class);
 
+    public final ListPath<com.senabo.domain.affection.entity.Affection, com.senabo.domain.affection.entity.QAffection> affectionList = this.<com.senabo.domain.affection.entity.Affection, com.senabo.domain.affection.entity.QAffection>createList("affectionList", com.senabo.domain.affection.entity.Affection.class, com.senabo.domain.affection.entity.QAffection.class, PathInits.DIRECT2);
+
     public final ListPath<com.senabo.domain.bath.entity.Bath, com.senabo.domain.bath.entity.QBath> bathList = this.<com.senabo.domain.bath.entity.Bath, com.senabo.domain.bath.entity.QBath>createList("bathList", com.senabo.domain.bath.entity.Bath.class, com.senabo.domain.bath.entity.QBath.class, PathInits.DIRECT2);
 
     public final ListPath<com.senabo.domain.brushingTeeth.entity.BrushingTeeth, com.senabo.domain.brushingTeeth.entity.QBrushingTeeth> brushingTeethList = this.<com.senabo.domain.brushingTeeth.entity.BrushingTeeth, com.senabo.domain.brushingTeeth.entity.QBrushingTeeth>createList("brushingTeethList", com.senabo.domain.brushingTeeth.entity.BrushingTeeth.class, com.senabo.domain.brushingTeeth.entity.QBrushingTeeth.class, PathInits.DIRECT2);
@@ -54,6 +56,8 @@ public class QMember extends EntityPathBase<Member> {
     public final NumberPath<java.math.BigDecimal> houseLongitude = createNumber("houseLongitude", java.math.BigDecimal.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final ListPath<com.senabo.domain.report.entity.Report, com.senabo.domain.report.entity.QReport> reportList = this.<com.senabo.domain.report.entity.Report, com.senabo.domain.report.entity.QReport>createList("reportList", com.senabo.domain.report.entity.Report.class, com.senabo.domain.report.entity.QReport.class, PathInits.DIRECT2);
 
     public final ListPath<Role, EnumPath<Role>> roles = this.<Role, EnumPath<Role>>createList("roles", Role.class, EnumPath.class, PathInits.DIRECT2);
 
