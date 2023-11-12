@@ -123,10 +123,12 @@ public class MemberController {
 
     @GetMapping("/throw/token-check")
     public void throwTokenException(){
+        log.info("토큰 Exception");
         memberService.tokenCheckExcpetion();
     }
     @GetMapping("/throw/not-found")
     public void throwNotFoundException(){
+        log.info("Not Found Exception");
         memberService.notFound();
     }
 }
