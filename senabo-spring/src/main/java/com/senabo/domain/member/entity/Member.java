@@ -1,6 +1,7 @@
 package com.senabo.domain.member.entity;
 
 import com.senabo.common.audit.BaseEntity;
+import com.senabo.domain.affection.entity.Affection;
 import com.senabo.domain.bath.entity.Bath;
 import com.senabo.domain.brushingTeeth.entity.BrushingTeeth;
 import com.senabo.domain.communication.entity.Communication;
@@ -8,6 +9,7 @@ import com.senabo.domain.disease.entity.Disease;
 import com.senabo.domain.expense.entity.Expense;
 import com.senabo.domain.feed.entity.Feed;
 import com.senabo.domain.member.dto.request.UpdateInfoRequest;
+import com.senabo.domain.report.entity.Report;
 import com.senabo.domain.stress.entity.Stress;
 import com.senabo.domain.walk.entity.Walk;
 import jakarta.persistence.*;
@@ -74,6 +76,9 @@ public class Member extends BaseEntity  {
     private List<Role> roles = new ArrayList<>(List.of(Role.ROLE_USER));
 
     @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Affection> affectionList;
+
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BrushingTeeth> brushingTeethList;
 
     @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -96,6 +101,9 @@ public class Member extends BaseEntity  {
 
     @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Walk> walkList;
+    
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Report> reportList;
 
 
 
