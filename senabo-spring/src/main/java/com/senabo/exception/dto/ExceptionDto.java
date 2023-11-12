@@ -3,13 +3,14 @@ package com.senabo.exception.dto;
 import com.senabo.exception.message.ExceptionMessage;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @Data
 @Builder
 public class ExceptionDto {
     private final String message;
-    public final int statusCode;
+    public final HttpStatus statusCode;
 
     public static ResponseEntity<ExceptionDto> toResponseEntity(ExceptionMessage e){
 
