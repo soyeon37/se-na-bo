@@ -31,7 +31,6 @@ import java.util.Optional;
 public class AffectionService {
     private final AffectionRepository affectionRepository;
     private final MemberService memberService;
-    private final ReportService reportService;
 
     @Transactional
     public AffectionResponse saveAffection(Member member, ActivityType type, int changeAmount) {
@@ -67,18 +66,15 @@ public class AffectionService {
         return affectionList;
     }
 
-    @Transactional
-    public List<Affection> getAffectionWeek(String email, int week) {
-        List<Affection> affectionList = new ArrayList<>();
-        Member member = memberService.findByEmail(email);
-        Optional<Report> result = reportService.findReportWeek(member, week);
-        if (result.isEmpty()) return affectionList;
-        Report report = result.get();
+
+
+    public List<Affection> getAffectionWeek(Report report, Member member) {
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        affectionList = affectionRepository.findAffectionWeek(member, endTime, startTime);
+        List<Affection> affectionList = affectionRepository.findAffectionWeek(member, endTime, startTime);
         return affectionList;
     }
+
 
 
     public Affection getLatestAffectionData(Member member) {
