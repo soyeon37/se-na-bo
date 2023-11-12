@@ -178,45 +178,45 @@ public class FeedService {
 
     }
 
-    @Transactional
-    public void schedulePoop(Member member) {
-        try {
-            Feed feed = findLatestData(member);
-
-            // 밥 먹은 지 3시간 후인지 확인
-            CheckFeedResponse response = checkLastFeed(member.getEmail());
-            LocalDateTime lastFeedH = response.lastFeedDateTime();
-            LocalDateTime nowH = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
-
-            log.info("마지막 밥 제공 시간: " + lastFeedH);
-
-            LocalDateTime threeAfter = lastFeedH.plusHours(3);
-
-            // 밥 먹은 지 3시간
-            if (nowH.isEqual(threeAfter)) {
-                // 배변 활동 푸시 알림
-                if (member.getDeviceToken() != null) {
-                    // FCM
-                    String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
-                    fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", dogName + "가 배변을 했어요!", member.getDeviceToken());
-                }
-            } else if (nowH.isAfter(threeAfter)) {
-                int originStress = member.getStressLevel();
-                // 밥 먹은 지 3시간 후인데 CleanYn: true || 이미 스트레스가 100
-                if (feed.getCleanYn() || originStress == 100) {
-                    return;
-                }
-                // 스트레스 1 증가
-                Duration duration = Duration.between(nowH, lastFeedH);
-                long hours = duration.toHours();
-                log.info("배변 후 " + hours + "시간 경과: 스트레스 1 증가");
-                int changeAmount = 1;
-                stressService.saveStress(member, StressType.POOP, changeAmount);
-            }
-        } catch (DataException e) {
-            log.error("Member ID: " + member.getId() + " 에러 발생: {}", e.getMessage());
-        }
-
-    }
+//    @Transactional
+//    public void schedulePoop(Member member) {
+//        try {
+//            Feed feed = findLatestData(member);
+//
+//            // 밥 먹은 지 3시간 후인지 확인
+//            CheckFeedResponse response = checkLastFeed(member.getEmail());
+//            LocalDateTime lastFeedH = response.lastFeedDateTime();
+//            LocalDateTime nowH = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
+//
+//            log.info("마지막 밥 제공 시간: " + lastFeedH);
+//
+//            LocalDateTime threeAfter = lastFeedH.plusHours(3);
+//
+//            // 밥 먹은 지 3시간
+//            if (nowH.isEqual(threeAfter)) {
+//                // 배변 활동 푸시 알림
+//                if (member.getDeviceToken() != null) {
+//                    // FCM
+//                    String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
+//                    fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", dogName + "가 배변을 했어요!", member.getDeviceToken());
+//                }
+//            } else if (nowH.isAfter(threeAfter)) {
+//                int originStress = member.getStressLevel();
+//                // 밥 먹은 지 3시간 후인데 CleanYn: true || 이미 스트레스가 100
+//                if (feed.getCleanYn() || originStress == 100) {
+//                    return;
+//                }
+//                // 스트레스 1 증가
+//                Duration duration = Duration.between(nowH, lastFeedH);
+//                long hours = duration.toHours();
+//                log.info("배변 후 " + hours + "시간 경과: 스트레스 1 증가");
+//                int changeAmount = 1;
+//                stressService.saveStress(member, StressType.POOP, changeAmount);
+//            }
+//        } catch (DataException e) {
+//            log.error("Member ID: " + member.getId() + " 에러 발생: {}", e.getMessage());
+//        }
+//
+//    }
 
 }

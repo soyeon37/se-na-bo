@@ -118,29 +118,29 @@ public class WalkService {
     }
 
 
-    @Transactional
-    public void scheduleCheckWalk(Member member) {
-        int changeAffectionAmount = 0;
-        int changeStressAmount = 0;
-
-        LocalDateTime startToday = LocalDateTime.now().minus(Duration.ofDays(1)).truncatedTo(ChronoUnit.DAYS);
-
-        List<Walk> list = walkRepository.findTodayData(member, startToday);
-        double totalDistance = 0.0;
-        for (Walk walk : list) {
-            totalDistance += walk.getDistance();
-        }
-
-        log.info("총 산책 거리: " + totalDistance);
-
-        if (totalDistance < 5.0) {
-            changeAffectionAmount = -5;
-            changeStressAmount = 10;
-        } else {
-            changeAffectionAmount = 5;
-            changeStressAmount = -10;
-        }
-        stressService.saveStress(member, StressType.WALK, changeStressAmount);
-        affectionService.saveAffection(member, ActivityType.WALK, changeAffectionAmount);
-    }
+//    @Transactional
+//    public void scheduleCheckWalk(Member member) {
+//        int changeAffectionAmount = 0;
+//        int changeStressAmount = 0;
+//
+//        LocalDateTime startToday = LocalDateTime.now().minus(Duration.ofDays(1)).truncatedTo(ChronoUnit.DAYS);
+//
+//        List<Walk> list = walkRepository.findTodayData(member, startToday);
+//        double totalDistance = 0.0;
+//        for (Walk walk : list) {
+//            totalDistance += walk.getDistance();
+//        }
+//
+//        log.info("총 산책 거리: " + totalDistance);
+//
+//        if (totalDistance < 5.0) {
+//            changeAffectionAmount = -5;
+//            changeStressAmount = 10;
+//        } else {
+//            changeAffectionAmount = 5;
+//            changeStressAmount = -10;
+//        }
+//        stressService.saveStress(member, StressType.WALK, changeStressAmount);
+//        affectionService.saveAffection(member, ActivityType.WALK, changeAffectionAmount);
+//    }
 }
