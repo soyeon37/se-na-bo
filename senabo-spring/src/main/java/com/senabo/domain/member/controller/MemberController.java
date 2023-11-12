@@ -42,7 +42,7 @@ public class MemberController {
         return ApiResponse.success("회원가입 성공", response);
     }
 
-    @DeleteMapping("/remove")
+    @PostMapping("/remove")
     @Operation(summary = "회원 탈퇴", description = "회원정보를 전부 삭제한다.")
     public ApiResponse<Object> remove(@RequestBody SignOutRequest request, @AuthenticationPrincipal UserDetails principal) {
         memberService.removeMember(principal.getUsername(), request);
