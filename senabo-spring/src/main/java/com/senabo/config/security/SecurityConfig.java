@@ -28,8 +28,18 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/member/fcm",
             "/member/throw/token-check",
-            "/member/throw/not-found"
-
+            "/member/throw/not-found",
+            "/member/**",
+            "/affection/**",
+            "/bath/**",
+            "/brushing-teeth/**",
+            "/communication/**",
+            "/disease/**",
+            "/expense/**",
+            "/feed/**",
+            "/report/**",
+            "/stress/**",
+            "/walk/**",
     };
 
     @Bean
