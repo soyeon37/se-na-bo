@@ -120,4 +120,13 @@ public class MemberController {
         memberService.fcmTest(request.deviceToken());
         return ApiResponse.success("FCM 발송 성공", true);
     }
+
+    @GetMapping("/throw/token-check")
+    public void throwTokenException(){
+        memberService.tokenCheckExcpetion();
+    }
+    @GetMapping("/throw/not-found")
+    public void throwNotFoundException(){
+        memberService.notFound();
+    }
 }

@@ -15,10 +15,7 @@ import com.senabo.domain.member.repository.MemberRepository;
 import com.senabo.domain.report.entity.Report;
 import com.senabo.domain.report.repository.ReportRepository;
 import com.senabo.exception.message.ExceptionMessage;
-import com.senabo.exception.model.TokenCheckFailException;
-import com.senabo.exception.model.TokenNotFoundException;
-import com.senabo.exception.model.UserAuthException;
-import com.senabo.exception.model.UserException;
+import com.senabo.exception.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -115,7 +112,7 @@ public class MemberService {
         Authentication authentication = new UsernamePasswordAuthenticationToken(request.email(), null, roles);
         TokenInfo tokenInfo = tokenProvider.generateToken(authentication);
         log.info("Token 발급");
-        
+
         refreshTokenService.setValues(tokenInfo.getRefreshToken(), request.email());
         log.info("레디스 저장");
 
@@ -143,8 +140,8 @@ public class MemberService {
         }
 
         String email = refreshTokenService.getValues(refreshToken);
-        log.info("Redis {}",email);
-        log.info("Auth {}",authentication.getName());
+        log.info("Redis {}", email);
+        log.info("Auth {}", authentication.getName());
 
         if (email == null || !email.equals(authentication.getName())) {
             throw new TokenCheckFailException(ExceptionMessage.MISMATCH_TOKEN);
@@ -176,4 +173,13 @@ public class MemberService {
         log.info("FCM 테스트 시작");
         fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", LocalDateTime.now() + ": FCM 테스트", deviceToken);
     }
+
+    public void tokenCheckExcpetion() {
+        throw new TokenCheckFailException(ExceptionMessage.FAIL_TOKEN_CHECK);
+    }
+
+    public void notFound() {
+        throw new DataException(ExceptionMessage.DATA_NOT_FOUND);
+    }
+
 }

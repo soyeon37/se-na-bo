@@ -1,5 +1,6 @@
 package com.senabo.config.security.jwt;
 
+import com.senabo.exception.handler.GlobalExceptionHandler;
 import com.senabo.exception.message.ExceptionMessage;
 import com.senabo.exception.model.TokenCheckFailException;
 import jakarta.servlet.FilterChain;
