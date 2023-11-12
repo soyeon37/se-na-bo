@@ -12,13 +12,13 @@ public class ExceptionDto {
     private final String message;
     public final HttpStatus statusCode;
 
-    public static ResponseEntity<ExceptionDto> toResponseEntity(ExceptionMessage e){
+    public static ResponseEntity<ExceptionDto> toResponseEntity(HttpStatus httpStatus, String message){
 
         return ResponseEntity
-                .status(e.getHttpStatus())
+                .status(httpStatus)
                 .body(ExceptionDto.builder()
-                        .statusCode(e.getHttpStatus())
-                        .message(e.getMessage())
+                        .statusCode(httpStatus)
+                        .message(message)
                         .build());
     }
 
