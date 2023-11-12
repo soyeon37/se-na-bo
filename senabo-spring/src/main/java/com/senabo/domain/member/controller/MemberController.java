@@ -101,6 +101,20 @@ public class MemberController {
         return ApiResponse.success("회원정보 수정 성공", response);
     }
 
+    @PostMapping("/total-time")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "사용자 접속시간을 수정한다.", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = MemberResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
+    }
+    )
+    @Operation(summary = "회원 접속 정보 수정", description = "총 접속 시간을 수정한다.")
+    public ApiResponse<MemberResponse> updateTotalTime(@AuthenticationPrincipal UserDetails principal, @RequestBody TotalTimeRequest request){
+        MemberResponse response = memberService.updateTotalTime(principal.getUsername(), request);
+        return ApiResponse.success("회원 접속 정보 수정 성공", response);
+    }
+
     @PostMapping("/reissue")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "재발급한 토큰을 가져온다.", content =

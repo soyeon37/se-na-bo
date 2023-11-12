@@ -4,10 +4,7 @@ package com.senabo.domain.member.service;
 import com.senabo.config.firebase.FCMService;
 import com.senabo.config.security.jwt.TokenInfo;
 import com.senabo.config.security.jwt.TokenProvider;
-import com.senabo.domain.member.dto.request.SignInRequest;
-import com.senabo.domain.member.dto.request.SignOutRequest;
-import com.senabo.domain.member.dto.request.SignUpRequest;
-import com.senabo.domain.member.dto.request.UpdateInfoRequest;
+import com.senabo.domain.member.dto.request.*;
 import com.senabo.domain.member.dto.response.*;
 import com.senabo.domain.member.entity.Member;
 import com.senabo.domain.member.entity.Role;
@@ -182,4 +179,10 @@ public class MemberService {
         throw new DataException(ExceptionMessage.DATA_NOT_FOUND);
     }
 
+    @Transactional
+    public MemberResponse updateTotalTime(String email, TotalTimeRequest request) {
+        Member member = findByEmail(email);
+        member.updateTotal(request);
+        return MemberResponse.from(member);
+    }
 }

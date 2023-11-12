@@ -8,6 +8,7 @@ import com.senabo.domain.communication.entity.Communication;
 import com.senabo.domain.disease.entity.Disease;
 import com.senabo.domain.expense.entity.Expense;
 import com.senabo.domain.feed.entity.Feed;
+import com.senabo.domain.member.dto.request.TotalTimeRequest;
 import com.senabo.domain.member.dto.request.UpdateInfoRequest;
 import com.senabo.domain.report.entity.Report;
 import com.senabo.domain.stress.entity.Stress;
@@ -126,6 +127,10 @@ public class Member extends BaseEntity  {
         this.species = request.species();
         this.houseLatitude = request.houseLatitude();
         this.houseLongitude = request.houseLongitude();
+    }
+
+    public void updateTotal(TotalTimeRequest request){
+        this.totalTime = request.totalTime();
     }
     public void updateStress(int stressLevel){
         this.stressLevel = stressLevel;
