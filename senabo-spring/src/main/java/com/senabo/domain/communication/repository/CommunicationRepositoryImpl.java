@@ -35,4 +35,16 @@ public class CommunicationRepositoryImpl implements CommunicationRepositoryCusto
                 .orderBy(communication.createTime.desc())
                 .fetch();
     }
+
+    @Override
+    public Long countCommunicationWeek(Member member, LocalDateTime lastStart) {
+        return queryFactory
+                .select(communication.count())
+                .from(communication)
+                .where(
+                        communication.memberId.eq(member),
+                        communication.createTime.goe(lastStart)
+                )
+                .fetchOne();
+    }
 }

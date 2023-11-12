@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static com.senabo.domain.stress.entity.QStress.stress;
 
@@ -53,13 +54,13 @@ public class StressRepositoryImpl implements StressRepositoryCustom {
     }
 
     @Override
-    public Stress findLatestData(Member member) {
-        return queryFactory
+    public Optional<Stress> findLatestData(Member member) {
+        return Optional.ofNullable(queryFactory
                 .selectFrom(stress)
                 .where(stress.memberId.eq(member))
                 .orderBy(stress.updateTime.desc())
                 .limit(1)
-                .fetchOne();
+                .fetchOne());
     }
 
     @Override

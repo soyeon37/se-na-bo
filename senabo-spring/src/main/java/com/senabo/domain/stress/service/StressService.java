@@ -9,6 +9,7 @@ import com.senabo.domain.stress.entity.Stress;
 import com.senabo.domain.stress.entity.StressType;
 import com.senabo.domain.stress.repository.StressRepository;
 import com.senabo.exception.message.ExceptionMessage;
+import com.senabo.exception.model.DataException;
 import com.senabo.exception.model.UserException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,9 +77,11 @@ public class StressService {
         return stressList;
     }
 
-    @Transactional
+
     public Stress getLatestStressData(Member member) {
-        return stressRepository.findLatestData(member);
+        Optional<Stress> stressOptional = stressRepository.findLatestData(member);
+        if (stressOptional.isEmpty()) throw new DataException(ExceptionMessage.DATA_NOT_FOUND);
+        return stressOptional.get();
     }
 
     @Transactional
@@ -87,10 +90,18 @@ public class StressService {
         return list;
     }
 
-    @Transactional
     public Long getCountLastWeekList(Member member, LocalDateTime lastStart, StressType type) {
         Long count = stressRepository.countLastWeekData(member, lastStart, type);
         return count;
+    }
+
+    public int getEndStressScore(Member member){
+        return getLatestStressData(member).getScore();
+    }
+
+    public int getScore(Member member, LocalDateTime lastStart, StressType type){
+        Long stressCnt = getCountLastWeekList(member, lastStart, type);
+        return  (int) (1 - stressCnt / 168) * 100;
     }
 
 }

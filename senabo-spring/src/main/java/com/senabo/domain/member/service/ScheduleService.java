@@ -45,14 +45,7 @@ public class ScheduleService {
          */
     }
 
-    // 매일 오전 12시 00분에 실행
-//    @Scheduled(cron = "0 0 0 * * *")
-//    public void scheduleReport(@AuthenticationPrincipal UserDetails principal) {
-//        log.info("리포트 스케줄러 실행");
-//        Long id = 1L;
-//        reportService.scheduleReport(principal.getUsername());
-//
-//    }
+
 
     // 어플 종료 확인
 

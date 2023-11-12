@@ -12,4 +12,5 @@ public interface CommunicationRepositoryCustom {
     List<Communication> findByMemberId(Member memberId);
 
     List<Communication> findCommunicationWeek(Member member, LocalDateTime endTime, LocalDateTime startTime);
+    Long countCommunicationWeek(Member member, LocalDateTime lastStart);
 }

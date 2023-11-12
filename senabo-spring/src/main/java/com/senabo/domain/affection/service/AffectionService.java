@@ -10,6 +10,7 @@ import com.senabo.domain.member.service.MemberService;
 import com.senabo.domain.report.entity.Report;
 import com.senabo.domain.report.service.ReportService;
 import com.senabo.exception.message.ExceptionMessage;
+import com.senabo.exception.model.DataException;
 import com.senabo.exception.model.UserException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -79,9 +80,16 @@ public class AffectionService {
         return affectionList;
     }
 
-    @Transactional
+
     public Affection getLatestAffectionData(Member member) {
-        return affectionRepository.findLatestDataByMemberId(member);
+        Optional<Affection> affectionOptional = affectionRepository.findLatestDataByMemberId(member);
+        if(affectionOptional.isEmpty())throw new DataException(ExceptionMessage.DATA_NOT_FOUND);
+        return affectionOptional.get();
+    }
+
+    public int getEndAffectionScore(Member member){
+        Affection affection = getLatestAffectionData(member);
+        return affection.getScore();
     }
 
 }

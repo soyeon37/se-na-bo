@@ -78,4 +78,8 @@ public class CommunicationService {
             throw new UserException(ExceptionMessage.FAIL_DELETE_DATA);
         }
     }
+
+    public Long countCommunicationWeek(Member member, LocalDateTime lastStart){
+        return communicationRepository.countCommunicationWeek(member, lastStart);
+    }
 }

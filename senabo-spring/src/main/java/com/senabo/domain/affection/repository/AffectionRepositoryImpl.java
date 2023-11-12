@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 import static com.senabo.domain.affection.entity.QAffection.affection;
@@ -24,12 +25,12 @@ public class AffectionRepositoryImpl implements AffectionRepositoryCustom {
                 .fetch();
     }
     @Override
-    public Affection findLatestDataByMemberId(Member member) {
-        return queryFactory
+    public Optional<Affection> findLatestDataByMemberId(Member member) {
+        return Optional.ofNullable(queryFactory
                 .selectFrom(affection)
                 .where(affection.memberId.eq(member))
                 .orderBy(affection.createTime.desc())
-                .fetchFirst();
+                .fetchFirst());
     }
     @Override
     public List<Affection> findAffectionWeek(Member member, LocalDateTime startTime, LocalDateTime endTime) {

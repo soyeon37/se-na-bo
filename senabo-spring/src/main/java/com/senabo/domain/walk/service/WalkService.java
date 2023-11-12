@@ -1,6 +1,8 @@
 package com.senabo.domain.walk.service;
 
 import com.senabo.common.ActivityType;
+import com.senabo.common.message.ParsingMessageService;
+import com.senabo.config.firebase.FCMService;
 import com.senabo.domain.affection.service.AffectionService;
 import com.senabo.domain.member.entity.Member;
 import com.senabo.domain.member.service.MemberService;
@@ -24,7 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -36,6 +40,7 @@ public class WalkService {
     private final ReportService reportService;
     private final StressService stressService;
     private final AffectionService affectionService;
+
 
     @Transactional
     public WalkResponse createWalk(String email) {
@@ -63,7 +68,7 @@ public class WalkService {
         Member member = memberService.findByEmail(email);
         List<Walk> walkList = new ArrayList<>();
         Optional<Report> result = reportService.findReportWeek(member, week);
-        if(result.isEmpty()) return walkList;
+        if (result.isEmpty()) return walkList;
         Report report = result.get();
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
         LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
@@ -78,10 +83,10 @@ public class WalkService {
         return walkList;
     }
 
-    public TodayWalkResponse getTodayTotal(List<Walk> walkList){
+    public TodayWalkResponse getTodayTotal(List<Walk> walkList) {
         Duration totalTime = Duration.ofSeconds(0);
         Double totalDistance = 0.0;
-        for(int i = 0; i < walkList.size(); i++){
+        for (int i = 0; i < walkList.size(); i++) {
             Walk walk = walkList.get(i);
             totalDistance += walk.getDistance();
             Duration walkDuration = Duration.between(walk.getStartTime(), walk.getEndTime());
@@ -115,8 +120,6 @@ public class WalkService {
 
     @Transactional
     public void scheduleCheckWalk(Member member) {
-        int originAffection = member.getAffection();
-        int originStress = member.getStressLevel();
         int changeAffectionAmount = 0;
         int changeStressAmount = 0;
 
@@ -124,35 +127,20 @@ public class WalkService {
 
         List<Walk> list = walkRepository.findTodayData(member, startToday);
         double totalDistance = 0.0;
-        for(Walk walk : list){
+        for (Walk walk : list) {
             totalDistance += walk.getDistance();
         }
 
         log.info("총 산책 거리: " + totalDistance);
 
-        boolean complete = false;
-
         if (totalDistance < 5.0) {
             changeAffectionAmount = -5;
             changeStressAmount = 10;
         } else {
-            complete = true;
             changeAffectionAmount = 5;
             changeStressAmount = -10;
         }
-
-
-        // !complete 미완료 + stress 증가 -> not 100
-        // complete 완료 + stress 감소 -> not 0
-        if ((!complete && originStress != 100) || (complete && originStress != 0)) {
-            stressService.saveStress(member, StressType.WALK, changeStressAmount);
-        }
-
-        // 재 계산 필요     if(originAffection >= 96) changeAmount = 100 - originAffection;
-        // 미완료 + affection 감소 -> not 0
-        // 완료 + affection 증가 -> not 100
-        if ((!complete && originAffection >= 5) || (complete && originAffection <= 95)) {
-            affectionService.saveAffection(member, ActivityType.WALK, changeAffectionAmount);
-        }
+        stressService.saveStress(member, StressType.WALK, changeStressAmount);
+        affectionService.saveAffection(member, ActivityType.WALK, changeAffectionAmount);
     }
 }

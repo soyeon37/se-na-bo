@@ -9,11 +9,11 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ExceptionMessage {
 
-    FAIL_DELETE_DATA("삭제에 실패했습니다."),
+    FAIL_DELETE_DATA(HttpStatus.INTERNAL_SERVER_ERROR,"삭제에 실패했습니다."),
 
-    FAIL_UPDATE_DATA("수정에 실패했습니다."),
+    FAIL_UPDATE_DATA(HttpStatus.INTERNAL_SERVER_ERROR,"수정에 실패했습니다."),
 
-    FAIL_SAVE_DATA("저장에 실패했습니다."),
+    FAIL_SAVE_DATA(HttpStatus.INTERNAL_SERVER_ERROR,"저장에 실패했습니다."),
 
     MISMATCH_USE_TOKEN(HttpStatus.UNAUTHORIZED,"유저와 토큰이 맞지 않습니다."),
 

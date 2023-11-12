@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 public interface StressRepositoryCustom  {
@@ -16,7 +17,7 @@ public interface StressRepositoryCustom  {
 
     Long countLastWeekData(Member member, LocalDateTime lastStart, StressType type);
 
-    Stress findLatestData(Member member);
+    Optional<Stress> findLatestData(Member member);
 
     List<Stress> findStressWeek(Member member, LocalDateTime endTime, LocalDateTime startTime);
 }
