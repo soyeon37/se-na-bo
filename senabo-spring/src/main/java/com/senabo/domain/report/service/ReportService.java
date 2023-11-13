@@ -144,7 +144,7 @@ public class ReportService {
             // 교감 score // 교감으로 고쳐야 함
             Long communicationCnt = 0L;
             communicationCnt = communicationService.countCommunicationWeek(member, lastStart);
-            int communicationScore = (int) (communicationCnt * 2);
+            int communicationScore = (int) (communicationCnt * 1);
             if (communicationScore > 100) communicationScore = 100;
 
             // lastreport update
