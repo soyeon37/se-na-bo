@@ -18,14 +18,23 @@ public class ReportScheduleService {
     private final ReportService reportService;
     private final FCMService fcmService;
 
-    // 매일 다음 날 오전 8시 00분에 실행
-    @Scheduled(cron = "0 0 8 * * *")
+    // 매일 다음 날 오전 1시 00분에 실행
+    @Scheduled(cron = "0 0 1 * * *")
     public void scheduleReport() {
         log.info("리포트 스케줄러 실행");
         List<Member> allMember = memberService.findAllMember();
         for (Member member : allMember) {
             reportService.scheduleReport(member);
-            if (member.getDeviceToken() != null) {
+        }
+    }
+
+    // 매일 오전 8시 00분에 실행
+    @Scheduled(cron = "0 0 8 * * *")
+    public void scheduleFCMReport() {
+        log.info("리포트 FCM 스케줄러 실행");
+        List<Member> allMember = memberService.findAllMember();
+        for (Member member : allMember) {
+            if (member.getDeviceToken() != null && reportService.check7Days(member)) {
                 // FCM
                 fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", "주간 리포트를 확인해주세요!", member.getDeviceToken());
             }

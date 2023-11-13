@@ -1,5 +1,6 @@
 package com.senabo.domain.member.controller;
 
+import com.google.firebase.database.core.Repo;
 import com.google.protobuf.Api;
 import com.senabo.common.api.ApiResponse;
 import com.senabo.domain.member.dto.request.*;
@@ -7,7 +8,9 @@ import com.senabo.domain.member.dto.response.MemberResponse;
 import com.senabo.domain.member.dto.response.ReIssueResponse;
 import com.senabo.domain.member.dto.response.SignInResponse;
 import com.senabo.domain.member.dto.response.SignUpResponse;
+import com.senabo.domain.member.entity.Member;
 import com.senabo.domain.member.service.MemberService;
+import com.senabo.domain.report.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Member", description = "Member API Document")
 public class MemberController {
     private final MemberService memberService;
+    private final ReportService reportService;
 
     @PostMapping("/sign-up")
     @ApiResponses(value = {
@@ -111,7 +115,9 @@ public class MemberController {
     )
     @Operation(summary = "회원 접속 정보 수정", description = "총 접속 시간을 수정한다.")
     public ApiResponse<MemberResponse> updateTotalTime(@AuthenticationPrincipal UserDetails principal, @RequestBody TotalTimeRequest request){
-        MemberResponse response = memberService.updateTotalTime(principal.getUsername(), request);
+        Member member = memberService.findByEmail(principal.getUsername());
+        MemberResponse response = memberService.updateTotalTime(member, request);
+        reportService.updateTotalTime(member, request.totalTime());
         return ApiResponse.success("회원 접속 정보 수정 성공", response);
     }
 

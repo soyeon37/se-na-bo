@@ -72,13 +72,24 @@ public class ReportService {
 
     // 앱 사용 시간 저장
     @Transactional
-    public ReportResponse updateTotalTime(String email, UpdateTotalTimeRequest request) {
-        Member member = memberService.findByEmail(email);
-        Duration duration = Duration.between(request.startTime(), request.endTime());
-        int hour = (int) duration.toHours();
+    public ReportResponse updateTotalTime(Member member, int totalTime) {
         Report report = findLatestData(member);
-        report.updateTotalTime(hour);
+        report.updateTotalTime(totalTime);
         return ReportResponse.from(report);
+    }
+
+    public boolean check7Days(Member member) {
+        // 마지막 리포트의 create datetime 가져오기
+        Report lastReport = findLatestData(member);
+        LocalDateTime lastCreateTime = lastReport.getCreateTime();
+        LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime lastStart = lastCreateTime.truncatedTo(ChronoUnit.DAYS);
+
+        // 7일이 되었으면 새로운 report 생성
+        Duration duration = Duration.between(now, lastStart);
+        long days = duration.toDays();
+        if (days < 7) return false;
+        return true;
     }
 
     @Transactional
@@ -134,7 +145,7 @@ public class ReportService {
             Long communicationCnt = 0L;
             communicationCnt = communicationService.countCommunicationWeek(member, lastStart);
             int communicationScore = (int) (communicationCnt * 2);
-            if(communicationScore > 100) communicationScore = 100;
+            if (communicationScore > 100) communicationScore = 100;
 
             // lastreport update
             lastReport.update(endAffectionScore, endStressScore, poopScore, walkScore, feedScore, communicationScore, diseaseScore);

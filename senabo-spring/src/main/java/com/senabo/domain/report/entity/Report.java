@@ -73,7 +73,7 @@ public class Report extends BaseEntity {
     }
 
     public void updateTotalTime(int totalTime){
-        this.totalTime = totalTime;
+        this.totalTime += totalTime;
     }
 
     public void update(int endAffectionScore, int endStressScore, int poopScore, int walkScore, int feedScore, int communicationScore, int diseaseScore) {
