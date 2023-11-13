@@ -111,7 +111,7 @@ public class FeedController {
 
 
     // 배변 Clean PUT
-    @PatchMapping("/clean")
+    @PutMapping("/clean")
     @Operation(summary = "배변 청소 완료", description = "배변 청소 여부(cleanYn)를 true로 수정한다.")
     public ApiResponse<FeedResponse> updatePoop(@AuthenticationPrincipal UserDetails principal) {
         FeedResponse response = feedService.updatePoop(principal.getUsername());

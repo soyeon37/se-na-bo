@@ -26,5 +26,4 @@ public record WalkResponse(
                 .updateTime(walk.getUpdateTime())
                 .build();
     }
-
 }

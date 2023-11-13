@@ -16,6 +16,7 @@ import com.senabo.domain.walk.dto.response.WalkResponse;
 import com.senabo.domain.walk.entity.Walk;
 import com.senabo.domain.walk.repository.WalkRepository;
 import com.senabo.exception.message.ExceptionMessage;
+import com.senabo.exception.model.DataException;
 import com.senabo.exception.model.UserException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -87,15 +88,25 @@ public class WalkService {
         }
         return TodayWalkResponse.from((int) totalTime.toMinutes(), totalDistance);
     }
+    @Transactional
+    public WalkResponse getWalkLatest(String email) {
+        Member member = memberService.findByEmail(email);
+        Optional<Walk> walkOptional = walkRepository.findLatestData(member);
+        if(walkOptional.isEmpty()) throw new DataException(ExceptionMessage.DATA_NOT_FOUND);
+        return WalkResponse.from(walkOptional.get());
+    }
 
     @Transactional
     public WalkResponse updateWalk(String email, UpdateWalkRequest request) {
         Member member = memberService.findByEmail(email);
-        Walk walk = walkRepository.findLatestData(member);
+
+        Optional<Walk> walkOptional = walkRepository.findLatestData(member);
+        if(walkOptional.isEmpty()) throw new DataException(ExceptionMessage.DATA_NOT_FOUND);
+        Walk walk = walkOptional.get();
         if (walk.getEndTime() == null) {
             walk.update(LocalDateTime.now(), request.distnace());
         } else {
-            throw new UserException(String.valueOf(ExceptionMessage.FAIL_UPDATE_DATA));
+            throw new UserException(ExceptionMessage.FAIL_UPDATE_DATA);
         }
         return WalkResponse.from(walk);
     }
@@ -136,4 +147,6 @@ public class WalkService {
         stressService.saveStress(member, StressType.WALK, changeStressAmount);
         affectionService.saveAffection(member, ActivityType.WALK, changeAffectionAmount);
     }
+
+
 }

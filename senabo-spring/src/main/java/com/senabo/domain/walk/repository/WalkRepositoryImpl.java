@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static com.senabo.domain.walk.entity.QWalk.walk;
 
@@ -25,13 +26,23 @@ public class WalkRepositoryImpl implements WalkRepositoryCustom {
     }
 
     @Override
-    public Walk findLatestData(Member member) {
-        return queryFactory
+    public Optional<Walk> findLatestData(Member member) {
+        return Optional.ofNullable(queryFactory
                 .selectFrom(walk)
                 .where(walk.memberId.eq(member))
                 .orderBy(walk.updateTime.desc())
                 .limit(1)
-                .fetchOne();
+                .fetchOne());
+    }
+
+    @Override
+    public Optional<Walk> findTodayDataLatest(Member member, LocalDateTime todayStartTime) {
+        return Optional.ofNullable(queryFactory
+                .selectFrom(walk)
+                .where(walk.memberId.eq(member), walk.endTime.goe(todayStartTime))
+                .orderBy(walk.endTime.desc())
+                .limit(1)
+                .fetchOne());
     }
 
     @Override

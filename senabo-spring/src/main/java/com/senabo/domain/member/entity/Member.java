@@ -130,7 +130,7 @@ public class Member extends BaseEntity  {
     }
 
     public void updateTotal(TotalTimeRequest request){
-        this.totalTime = request.totalTime();
+        this.totalTime += request.totalTime();
     }
     public void updateStress(int stressLevel){
         this.stressLevel = stressLevel;

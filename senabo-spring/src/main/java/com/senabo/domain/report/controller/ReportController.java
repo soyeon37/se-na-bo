@@ -63,7 +63,7 @@ public class ReportController {
         return ApiResponse.success("주간 리포트 " + week + "주차 조회 성공", ReportResponse.from(response.get()));
     }
 
-    @PatchMapping("/time")
+    @PutMapping("/time")
     @Operation(summary = "총 사용 시간 업데이트", description = "처음 접속 시간과 마지막 접속 시간을 받아서 총 사용 시간을 업데이트한다.")
     public ApiResponse<ReportResponse> updateTotalTimeReport(@AuthenticationPrincipal UserDetails principal, @RequestBody UpdateTotalTimeRequest request) {
         ReportResponse response = reportService.updateTotalTime(principal.getUsername(), request);
