@@ -162,8 +162,8 @@ public class MemberService {
     }
 
 
-    public List<Member> findAllMember() {
-        return memberRepository.findAll();
+    public List<Member> findAllMemberNonComplete() {
+        return memberRepository.findAllMemberNonComplete();
     }
 
     public void fcmTest(String deviceToken) {
@@ -183,5 +183,9 @@ public class MemberService {
     public MemberResponse updateTotalTime(Member member, TotalTimeRequest request) {
         member.updateTotal(request);
         return MemberResponse.from(member);
+    }
+
+    public List<Member> findAllMember(){
+        return memberRepository.findAll();
     }
 }

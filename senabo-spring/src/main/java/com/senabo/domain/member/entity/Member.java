@@ -6,6 +6,7 @@ import com.senabo.domain.bath.entity.Bath;
 import com.senabo.domain.brushingTeeth.entity.BrushingTeeth;
 import com.senabo.domain.communication.entity.Communication;
 import com.senabo.domain.disease.entity.Disease;
+import com.senabo.domain.emergency.entity.Emergency;
 import com.senabo.domain.expense.entity.Expense;
 import com.senabo.domain.feed.entity.Feed;
 import com.senabo.domain.member.dto.request.TotalTimeRequest;
@@ -71,6 +72,9 @@ public class Member extends BaseEntity  {
     @Column(nullable = true)
     private String deviceToken;
 
+    @Column(name = "complete", columnDefinition = "false")
+    private boolean complete;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     @Enumerated(EnumType.STRING)
@@ -106,6 +110,8 @@ public class Member extends BaseEntity  {
     @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Report> reportList;
 
+    @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Emergency> emergencyList;
 
 
 
@@ -127,6 +133,10 @@ public class Member extends BaseEntity  {
         this.species = request.species();
         this.houseLatitude = request.houseLatitude();
         this.houseLongitude = request.houseLongitude();
+    }
+
+    public void complete(){
+        this.complete = true;
     }
 
     public void updateTotal(TotalTimeRequest request){

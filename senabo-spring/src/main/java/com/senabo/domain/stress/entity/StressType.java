@@ -12,5 +12,6 @@ public enum StressType {
     CRUSH,
     BITE,
     BARKING,
-    VOMITING
+    VOMITING,
+    BATH
 }

@@ -21,7 +21,7 @@ public class FeedScheduleService {
     @Scheduled(cron = "0 0 0/1 * * *")
     public void schedulePoop() {
         log.info("배변 스케줄러 실행");
-        List<Member> allMember = memberService.findAllMember();
+        List<Member> allMember = memberService.findAllMemberNonComplete();
         for(Member member : allMember){
             feedService.schedulePoop(member);
         }
@@ -31,7 +31,7 @@ public class FeedScheduleService {
     @Scheduled(cron = "0 0 0/1 * * *")
     public void scheduleFeed() {
         log.info("배식 스케줄러 실행");
-        List<Member> allMember = memberService.findAllMember();
+        List<Member> allMember = memberService.findAllMemberNonComplete();
         for(Member member : allMember){
             feedService.scheduleFeed(member);
         }

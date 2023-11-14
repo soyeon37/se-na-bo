@@ -21,7 +21,7 @@ public class EmergencyScheduleService {
     @Scheduled(cron = "0 0 13-22 * * MON-FRI")
     public void scheduleWeekdayDayEmergency(){
         log.info("주중 낮 돌발 상황 스케줄러 실행");
-        List<Member> allMember = memberService.findAllMember();
+        List<Member> allMember = memberService.findAllMemberNonComplete();
         for(Member member : allMember){
             if(member.getDeviceToken() != null){
                 emergencyService.ramdomDayEmergency(member);
@@ -32,7 +32,7 @@ public class EmergencyScheduleService {
     @Scheduled(cron = "0 0 0-3 * * MON-FRI")
     public void scheduleWeekdayEveningEmergency(){
         log.info("주중 저녁 돌발 상황 스케줄러 실행");
-        List<Member> allMember = memberService.findAllMember();
+        List<Member> allMember = memberService.findAllMemberNonComplete();
         for(Member member : allMember){
             if(member.getDeviceToken() != null){
                 emergencyService.ramdomEveningEmergency(member);
@@ -43,7 +43,7 @@ public class EmergencyScheduleService {
     @Scheduled(cron = "0 0 5-7 * * SAT,SUN")
     public void scheduleWeekendEmergency(){
         log.info("주말 산책 돌발 상황 스케줄러 실행");
-        List<Member> allMember = memberService.findAllMember();
+        List<Member> allMember = memberService.findAllMemberNonComplete();
         for(Member member : allMember){
             if(member.getDeviceToken() != null){
                 emergencyService.ramdomWalkWeekendEmergency(member);
@@ -54,7 +54,7 @@ public class EmergencyScheduleService {
     @Scheduled(cron = "0 0 19-23 * * SAT,SUN")
     public void scheduleBarkWeekendEmergency(){
         log.info("주말 짖음 돌발 상황 스케줄러 실행");
-        List<Member> allMember = memberService.findAllMember();
+        List<Member> allMember = memberService.findAllMemberNonComplete();
         for(Member member : allMember){
             if(member.getDeviceToken() != null){
                 emergencyService.ramdomBarkWeekendEmergency(member);
@@ -65,7 +65,7 @@ public class EmergencyScheduleService {
     @Scheduled(cron = "0 0 5-8 * * SAT,SUN")
     public void scheduleVomitingWeekendEmergency(){
         log.info("주말 토 돌발 상황 스케줄러 실행");
-        List<Member> allMember = memberService.findAllMember();
+        List<Member> allMember = memberService.findAllMemberNonComplete();
         for(Member member : allMember){
             if(member.getDeviceToken() != null){
                 emergencyService.ramdomVomitingWeekendEmergency(member);

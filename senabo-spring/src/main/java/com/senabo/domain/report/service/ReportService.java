@@ -2,18 +2,19 @@ package com.senabo.domain.report.service;
 
 import com.senabo.domain.affection.entity.Affection;
 import com.senabo.domain.affection.service.AffectionService;
+import com.senabo.domain.bath.entity.Bath;
+import com.senabo.domain.bath.service.BathService;
+import com.senabo.domain.brushingTeeth.service.BrushingTeethService;
 import com.senabo.domain.communication.service.CommunicationService;
 import com.senabo.domain.disease.service.DiseaseService;
 import com.senabo.domain.member.entity.Member;
 import com.senabo.domain.member.service.MemberService;
-import com.senabo.domain.report.dto.request.UpdateTotalTimeRequest;
 import com.senabo.domain.report.dto.response.ReportResponse;
 import com.senabo.domain.report.entity.Report;
 import com.senabo.domain.report.repository.ReportRepository;
 import com.senabo.domain.stress.entity.Stress;
 import com.senabo.domain.stress.entity.StressType;
 import com.senabo.domain.stress.service.StressService;
-import com.senabo.domain.walk.service.WalkService;
 import com.senabo.exception.message.ExceptionMessage;
 import com.senabo.exception.model.DataException;
 import com.senabo.exception.model.UserException;
@@ -42,6 +43,8 @@ public class ReportService {
     private final StressService stressService;
     private final DiseaseService diseaseService;
     private final CommunicationService communicationService;
+    private final BathService bathService;
+    private final BrushingTeethService brushingTeethService;
 
     @Transactional
     public List<Report> getReport(String email) {
@@ -88,8 +91,8 @@ public class ReportService {
         // 7일이 되었으면 새로운 report 생성
         Duration duration = Duration.between(now, lastStart);
         long days = duration.toDays();
-        if (days < 7) return false;
-        return true;
+        if (days == 7) return true;
+        return false;
     }
 
     @Transactional
@@ -105,6 +108,7 @@ public class ReportService {
             Duration duration = Duration.between(now, lastStart);
             long days = duration.toDays();
             if (days < 7) return;
+
             /**
              * Affection
              */
@@ -150,6 +154,22 @@ public class ReportService {
             // lastreport update
             lastReport.update(endAffectionScore, endStressScore, poopScore, walkScore, feedScore, communicationScore, diseaseScore);
             ReportResponse.from(lastReport);
+
+            // 마지막 주차인지 확인
+            if (lastReport.getWeek() == 8) {
+                member.complete();
+                return;
+            }
+
+            // 5주 간격 목욕 -> 20
+            if (lastReport.getWeek() >= 5 && stressService.getStressType(member, StressType.BATH).isEmpty()) {
+                List<Bath> bathList = bathService.getBath(member.getEmail());
+                if (bathList.isEmpty()) stressService.saveStress(member, StressType.BATH, 20);
+            }
+
+            // 양치 최소 1회 확인 -> 10
+            if (brushingTeethService.getBrushingTeethWeek(lastReport, member).isEmpty())
+                stressService.saveStress(member, StressType.BRUSHING_TEETH, 10);
 
             // newreport save
             Report newReport = reportRepository.save(
