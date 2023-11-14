@@ -1,9 +1,16 @@
 package com.senabo.domain.stress.entity;
 
 public enum StressType {
-    POOP,
     BRUSHING_TEETH,
-    WALK,
     FEED,
-    SHOWER
+    SHOWER,
+    POOP,
+    WALK,
+    STOMACHACHE,
+    ANXIETY,
+    DEPRESSION,
+    CRUSH,
+    BITE,
+    BARKING,
+    VOMITING
 }

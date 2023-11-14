@@ -86,4 +86,8 @@ public class ExpenseService {
             throw new UserException(ExceptionMessage.FAIL_DELETE_DATA);
         }
     }
+
+    public List<Expense> findTodayExpense(Member member){
+        return expenseRepository.findTodayExpense(member);
+    }
 }

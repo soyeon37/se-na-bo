@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static com.senabo.domain.communication.entity.QCommunication.communication;
@@ -56,5 +57,17 @@ public class ExpenseRepositoryImpl implements ExpenseRepositoryCustom {
                         expense.createTime.goe(startTime)
                 )
                 .fetchOne();
+    }
+
+    @Override
+    public List<Expense> findTodayExpense(Member member) {
+        LocalDateTime today = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
+        return queryFactory.selectFrom(expense)
+                .where(
+                        expense.memberId.eq(member),
+                        expense.createTime.goe(today)
+                )
+                .orderBy(expense.createTime.desc())
+                .fetch();
     }
 }

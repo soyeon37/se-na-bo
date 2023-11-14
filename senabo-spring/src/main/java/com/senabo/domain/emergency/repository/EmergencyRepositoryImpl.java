@@ -2,6 +2,7 @@ package com.senabo.domain.emergency.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.senabo.domain.emergency.entity.Emergency;
+import com.senabo.domain.emergency.entity.EmergencyType;
 import com.senabo.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +36,17 @@ public class EmergencyRepositoryImpl implements EmergencyRepositoryCustom {
         return queryFactory
                 .selectFrom(emergency)
                 .where(emergency.memberId.eq(member), emergency.createTime.goe(sevenDaysAgo))
+                .orderBy(emergency.createTime.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<Emergency> findByTypeToday(Member member, EmergencyType type) {
+        LocalDateTime today = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
+
+        return queryFactory
+                .selectFrom(emergency)
+                .where(emergency.memberId.eq(member), emergency.createTime.goe(today), emergency.type.eq(type))
                 .orderBy(emergency.createTime.desc())
                 .fetch();
     }

@@ -149,4 +149,7 @@ public class WalkService {
     }
 
 
+    public Optional<Walk> findLatestData(Member member){
+        return walkRepository.findLatestData(member);
+    }
 }

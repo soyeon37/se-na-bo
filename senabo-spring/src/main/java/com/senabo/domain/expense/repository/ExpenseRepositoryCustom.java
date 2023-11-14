@@ -15,4 +15,6 @@ public interface ExpenseRepositoryCustom {
     List<Expense> findExpenseWeek(Member member, LocalDateTime endTime, LocalDateTime startTime);
     Double getTotalAmount(Member member);
     Double getTotalAmountWeek(Member member, LocalDateTime endTime, LocalDateTime startTime);
+
+    List<Expense> findTodayExpense(Member member);
 }
