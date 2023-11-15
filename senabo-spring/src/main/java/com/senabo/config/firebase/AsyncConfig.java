@@ -14,7 +14,7 @@ import java.util.concurrent.Executor;
 public class AsyncConfig {
 
     @Bean(name = "fcmTaskExecutor")
-    public Executor fcmTaskExecutor(){
+    public ThreadPoolTaskExecutor fcmTaskExecutor(){
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         int poolSize = Runtime.getRuntime().availableProcessors();
         log.info("======================================");
