@@ -74,6 +74,7 @@ public class WalkService {
     public List<Walk> getTodayWalk(String email) {
         Member member = memberService.findByEmail(email);
         List<Walk> walkList = walkRepository.findTodayData(member, LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
+
         return walkList;
     }
 
@@ -99,12 +100,14 @@ public class WalkService {
     @Transactional
     public WalkResponse updateWalk(String email, UpdateWalkRequest request) {
         Member member = memberService.findByEmail(email);
-
+        // NPE 
+        Double distance = request.distnace();
+        if(distance == null) distance = 0.0;
         Optional<Walk> walkOptional = walkRepository.findLatestData(member);
         if(walkOptional.isEmpty()) throw new DataException(ExceptionMessage.DATA_NOT_FOUND);
         Walk walk = walkOptional.get();
         if (walk.getEndTime() == null) {
-            walk.update(LocalDateTime.now(), request.distnace());
+            walk.update(LocalDateTime.now(), distance);
         } else {
             throw new UserException(ExceptionMessage.FAIL_UPDATE_DATA);
         }

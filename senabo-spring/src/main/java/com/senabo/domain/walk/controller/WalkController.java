@@ -92,7 +92,7 @@ public class WalkController {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내역이 있으면 status: SUCCESS, 내역이 없으면 status: FAIL", content =
                     {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = WalkResponse.class))}),
+                    @Schema(implementation = TodayWalkResponse.class))}),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "DATA NOT FOUND")
     }
     )
