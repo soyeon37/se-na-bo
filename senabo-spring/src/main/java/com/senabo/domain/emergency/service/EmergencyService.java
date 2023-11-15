@@ -24,10 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -207,5 +204,16 @@ public class EmergencyService {
             }
         }
         return fcmService.makeEmpty();
+    }
+
+    public Map<String, EmergencyResponse> getEmergencyLastWeekUnSolved(Member member) {
+        Map<String, EmergencyResponse> map = new HashMap<>();
+        EmergencyType[] type = EmergencyType.values();
+        for (int i = 0; i < type.length; i++) {
+            Optional<Emergency> emergency = emergencyRepository.findUnsolvedEmergency(member, type[i]);
+            map.put(type[i].toString(), EmergencyResponse.from(emergency.get()));
+            log.info(type[i].toString());
+        }
+        return map;
     }
 }

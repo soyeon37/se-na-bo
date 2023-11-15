@@ -12,4 +12,5 @@ public interface EmergencyRepositoryCustom {
     Optional<Emergency> findLatestEmergency(Member member);
     List<Emergency> findLastWeekEmergency(Member member);
     List<Emergency> findByTypeToday(Member member, EmergencyType type);
+    Optional<Emergency> findUnsolvedEmergency(Member member, EmergencyType type);
 }

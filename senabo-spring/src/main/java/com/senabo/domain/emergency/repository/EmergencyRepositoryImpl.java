@@ -50,4 +50,17 @@ public class EmergencyRepositoryImpl implements EmergencyRepositoryCustom {
                 .orderBy(emergency.createTime.desc())
                 .fetch();
     }
+
+    @Override
+    public Optional<Emergency> findUnsolvedEmergency(Member member, EmergencyType type) {
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7).truncatedTo(ChronoUnit.DAYS);
+        return Optional.ofNullable(queryFactory
+                .selectFrom(emergency)
+                .where(emergency.memberId.eq(member),
+                        emergency.type.eq(type),
+                        emergency.solved.isFalse(),
+                        emergency.createTime.goe(sevenDaysAgo))
+                .orderBy(emergency.createTime.desc())
+                .fetchOne());
+    }
 }

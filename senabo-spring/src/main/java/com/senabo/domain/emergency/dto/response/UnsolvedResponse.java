@@ -7,16 +7,16 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record EmergencyResponse(
+public record UnsolvedResponse(
         Long id,
         Long memberId,
         EmergencyType type,
-        Boolean solved,
+        boolean solved,
         LocalDateTime createTime,
         LocalDateTime updateTime
 ) {
-    public static EmergencyResponse from(Emergency emergency) {
-        return EmergencyResponse.builder()
+    public static UnsolvedResponse from(Emergency emergency) {
+        return UnsolvedResponse.builder()
                 .id(emergency.getId())
                 .memberId(emergency.getMemberId().getId())
                 .type(emergency.getType())

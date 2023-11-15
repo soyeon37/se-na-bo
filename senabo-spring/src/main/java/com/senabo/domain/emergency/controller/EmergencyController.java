@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,14 +34,21 @@ public class EmergencyController {
         return ApiResponse.success("돌발상황 해결 성공", response);
     }
 
+//    @GetMapping("/get")
+//    @Operation(summary = "최근 7일 내 돌발상황 조회", description = "최근 7일 내 발생한 돌발상황을 조회한다. 7일이 지나면 돌발상황이 무효된 것으로 간주한다.")
+//    public ApiResponse<List<EmergencyResponse>> getEmergencyLastWeek(@AuthenticationPrincipal UserDetails principal) {
+//        List<Emergency> emergency = emergencyService.getEmergencyLastWeek(memberService.findByEmail(principal.getUsername()));
+//        if (emergency.isEmpty()) return ApiResponse.fail("일주일 간 발생한 돌발상황 조회 실패", null);
+//        List<EmergencyResponse> response = emergency.stream()
+//                .map(EmergencyResponse::from)
+//                .collect(Collectors.toList());
+//        return ApiResponse.success("일주일 간 발생한 돌발상황 조회 성공", response);
+//    }
+
     @GetMapping("/get")
-    @Operation(summary = "최근 7일 내 돌발상황 조회", description = "최근 7일 내 발생한 돌발상황을 조회한다. 7일이 지나면 돌발상황이 무효된 것으로 간주한다.")
-    public ApiResponse<List<EmergencyResponse>> getEmergencyLastWeek(@AuthenticationPrincipal UserDetails principal) {
-        List<Emergency> emergency = emergencyService.getEmergencyLastWeek(memberService.findByEmail(principal.getUsername()));
-        if (emergency.isEmpty()) return ApiResponse.fail("일주일 간 발생한 돌발상황 조회 실패", null);
-        List<EmergencyResponse> response = emergency.stream()
-                .map(EmergencyResponse::from)
-                .collect(Collectors.toList());
-        return ApiResponse.success("일주일 간 발생한 돌발상황 조회 성공", response);
+    @Operation(summary = "해결 못한 가장 최신 돌발상황 조회", description = "해결 못한 가장 최신 돌발상황 조회한다. 7일이 지나면 돌발상황이 무효된 것으로 간주한다.")
+    public ApiResponse<Map<String, EmergencyResponse>> getEmergencyLastWeekUnSolved(@AuthenticationPrincipal UserDetails principal) {
+        Map<String, EmergencyResponse> emergency = emergencyService.getEmergencyLastWeekUnSolved(memberService.findByEmail(principal.getUsername()));
+        return ApiResponse.success("해결 못한 가장 최신 돌발상황 조회 성공", emergency);
     }
 }
