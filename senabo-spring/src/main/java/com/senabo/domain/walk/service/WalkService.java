@@ -100,7 +100,10 @@ public class WalkService {
     @Transactional
     public WalkResponse updateWalk(String email, UpdateWalkRequest request) {
         Member member = memberService.findByEmail(email);
-        // NPE 
+        log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        log.info("Request DTO {}", request.distnace());
+        log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        // NPE
         Double distance = request.distnace();
         if(distance == null) distance = 0.0;
         Optional<Walk> walkOptional = walkRepository.findLatestData(member);
