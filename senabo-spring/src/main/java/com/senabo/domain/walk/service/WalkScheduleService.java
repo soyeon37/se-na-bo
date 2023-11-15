@@ -23,7 +23,7 @@ public class WalkScheduleService {
     @Scheduled(cron = "0 0 0 * * *")
     public void scheduleCheckWalk(){
         log.info("산책 스케줄러 실행");
-        List<Member> allMember = memberService.findAllMember();
+        List<Member> allMember = memberService.findAllMemberNonComplete();
         for(Member member : allMember){
             walkService.scheduleCheckWalk(member);
             if (member.getDeviceToken() != null) {
@@ -37,7 +37,7 @@ public class WalkScheduleService {
     @Scheduled(cron = "0 0 12/20 * * *")
     public void scheduleSendWalk(){
         log.info("산책 알림 스케줄러 실행");
-        List<Member> allMember = memberService.findAllMember();
+        List<Member> allMember = memberService.findAllMemberNonComplete();
         for(Member member : allMember){
             if (member.getDeviceToken() != null) {
                 // FCM

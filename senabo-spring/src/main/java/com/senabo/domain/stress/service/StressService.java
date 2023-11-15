@@ -98,4 +98,8 @@ public class StressService {
         return  (int) (1 - stressCnt / 168) * 100;
     }
 
+    public List<Stress> getStressType (Member member, StressType type){
+        return stressRepository.findByMemberIdAndTypeOrderByCreateTimeDesc(member, type);
+    }
+
 }

@@ -32,6 +32,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final ListPath<com.senabo.domain.communication.entity.Communication, com.senabo.domain.communication.entity.QCommunication> communicationList = this.<com.senabo.domain.communication.entity.Communication, com.senabo.domain.communication.entity.QCommunication>createList("communicationList", com.senabo.domain.communication.entity.Communication.class, com.senabo.domain.communication.entity.QCommunication.class, PathInits.DIRECT2);
 
+    public final BooleanPath complete = createBoolean("complete");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createTime = _super.createTime;
 
@@ -42,6 +44,8 @@ public class QMember extends EntityPathBase<Member> {
     public final StringPath dogName = createString("dogName");
 
     public final StringPath email = createString("email");
+
+    public final ListPath<com.senabo.domain.emergency.entity.Emergency, com.senabo.domain.emergency.entity.QEmergency> emergencyList = this.<com.senabo.domain.emergency.entity.Emergency, com.senabo.domain.emergency.entity.QEmergency>createList("emergencyList", com.senabo.domain.emergency.entity.Emergency.class, com.senabo.domain.emergency.entity.QEmergency.class, PathInits.DIRECT2);
 
     public final DateTimePath<java.time.LocalDateTime> enterTime = createDateTime("enterTime", java.time.LocalDateTime.class);
 

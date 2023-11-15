@@ -22,7 +22,7 @@ public class ReportScheduleService {
     @Scheduled(cron = "0 0 1 * * *")
     public void scheduleReport() {
         log.info("리포트 스케줄러 실행");
-        List<Member> allMember = memberService.findAllMember();
+        List<Member> allMember = memberService.findAllMemberNonComplete();
         for (Member member : allMember) {
             reportService.scheduleReport(member);
         }
