@@ -203,4 +203,11 @@ public class MemberService {
     public List<Member> findAllMember(){
         return memberRepository.findAll();
     }
+
+    @Transactional
+    public MemberResponse updateLocate(String email, UpdateLocateRequest request) {
+        Member member = findByEmail(email);
+        member.updateLocate(request);
+        return MemberResponse.from(member);
+    }
 }

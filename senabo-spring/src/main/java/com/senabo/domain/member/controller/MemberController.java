@@ -105,6 +105,20 @@ public class MemberController {
         return ApiResponse.success("회원정보 수정 성공", response);
     }
 
+    @PutMapping("/locate")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "사용자 위치를 수정한다.", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = MemberResponse.class))}),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "USER NOT FOUND")
+    }
+    )
+    @Operation(summary = "회원 위치 수정", description = "위도, 경도를 수정한다.")
+    public ApiResponse<MemberResponse> updateLocate(@AuthenticationPrincipal UserDetails principal, @RequestBody UpdateLocateRequest request) {
+        MemberResponse response = memberService.updateLocate(principal.getUsername(), request);
+        return ApiResponse.success("회원 위치 수정 성공", response);
+    }
+
     @PostMapping("/total-time")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "사용자 접속시간을 수정한다.", content =

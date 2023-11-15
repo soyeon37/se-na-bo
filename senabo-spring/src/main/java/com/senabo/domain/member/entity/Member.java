@@ -11,6 +11,7 @@ import com.senabo.domain.expense.entity.Expense;
 import com.senabo.domain.feed.entity.Feed;
 import com.senabo.domain.member.dto.request.TotalTimeRequest;
 import com.senabo.domain.member.dto.request.UpdateInfoRequest;
+import com.senabo.domain.member.dto.request.UpdateLocateRequest;
 import com.senabo.domain.report.entity.Report;
 import com.senabo.domain.stress.entity.Stress;
 import com.senabo.domain.walk.entity.Walk;
@@ -131,6 +132,11 @@ public class Member extends BaseEntity  {
         this.dogName = request.dogName();
         this.sex = request.sex();
         this.species = request.species();
+        this.houseLatitude = request.houseLatitude();
+        this.houseLongitude = request.houseLongitude();
+    }
+
+    public void updateLocate(UpdateLocateRequest request){
         this.houseLatitude = request.houseLatitude();
         this.houseLongitude = request.houseLongitude();
     }
