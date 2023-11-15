@@ -72,7 +72,7 @@ public class Member extends BaseEntity  {
     @Column(nullable = true)
     private String deviceToken;
 
-    @Column(name = "complete", columnDefinition = "false")
+    @Column(name = "complete")
     private boolean complete;
 
     @ElementCollection(fetch = FetchType.EAGER)
