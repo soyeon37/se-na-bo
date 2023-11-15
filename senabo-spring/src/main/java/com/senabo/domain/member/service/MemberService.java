@@ -179,7 +179,7 @@ public class MemberService {
         poopMessageList.add(new String[]{});
         List<String[]> sendMessageList;
         sendMessageList = poopMessageList.stream()
-                .filter(Objects::nonNull)
+                .filter(array -> array[0] != null)
                 .toList();
 
         fcmService.sendFCM(sendMessageList);
