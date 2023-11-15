@@ -202,4 +202,11 @@ public class MemberService {
         member.updateLocate(request);
         return MemberResponse.from(member);
     }
+
+    @Transactional
+    public MemberResponse updateDeviceToken(String email, UpdateDeviceTokenRequest request) {
+        Member member = findByEmail(email);
+        member.updateDeviceToken(request);
+        return MemberResponse.from(member);
+    }
 }

@@ -160,6 +160,14 @@ public class MemberController {
         log.info("토큰 Exception");
         memberService.tokenCheckExcpetion();
     }
+
+    @PutMapping("/device-token")
+    @Operation(summary = "회원 기기 토큰 수정", description = "기기 토큰을 수정한다.")
+    public ApiResponse<MemberResponse> updateDeviceToken(@AuthenticationPrincipal UserDetails principal, @RequestBody UpdateDeviceTokenRequest request){
+        MemberResponse response = memberService.updateDeviceToken(principal.getUsername(), request);
+        return ApiResponse.success("회원 기기 토큰 수정 성공", response);
+    }
+
     @GetMapping("/throw/not-found")
     public void throwNotFoundException(){
         log.info("Not Found Exception");

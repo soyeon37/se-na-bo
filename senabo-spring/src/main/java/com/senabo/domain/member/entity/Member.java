@@ -10,6 +10,7 @@ import com.senabo.domain.emergency.entity.Emergency;
 import com.senabo.domain.expense.entity.Expense;
 import com.senabo.domain.feed.entity.Feed;
 import com.senabo.domain.member.dto.request.TotalTimeRequest;
+import com.senabo.domain.member.dto.request.UpdateDeviceTokenRequest;
 import com.senabo.domain.member.dto.request.UpdateInfoRequest;
 import com.senabo.domain.member.dto.request.UpdateLocateRequest;
 import com.senabo.domain.report.entity.Report;
@@ -141,6 +142,10 @@ public class Member extends BaseEntity  {
         this.houseLongitude = request.houseLongitude();
     }
 
+    public void updateDeviceToken(UpdateDeviceTokenRequest request) {
+        this.deviceToken = request.deviceToken();
+    }
+
     public void complete(){
         this.complete = true;
     }
@@ -159,6 +164,8 @@ public class Member extends BaseEntity  {
     public void setDeviceToken(String deviceToken) {
         this.deviceToken = deviceToken;
     }
+
+
 
 
 //    @Override
