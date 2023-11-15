@@ -100,17 +100,11 @@ public class WalkService {
     @Transactional
     public WalkResponse updateWalk(String email, UpdateWalkRequest request) {
         Member member = memberService.findByEmail(email);
-        log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-        log.info("Request DTO {}", request.distnace());
-        log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-        // NPE
-        Double distance = request.distnace();
-        if(distance == null) distance = 0.0;
         Optional<Walk> walkOptional = walkRepository.findLatestData(member);
         if(walkOptional.isEmpty()) throw new DataException(ExceptionMessage.DATA_NOT_FOUND);
         Walk walk = walkOptional.get();
         if (walk.getEndTime() == null) {
-            walk.update(LocalDateTime.now(), distance);
+            walk.update(LocalDateTime.now(), request.distance());
         } else {
             throw new UserException(ExceptionMessage.FAIL_UPDATE_DATA);
         }

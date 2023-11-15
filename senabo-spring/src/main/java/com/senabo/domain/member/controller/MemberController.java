@@ -145,7 +145,6 @@ public class MemberController {
     )
     @Operation(summary = "토큰 재발급", description = "만료된 토큰을 받아서 재발급한다.")
     public ApiResponse<ReIssueResponse> reissue(@RequestBody ReIssueRequest request) {
-//        log.info("재발급 시작: {}",SecurityContextHolder.getContext().getAuthentication().toString());
         return ApiResponse.success("토큰 재발급 성공", memberService.reissue(request.refreshToken(), SecurityContextHolder.getContext().getAuthentication()));
     }
 
