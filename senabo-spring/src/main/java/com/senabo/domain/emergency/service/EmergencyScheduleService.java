@@ -21,6 +21,7 @@ public class EmergencyScheduleService {
     @Scheduled(cron = "0 0 13-22 * * MON-FRI")
     public void scheduleWeekdayDayEmergency(){
         log.info("주중 낮 돌발 상황 스케줄러 실행");
+
         List<Member> allMember = memberService.findAllMember();
         for(Member member : allMember){
             if(member.getDeviceToken() != null){

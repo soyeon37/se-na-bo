@@ -17,6 +17,7 @@ import com.senabo.exception.message.ExceptionMessage;
 import com.senabo.exception.model.DataException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,8 @@ public class EmergencyService {
     private final StressService stressService;
     private final WalkService walkService;
     private final ExpenseService expenseService;
+
+    private final ApplicationEventPublisher eventPublisher;
 
 
     public void ramdomDayEmergency(Member member) {
@@ -161,13 +164,13 @@ public class EmergencyService {
         // 보낸 적이 있으면 산책 나갔는지 검사
         if (!emergencyList.isEmpty()) {
             Optional<Walk> walkOptional = walkService.findLatestData(member);
-            if(walkOptional.isEmpty()) stressService.saveStress(member, StressType.WALK, 30);
-        } 
+            if (walkOptional.isEmpty()) stressService.saveStress(member, StressType.WALK, 30);
+        }
         // 보낸 적이 없으면 ramdom, 무조건 1번 알림
         else {
             LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
             LocalDateTime eightAm = now.withHour(8).withMinute(0).withSecond(0).withNano(0);
-            if ( ramdomSend() || now.isEqual(eightAm) || now.isAfter(eightAm)) {
+            if (ramdomSend() || now.isEqual(eightAm) || now.isAfter(eightAm)) {
                 String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
                 String body = dogName + "가 산책을 가고 싶어해요";
                 fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", body, member.getDeviceToken());
@@ -177,10 +180,10 @@ public class EmergencyService {
 
     public void ramdomBarkWeekendEmergency(Member member) {
         List<Emergency> emergencyList = emergencyRepository.findByTypeToday(member, EmergencyType.BARKING);
-        if(!emergencyList.isEmpty()) return;
+        if (!emergencyList.isEmpty()) return;
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
         LocalDateTime elevenPm = now.withHour(23).withMinute(0).withSecond(0).withNano(0);
-        if(ramdomSend() || now.isEqual(elevenPm) || now.isAfter(elevenPm)){
+        if (ramdomSend() || now.isEqual(elevenPm) || now.isAfter(elevenPm)) {
             stressService.saveStress(member, StressType.BARKING, 20);
             String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
             String body = dogName + "가 짖어서 민원이 들어올 수 있습니다";
@@ -193,13 +196,13 @@ public class EmergencyService {
         // 보낸 적이 있으면 병원에 갔는지 검사
         if (!emergencyList.isEmpty()) {
             List<Expense> expenseList = expenseService.findTodayExpense(member);
-            if(expenseList.isEmpty()) stressService.saveStress(member, StressType.VOMITING, 30);
+            if (expenseList.isEmpty()) stressService.saveStress(member, StressType.VOMITING, 30);
         }
         // 보낸 적이 없으면 ramdom
         else {
             if (ramdomSend()) {
                 String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
-                String  body = dogName + "의 상태가 좋지 않습니다";
+                String body = dogName + "의 상태가 좋지 않습니다";
                 fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", body, member.getDeviceToken());
                 stressService.saveStress(member, StressType.VOMITING, 10);
             }

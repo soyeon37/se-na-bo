@@ -9,13 +9,13 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 @Slf4j
 @Configuration
 public class SchedulerConfig implements SchedulingConfigurer {
-    private final int POOL_SIZE = 10;
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar){
         ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
 
-                threadPoolTaskScheduler.setPoolSize(POOL_SIZE);
+                int poolSize = Runtime.getRuntime().availableProcessors();
+                threadPoolTaskScheduler.setPoolSize(poolSize);
                 threadPoolTaskScheduler.setThreadNamePrefix("scheduled-task-pool");
                 threadPoolTaskScheduler.initialize();
 

@@ -11,6 +11,7 @@ import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class FCMService {
+    private final ThreadPoolTaskExecutor taskExecutor;
 
     @Value("${fcm.service-account-file}")
     private String serviceAccountFilePath;
@@ -30,6 +32,16 @@ public class FCMService {
     private String API_URL = "https://fcm.googleapis.com/v1/projects/senabo-k9a108t/messages:send";
 
     private final ObjectMapper objectMapper;
+
+
+    public void sendFCM(List<String[]> messageList) {
+        log.info("sendFCM By Execute");
+        for (String[] message :
+                messageList) {
+            sendNotificationByToken(message[0], message[1], message[2]);
+        }
+    }
+
 
     public void sendNotificationByToken(String title, String body, String token) {
         log.info("sendNotificationByToken");
@@ -51,7 +63,7 @@ public class FCMService {
         }
     }
 
-    public void sendMulticastMessageTo(String title, String body, List<String> tokenList)  {
+    public void sendMulticastMessageTo(String title, String body, List<String> tokenList) {
         MulticastMessage message = MulticastMessage.builder()
                 .putData("fcm_type", "NOTIFICATION")
                 .putData("title", title)
