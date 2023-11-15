@@ -38,7 +38,7 @@ public class FCMService {
         log.info("sendFCM By Execute");
         for (String[] message :
                 messageList) {
-            sendNotificationByToken(message[0], message[1], message[2]);
+            taskExecutor.execute(() -> sendNotificationByToken(message[0], message[1], message[2]));
         }
     }
 

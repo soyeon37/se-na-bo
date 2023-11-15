@@ -136,8 +136,8 @@ public class MemberController {
     }
 
     @PostMapping("/fcm")
-    public ApiResponse<Object> fcmTest(@RequestBody FcmTokenRequest request){
-        memberService.fcmTest(request.deviceToken());
+    public ApiResponse<Object> fcmTest(){
+        memberService.fcmTest();
         return ApiResponse.success("FCM 발송 성공", true);
     }
 

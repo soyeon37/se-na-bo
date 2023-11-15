@@ -6,15 +6,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.concurrent.Executor;
-
 @Slf4j
 @Configuration
 @EnableAsync
 public class AsyncConfig {
 
     @Bean(name = "fcmTaskExecutor")
-    public ThreadPoolTaskExecutor fcmTaskExecutor(){
+    public ThreadPoolTaskExecutor fcmTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         int poolSize = Runtime.getRuntime().availableProcessors();
         log.info("======================================");
@@ -26,6 +24,6 @@ public class AsyncConfig {
         executor.setQueueCapacity(50); // 최대 큐 수
         executor.setKeepAliveSeconds(60); // maxPoolSize로 인해 덤으로 더 돌아다니는 튜브는 60초 후에 수거해서 정리
         executor.initialize(); // 초기화 후 반환
-        return  executor;
+        return executor;
     }
 }

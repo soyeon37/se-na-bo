@@ -9,7 +9,6 @@ import com.senabo.domain.feed.repository.FeedRepository;
 import com.senabo.domain.member.entity.Member;
 import com.senabo.domain.member.service.MemberService;
 import com.senabo.domain.report.entity.Report;
-import com.senabo.domain.report.service.ReportService;
 import com.senabo.domain.stress.entity.StressType;
 import com.senabo.domain.stress.service.StressService;
 import com.senabo.exception.message.ExceptionMessage;
@@ -24,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +35,6 @@ public class FeedService {
     private final MemberService memberService;
     private final StressService stressService;
     private final ParsingMessageService parsingMessageService;
-    private final FCMService fcmService;
 
     @Transactional
     public FeedResponse createFeed(String email) {
@@ -118,7 +115,8 @@ public class FeedService {
     }
 
     @Transactional
-    public void scheduleFeed(Member member) {
+    public String[] scheduleFeed(Member member) {
+        String[] feedMessage = new String[3];
         try {
             Feed feed = findLatestData(member);
             LocalDateTime now = LocalDateTime.now();
@@ -139,14 +137,18 @@ public class FeedService {
                 if (member.getDeviceToken() != null) {
                     // FCM
                     String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
-                    fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", dogName + "의 밥을 줄 시간이에요!", member.getDeviceToken());
+//                    fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", dogName + "의 밥을 줄 시간이에요!", member.getDeviceToken());
+                    feedMessage[0] = "세상에 나쁜 보호자는 있다";
+                    feedMessage[1] = dogName + "의 밥을 줄 시간이에요!";
+                    feedMessage[2] = member.getDeviceToken();
+                    return feedMessage;
                 }
             }
             // 배식 13시간 경과 이후 : 스트레스 1 씩 증가
             else if (nowH.isAfter(twelveAfter)) {
                 log.info("배식 후 13시간 경과: 스트레스 증가");
                 int originStress = member.getStressLevel();
-                if (originStress == 100) return;
+                if (originStress == 100) return feedMessage;
                 // 스트레스 1 증가
                 Duration duration = Duration.between(nowH, lastFeedH);
                 long hours = duration.toHours();
@@ -158,7 +160,11 @@ public class FeedService {
                     if (member.getDeviceToken() != null) {
                         // FCM
                         String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
-                        fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", dogName + "가 공복이어서 토를 했어요.", member.getDeviceToken());
+//                        fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", dogName + "가 공복이어서 토를 했어요.", member.getDeviceToken());
+                        feedMessage[0] = "세상에 나쁜 보호자는 있다";
+                        feedMessage[1] = dogName + "가 공복이어서 토를 했어요";
+                        feedMessage[2] = member.getDeviceToken();
+                        return feedMessage;
                     }
                     // 스트레스 3 증가
                     changeAmount = 3;
@@ -169,11 +175,12 @@ public class FeedService {
             log.error("Member ID: " + member.getId() + " 에러 발생: {}", e.getMessage());
         }
 
-
+        return feedMessage;
     }
 
     @Transactional
-    public void schedulePoop(Member member) {
+    public String[] schedulePoop(Member member) {
+        String[] poopMessage = new String[3];
         try {
             Feed feed = findLatestData(member);
 
@@ -192,13 +199,17 @@ public class FeedService {
                 if (member.getDeviceToken() != null) {
                     // FCM
                     String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
-                    fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", dogName + "가 배변을 했어요!", member.getDeviceToken());
+//                    fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", dogName + "가 배변을 했어요!", member.getDeviceToken());
+                    poopMessage[0] = "세상에 나쁜 보호자는 있다";
+                    poopMessage[1] = dogName + "가 배변을 했어요!";
+                    poopMessage[2] = member.getDeviceToken();
+                    return poopMessage;
                 }
             } else if (nowH.isAfter(threeAfter)) {
                 int originStress = member.getStressLevel();
                 // 밥 먹은 지 3시간 후인데 CleanYn: true || 이미 스트레스가 100
                 if (feed.getCleanYn() || originStress == 100) {
-                    return;
+                    return poopMessage;
                 }
                 // 스트레스 1 증가
                 Duration duration = Duration.between(nowH, lastFeedH);
@@ -210,7 +221,7 @@ public class FeedService {
         } catch (DataException e) {
             log.error("Member ID: " + member.getId() + " 에러 발생: {}", e.getMessage());
         }
-
+        return poopMessage;
     }
 
 }

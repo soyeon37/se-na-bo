@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -166,9 +167,23 @@ public class MemberService {
         return memberRepository.findAllMemberNonComplete();
     }
 
-    public void fcmTest(String deviceToken) {
+    public void fcmTest() {
         log.info("FCM 테스트 시작");
-        fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", LocalDateTime.now() + ": FCM 테스트", deviceToken);
+        List<Member> allMember = findAllMemberNonComplete();
+        List<String[]> poopMessageList = new ArrayList<>();
+        for(Member member : allMember){
+            if (member.getDeviceToken() == null) continue;
+            poopMessageList.add(new String[]{"세나보 테스트", "테스트 문자입니다.", member.getDeviceToken()});
+        }
+        poopMessageList.add(new String[]{});
+        poopMessageList.add(new String[]{});
+        List<String[]> sendMessageList;
+        sendMessageList = poopMessageList.stream()
+                .filter(Objects::nonNull)
+                .toList();
+
+        fcmService.sendFCM(sendMessageList);
+//        fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", LocalDateTime.now() + ": FCM 테스트", deviceToken);
     }
 
     public void tokenCheckExcpetion() {
