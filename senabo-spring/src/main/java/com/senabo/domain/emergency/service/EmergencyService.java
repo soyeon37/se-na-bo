@@ -1,6 +1,7 @@
 package com.senabo.domain.emergency.service;
 
 import com.senabo.common.message.ParsingMessageService;
+import com.senabo.config.firebase.FCMMessage;
 import com.senabo.config.firebase.FCMService;
 import com.senabo.domain.emergency.dto.response.EmergencyResponse;
 import com.senabo.domain.emergency.entity.Emergency;
@@ -17,7 +18,6 @@ import com.senabo.exception.message.ExceptionMessage;
 import com.senabo.exception.model.DataException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,11 +41,8 @@ public class EmergencyService {
     private final WalkService walkService;
     private final ExpenseService expenseService;
 
-    private final ApplicationEventPublisher eventPublisher;
-
-
-    public void ramdomDayEmergency(Member member) {
-        if (!ramdomSend()) return;
+    public FCMMessage ramdomDayEmergency(Member member) {
+        if (!ramdomSend()) return fcmService.makeEmpty();
         EmergencyType type;
         EmergencyType[] types = {EmergencyType.POOP, EmergencyType.STOMACHACHE, EmergencyType.ANXIETY, EmergencyType.DEPRESSION};
         List<Emergency> list = getEmergencyLastWeek(member);
@@ -63,7 +60,7 @@ public class EmergencyService {
                 typeList.add(types[i]);
             }
         }
-        if (typeList.isEmpty()) return;
+        if (typeList.isEmpty()) return fcmService.makeEmpty();
 
         type = comb(typeList);
         String body = "";
@@ -86,12 +83,13 @@ public class EmergencyService {
                 stressService.saveStress(member, StressType.DEPRESSION, 10);
             }
         }
-        fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", body, member.getDeviceToken());
+
         saveEmergency(member, type);
+        return fcmService.makeMessage("세상에 나쁜 보호자는 있다", body, member.getDeviceToken());
     }
 
-    public void ramdomEveningEmergency(Member member) {
-        if (!ramdomSend()) return;
+    public FCMMessage ramdomEveningEmergency(Member member) {
+        if (!ramdomSend()) return fcmService.makeEmpty();
         EmergencyType type;
         EmergencyType[] types = {EmergencyType.CRUSH, EmergencyType.BITE};
         List<Emergency> list = getEmergencyLastWeek(member);
@@ -107,7 +105,7 @@ public class EmergencyService {
                 typeList.add(types[i]);
             }
         }
-        if (typeList.isEmpty()) return;
+        if (typeList.isEmpty()) return fcmService.makeEmpty();
 
         type = comb(typeList);
         String body = "";
@@ -116,8 +114,8 @@ public class EmergencyService {
             case CRUSH -> body = dogName + "가 잠을 자지 않아요";
             case BITE -> body = "물림 사고가 발생했어요!";
         }
-        fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", body, member.getDeviceToken());
         saveEmergency(member, type);
+        return fcmService.makeMessage("세상에 나쁜 보호자는 있다", body, member.getDeviceToken());
     }
 
 
@@ -129,7 +127,6 @@ public class EmergencyService {
     }
 
     public EmergencyType comb(List<EmergencyType> types) {
-        ;
         int randomIndex = new Random().nextInt(types.size());
         return types.get(randomIndex);
     }
@@ -159,7 +156,7 @@ public class EmergencyService {
     }
 
 
-    public void ramdomWalkWeekendEmergency(Member member) {
+    public FCMMessage ramdomWalkWeekendEmergency(Member member) {
         List<Emergency> emergencyList = emergencyRepository.findByTypeToday(member, EmergencyType.WALK);
         // 보낸 적이 있으면 산책 나갔는지 검사
         if (!emergencyList.isEmpty()) {
@@ -173,25 +170,27 @@ public class EmergencyService {
             if (ramdomSend() || now.isEqual(eightAm) || now.isAfter(eightAm)) {
                 String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
                 String body = dogName + "가 산책을 가고 싶어해요";
-                fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", body, member.getDeviceToken());
+                return fcmService.makeMessage("세상에 나쁜 보호자는 있다", body, member.getDeviceToken());
             }
         }
+        return fcmService.makeEmpty();
     }
 
-    public void ramdomBarkWeekendEmergency(Member member) {
+    public FCMMessage ramdomBarkWeekendEmergency(Member member) {
         List<Emergency> emergencyList = emergencyRepository.findByTypeToday(member, EmergencyType.BARKING);
-        if (!emergencyList.isEmpty()) return;
+        if (!emergencyList.isEmpty()) return fcmService.makeEmpty();
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
         LocalDateTime elevenPm = now.withHour(23).withMinute(0).withSecond(0).withNano(0);
         if (ramdomSend() || now.isEqual(elevenPm) || now.isAfter(elevenPm)) {
             stressService.saveStress(member, StressType.BARKING, 20);
             String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
             String body = dogName + "가 짖어서 민원이 들어올 수 있습니다";
-            fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", body, member.getDeviceToken());
+            return fcmService.makeMessage("세상에 나쁜 보호자는 있다", body, member.getDeviceToken());
         }
+        return fcmService.makeEmpty();
     }
 
-    public void ramdomVomitingWeekendEmergency(Member member) {
+    public FCMMessage ramdomVomitingWeekendEmergency(Member member) {
         List<Emergency> emergencyList = emergencyRepository.findByTypeToday(member, EmergencyType.VOMITING);
         // 보낸 적이 있으면 병원에 갔는지 검사
         if (!emergencyList.isEmpty()) {
@@ -203,9 +202,10 @@ public class EmergencyService {
             if (ramdomSend()) {
                 String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
                 String body = dogName + "의 상태가 좋지 않습니다";
-                fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", body, member.getDeviceToken());
                 stressService.saveStress(member, StressType.VOMITING, 10);
+                return fcmService.makeMessage("세상에 나쁜 보호자는 있다", body, member.getDeviceToken());
             }
         }
+        return fcmService.makeEmpty();
     }
 }

@@ -34,11 +34,11 @@ public class FCMService {
     private final ObjectMapper objectMapper;
 
 
-    public void sendFCM(List<String[]> messageList) {
+    public void sendFCM(List<FCMMessage> messageList) {
         log.info("sendFCM By Execute");
-        for (String[] message :
+        for (FCMMessage message :
                 messageList) {
-            taskExecutor.execute(() -> sendNotificationByToken(message[0], message[1], message[2]));
+            taskExecutor.execute(() -> sendNotificationByToken(message.getMessage().getNotification().getTitle(), message.getMessage().getNotification().getBody(), message.getMessage().getToken()));
         }
     }
 
@@ -61,6 +61,38 @@ public class FCMService {
         } catch (FirebaseMessagingException e) {
             e.printStackTrace();
         }
+    }
+
+    public FCMMessage makeMessage(String title, String body, String token){
+        return FCMMessage.builder()
+                .message(
+                        FCMMessage.Message.builder()
+                                .token(token)
+                                .notification(
+                                        FCMMessage.Notification.builder()
+                                                .title(title)
+                                                .body(body)
+                                                .build()
+                                )
+                                .build()
+                )
+                .build();
+    }
+
+    public FCMMessage makeEmpty(){
+        return FCMMessage.builder()
+                .message(
+                        FCMMessage.Message.builder()
+                                .token(null)
+                                .notification(
+                                        FCMMessage.Notification.builder()
+                                                .title(null)
+                                                .body(null)
+                                                .build()
+                                )
+                                .build()
+                )
+                .build();
     }
 
     public void sendMulticastMessageTo(String title, String body, List<String> tokenList) {
@@ -110,24 +142,24 @@ public class FCMService {
         return googleCredentials.getAccessToken().getTokenValue();
     }
 
-    public String makeMessage(String targetToken, String title, String body) throws JsonProcessingException, JsonParseException {
-        FCMMessage fcmMessage = FCMMessage.builder()
-                .message(
-                        FCMMessage.Message.builder()
-                                .token(targetToken)
-                                .notification(
-                                        FCMMessage.Notification.builder()
-                                                .title(title)
-                                                .body(body)
-                                                .build()
-                                )
-                                .build()
-                )
-                .validateOnly(false)
-                .build();
-
-        return objectMapper.writeValueAsString(fcmMessage);
-    }
+//    public String makeMessage(String targetToken, String title, String body) throws JsonProcessingException, JsonParseException {
+//        FCMMessage fcmMessage = FCMMessage.builder()
+//                .message(
+//                        FCMMessage.Message.builder()
+//                                .token(targetToken)
+//                                .notification(
+//                                        FCMMessage.Notification.builder()
+//                                                .title(title)
+//                                                .body(body)
+//                                                .build()
+//                                )
+//                                .build()
+//                )
+//                .validateOnly(false)
+//                .build();
+//
+//        return objectMapper.writeValueAsString(fcmMessage);
+//    }
 
     public void sendToToken(String targetToken) throws FirebaseMessagingException {
         Message message = Message.builder()
@@ -142,20 +174,20 @@ public class FCMService {
         log.info("FCM 테스트 = {}", response);
     }
 
-    public void sendMessageTo(String token) throws IOException {
-        String message = makeMessage(token, "[테스트 알림]", "테스트 내용");
-
-        OkHttpClient client = new OkHttpClient();
-        RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
-        Request request = new Request.Builder()
-                .url(API_URL)
-                .post(requestBody)
-                .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
-                .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
-                .build();
-
-        Response response = client.newCall(request).execute();
-
-        log.info(response.body().string());
-    }
+//    public void sendMessageTo(String token) throws IOException {
+//        String message = makeMessage(token, "[테스트 알림]", "테스트 내용");
+//
+//        OkHttpClient client = new OkHttpClient();
+//        RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
+//        Request request = new Request.Builder()
+//                .url(API_URL)
+//                .post(requestBody)
+//                .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
+//                .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
+//                .build();
+//
+//        Response response = client.newCall(request).execute();
+//
+//        log.info(response.body().string());
+//    }
 }

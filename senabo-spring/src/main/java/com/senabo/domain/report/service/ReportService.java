@@ -98,60 +98,26 @@ public class ReportService {
     @Transactional
     public void scheduleReport(Member member) {
         try {
-            // 마지막 리포트의 create datetime 가져오기
+            // 마지막 리포트 정보 가져오기
             Report lastReport = findLatestData(member);
-            LocalDateTime lastCreateTime = lastReport.getCreateTime();
+            LocalDateTime lastCreateTime = lastReport.getCreateTime().truncatedTo(ChronoUnit.DAYS);
             LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
             LocalDateTime lastStart = lastCreateTime.truncatedTo(ChronoUnit.DAYS);
 
-            // 7일이 되었으면 새로운 report 생성
-            Duration duration = Duration.between(now, lastStart);
-            long days = duration.toDays();
-            if (days < 7) return;
+            // 7일 이상 경과하면 새 리포트 생성
+            long daysElapsed = Duration.between(now, lastStart).toDays();
+            if (daysElapsed < 7) return;
 
-            /**
-             * Affection
-             */
-            Affection affection = affectionService.getLatestAffectionData(member);
-            int endAffectionScore = affection.getScore();
-            /**
-             * Stress
-             */
-            Stress stress = stressService.getLatestStressData(member);
-            int endStressScore = stress.getScore();
-            /**
-             * 배변 score
-             * Poop 테이블에서 lastCreateTime 기준보다 큰 data를 가져온다.
-             * 배변 패드를 안 치운 횟수를 100에서 감점한다.
-             * poopList의 전체 횟수 - 치우지 않은 횟수 / 168 * 100
-             */
-            Long poopStressCnt = 0L;
-            poopStressCnt = stressService.getCountLastWeekList(member, lastStart, StressType.POOP);
-            int poopScore = (int) (1 - poopStressCnt / 168) * 100;
+            // 각각의 스코어 계산
+            int endAffectionScore = affectionService.getLatestAffectionData(member).getScore();
+            int endStressScore = stressService.getLatestStressData(member).getScore();
+            int poopScore = calculateStressScore(member, StressType.POOP, 168);
+            int walkScore = calculateStressScore(member, StressType.WALK, 7);
+            int diseaseScore = (int) Math.max(0, 100 - diseaseService.getCountLastWeekDiseaseList(member, lastStart) * 10);
+            int feedScore = calculateStressScore(member, StressType.FEED, 168);
+            int communicationScore = calculateCommunicationScore(member, lastStart);
 
-            // 산책 score
-            Long walkStressCnt = 0L;
-            walkStressCnt = stressService.getCountLastWeekList(member, lastStart, StressType.WALK);
-            int walkScore = (int) (1 - walkStressCnt / 7) * 100;
-
-            // 질병 score
-            Long diseaseStressCnt = 0L;
-            diseaseStressCnt = diseaseService.getCountLastWeekDiseaseList(member, lastStart);
-            int diseaseScore = (int) (100 - diseaseStressCnt * 10);
-            if (diseaseScore <= 0) diseaseScore = 0;
-
-            // 먹이 score
-            Long feedStressCnt = 0L;
-            feedStressCnt = stressService.getCountLastWeekList(member, lastStart, StressType.FEED);
-            int feedScore = (int) (1 - feedStressCnt / 168) * 100;
-
-            // 교감 score // 교감으로 고쳐야 함
-            Long communicationCnt = 0L;
-            communicationCnt = communicationService.countCommunicationWeek(member, lastStart);
-            int communicationScore = (int) (communicationCnt * 1);
-            if (communicationScore > 100) communicationScore = 100;
-
-            // lastreport update
+            // lastReport 업데이트
             lastReport.update(endAffectionScore, endStressScore, poopScore, walkScore, feedScore, communicationScore, diseaseScore);
             ReportResponse.from(lastReport);
 
@@ -162,26 +128,36 @@ public class ReportService {
             }
 
             // 5주 간격 목욕 -> 20
-            if (lastReport.getWeek() >= 5 && stressService.getStressType(member, StressType.BATH).isEmpty()) {
-                List<Bath> bathList = bathService.getBath(member.getEmail());
-                if (bathList.isEmpty()) stressService.saveStress(member, StressType.BATH, 20);
+            if (lastReport.getWeek() >= 5 && stressService.getStressType(member, StressType.BATH).isEmpty() && bathService.getBath(member.getEmail()).isEmpty()) {
+                stressService.saveStress(member, StressType.BATH, 20);
             }
 
             // 양치 최소 1회 확인 -> 10
-            if (brushingTeethService.getBrushingTeethWeek(lastReport, member).isEmpty())
+            if (brushingTeethService.getBrushingTeethWeek(lastReport, member).isEmpty()) {
                 stressService.saveStress(member, StressType.BRUSHING_TEETH, 10);
-
-            // newreport save
-            Report newReport = reportRepository.save(
-                    new Report(member, lastReport.getWeek() + 1, endAffectionScore, endStressScore)
-            );
-            try {
-                reportRepository.flush();
-            } catch (DataIntegrityViolationException e) {
-                throw new UserException(String.valueOf(ExceptionMessage.FAIL_SAVE_DATA));
             }
+
+            // newReport 저장
+            Report newReport = reportRepository.save(new Report(member, lastReport.getWeek() + 1, endAffectionScore, endStressScore));
+            reportRepository.flush();
+
         } catch (Exception e) {
             e.printStackTrace();
+            // 예외 처리를 추가하세요.
         }
     }
+
+    private int calculateStressScore(Member member, StressType stressType, int divisor) {
+        Long stressCnt = stressService.getCountLastWeekList(member, findLatestData(member).getCreateTime().truncatedTo(ChronoUnit.DAYS), stressType);
+        return (int) (1 - stressCnt / divisor) * 100;
+    }
+
+    private int calculateCommunicationScore(Member member, LocalDateTime lastStart) {
+        Long communicationCnt = communicationService.getCountCommunicationWeek(member, lastStart);
+        int communicationScore = communicationCnt.intValue();
+        return Math.min(100, communicationScore);
+    }
+
+
+
 }

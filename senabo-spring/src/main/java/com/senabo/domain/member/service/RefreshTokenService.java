@@ -24,18 +24,18 @@ public class RefreshTokenService {
     }
 
     public String getValues(String token) {
-        try{
+        try {
             return stringRedisTemplate.opsForValue().get(token);
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             log.info("Redis get error");
             throw new TokenNotFoundException(ExceptionMessage.TOKEN_NOT_FOUND);
         }
     }
 
     public void delValues(String token) {
-        try{
+        try {
             stringRedisTemplate.delete(token);
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             log.info("Redis delete error");
             throw new TokenNotFoundException(ExceptionMessage.TOKEN_NOT_FOUND);
         }

@@ -1,6 +1,7 @@
 package com.senabo.domain.member.service;
 
 
+import com.senabo.config.firebase.FCMMessage;
 import com.senabo.config.firebase.FCMService;
 import com.senabo.config.security.jwt.TokenInfo;
 import com.senabo.config.security.jwt.TokenProvider;
@@ -170,20 +171,11 @@ public class MemberService {
     public void fcmTest() {
         log.info("FCM 테스트 시작");
         List<Member> allMember = findAllMemberNonComplete();
-        List<String[]> poopMessageList = new ArrayList<>();
-        for(Member member : allMember){
-            if (member.getDeviceToken() == null) continue;
-            poopMessageList.add(new String[]{"세나보 테스트", "테스트 문자입니다.", member.getDeviceToken()});
-        }
-        poopMessageList.add(new String[]{});
-        poopMessageList.add(new String[]{});
-        List<String[]> sendMessageList;
-        sendMessageList = poopMessageList.stream()
-                .filter(array -> array != null && array.length > 0)
+        List<FCMMessage> testList = allMember.stream()
+                .filter(member -> member.getDeviceToken() != null)
+                .map(member -> fcmService.makeMessage("세나보 테스트", "테스트입니다.", member.getDeviceToken()))
                 .toList();
-
-        fcmService.sendFCM(sendMessageList);
-//        fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", LocalDateTime.now() + ": FCM 테스트", deviceToken);
+        fcmService.sendFCM(testList);
     }
 
     public void tokenCheckExcpetion() {

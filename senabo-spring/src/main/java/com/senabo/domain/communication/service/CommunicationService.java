@@ -70,7 +70,7 @@ public class CommunicationService {
         }
     }
 
-    public Long countCommunicationWeek(Member member, LocalDateTime lastStart){
+    public Long getCountCommunicationWeek(Member member, LocalDateTime lastStart){
         return communicationRepository.countCommunicationWeek(member, lastStart);
     }
 }

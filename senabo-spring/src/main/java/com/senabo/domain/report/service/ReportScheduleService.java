@@ -1,5 +1,6 @@
 package com.senabo.domain.report.service;
 
+import com.senabo.config.firebase.FCMMessage;
 import com.senabo.config.firebase.FCMService;
 import com.senabo.domain.member.entity.Member;
 import com.senabo.domain.member.service.MemberService;
@@ -32,12 +33,12 @@ public class ReportScheduleService {
     @Scheduled(cron = "0 0 8 * * *")
     public void scheduleFCMReport() {
         log.info("리포트 FCM 스케줄러 실행");
-        List<Member> allMember = memberService.findAllMember();
-        for (Member member : allMember) {
-            if (member.getDeviceToken() != null && reportService.check7Days(member)) {
-                // FCM
-                fcmService.sendNotificationByToken("세상에 나쁜 보호자는 있다", "주간 리포트를 확인해주세요!", member.getDeviceToken());
-            }
-        }
+
+        List<FCMMessage> reoprtList = memberService.findAllMember().stream()
+                .filter(member -> member.getDeviceToken() != null && reportService.check7Days(member))
+                .map(member -> fcmService.makeMessage("세상에 나쁜 보호자는 있다", "주간 리포트를 확인해주세요!", member.getDeviceToken()))
+                .toList();
+
+        fcmService.sendFCM(reoprtList);
     }
 }
