@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -206,14 +207,13 @@ public class EmergencyService {
         return fcmService.makeEmpty();
     }
 
-    public Map<String, EmergencyResponse> getEmergencyLastWeekUnSolved(Member member) {
-        Map<String, EmergencyResponse> map = new HashMap<>();
-        EmergencyType[] type = EmergencyType.values();
-        for (int i = 0; i < type.length; i++) {
-            Optional<Emergency> emergency = emergencyRepository.findUnsolvedEmergency(member, type[i]);
-            map.put(type[i].toString(), EmergencyResponse.from(emergency.get()));
-            log.info(type[i].toString());
-        }
-        return map;
+    public List<EmergencyResponse> getEmergencyLastWeekUnSolved(Member member) {
+        EmergencyType[] types = EmergencyType.values();
+        return Arrays.stream(types)
+                .map(type -> emergencyRepository.findUnsolvedEmergency(member, type))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(EmergencyResponse::from)
+                .toList();
     }
 }
