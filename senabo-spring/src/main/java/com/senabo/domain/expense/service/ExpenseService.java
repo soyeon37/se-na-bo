@@ -59,7 +59,7 @@ public class ExpenseService {
         log.info("total Amount : {}", totalAmount);
         log.info("======================================");
         if (totalAmount == null) totalAmount = 0.0;
-        return TotalAmountExpenseResponse.from(0.0);
+        return TotalAmountExpenseResponse.from(totalAmount);
     }
 
     @Transactional
