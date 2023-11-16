@@ -17,36 +17,10 @@ public class ParsingMessageService {
         // 문자열의 마지막 문자 추출
         char lastChar = input.charAt(input.length() - 1);
 
-        // 추출한 문자가 한글인지 확인
-        if (isKoreanCharacter(lastChar)) {
-            // 한글 자음과 모음 범위 확인
-            if (isJaeum(lastChar)) {
-                log.info("맨 끝 자리는 한글 자음입니다.");
-                dogName += "이";
-            } else if (isMoeum(lastChar)) {
-                log.info("맨 끝 자리는 한글 모음입니다.");
-            } else {
-                log.info("맨 끝 자리는 한글 자음도 모음도 아닙니다.");
-            }
-        } else {
-            log.info("맨 끝 자리는 한글이 아닙니다.");
-        }
+        if (lastChar < 0xAC00 || lastChar > 0xD7A3)
+            return input;
 
-        return dogName;
-    }
-
-    // 문자가 한글인지 확인하는 메서드
-    private static boolean isKoreanCharacter(char ch) {
-        return Character.UnicodeBlock.of(ch) == Character.UnicodeBlock.HANGUL_SYLLABLES;
-    }
-
-    // 문자가 한글 자음인지 확인하는 메서드
-    private static boolean isJaeum(char ch) {
-        return ch >= 'ㄱ' && ch <= 'ㅎ';
-    }
-
-    // 문자가 한글 모음인지 확인하는 메서드
-    private static boolean isMoeum(char ch) {
-        return ch >= 'ㅏ' && ch <= 'ㅣ';
+        String select = ((lastChar - 0xAC00) % 28 > 0) ? "이" : "";
+        return input + select;
     }
 }
