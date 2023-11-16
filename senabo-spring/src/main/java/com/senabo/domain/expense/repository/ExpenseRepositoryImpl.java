@@ -44,7 +44,7 @@ public class ExpenseRepositoryImpl implements ExpenseRepositoryCustom {
         return queryFactory.select(expense.amount.sum())
                 .from(expense)
                 .where(expense.memberId.eq(member))
-                .fetchOne();
+                .fetchFirst();
     }
 
     @Override

@@ -55,6 +55,9 @@ public class ExpenseService {
     public TotalAmountExpenseResponse getExpenseTotal(String email) {
         Member member = memberService.findByEmail(email);
         Double totalAmount = expenseRepository.getTotalAmount(member);
+        log.info("======================================");
+        log.info("total Amount : {}", totalAmount);
+        log.info("======================================");
         if (totalAmount == null) totalAmount = 0.0;
         return TotalAmountExpenseResponse.from(0.0);
     }
