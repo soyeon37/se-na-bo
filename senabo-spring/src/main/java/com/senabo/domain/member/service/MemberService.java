@@ -132,8 +132,8 @@ public class MemberService {
         }
 
         if (!tokenProvider.validateToken(refreshToken)) {
-            Member member = findByEmail(authentication.getName());
-            member.setDeviceToken(null);
+//            Member member = findByEmail(authentication.getName());
+//            member.setDeviceToken(null);
             refreshTokenService.delValues(refreshToken);
             throw new TokenNotFoundException(ExceptionMessage.TOKEN_VALID_TIME_EXPIRED);
         }

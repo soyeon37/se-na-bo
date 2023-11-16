@@ -184,19 +184,19 @@ public class FeedService {
 
             log.info("마지막 밥 제공 시간: " + lastFeedH);
 
-            LocalDateTime threeAfter = lastFeedH.plusHours(3);
+            LocalDateTime oneAfter = lastFeedH.plusHours(1);
 
-            // 밥 먹은 지 3시간
-            if (nowH.isEqual(threeAfter)) {
+            // 밥 먹은 지 1시간
+            if (nowH.isEqual(oneAfter)) {
                 // 배변 활동 푸시 알림
                 if (member.getDeviceToken() != null) {
                     // FCM
                     String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
                     return fcmService.makeMessage(title, dogName + "가 배변을 했어요!", member.getDeviceToken());
                 }
-            } else if (nowH.isAfter(threeAfter)) {
+            } else if (nowH.isAfter(oneAfter)) {
                 int originStress = member.getStressLevel();
-                // 밥 먹은 지 3시간 후인데 CleanYn: true || 이미 스트레스가 100
+                // 밥 먹은 지 1시간 후인데 CleanYn: true || 이미 스트레스가 100
                 if (feed.getCleanYn() || originStress == 100) {
                     return fcmService.makeEmpty();
                 }
