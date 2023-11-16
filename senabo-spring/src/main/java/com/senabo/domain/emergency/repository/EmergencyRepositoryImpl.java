@@ -61,6 +61,7 @@ public class EmergencyRepositoryImpl implements EmergencyRepositoryCustom {
                         emergency.solved.isFalse(),
                         emergency.createTime.goe(sevenDaysAgo))
                 .orderBy(emergency.createTime.desc())
+                .limit(1)
                 .fetchOne());
     }
 }

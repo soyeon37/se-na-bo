@@ -40,6 +40,7 @@ public class SecurityConfig {
             "/report/**",
             "/stress/**",
             "/walk/**",
+            "emergency/**"
     };
 
     @Bean
