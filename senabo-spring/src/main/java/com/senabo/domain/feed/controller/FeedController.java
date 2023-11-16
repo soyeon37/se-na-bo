@@ -91,9 +91,6 @@ public class FeedController {
     @Operation(summary = "배식 가능 여부 확인", description = "마지막 배식시간이 현재 시각으로 부터 12시간이 경과했는지 확인한다.")
     public ApiResponse<CheckFeedResponse> checkLastFeed(@AuthenticationPrincipal UserDetails principal) {
         CheckFeedResponse response = feedService.checkLastFeed(principal.getUsername());
-        log.info("=============================================");
-        log.info("possibleTn{}", response.possibleYn());
-        log.info("=============================================");
         return ApiResponse.success("배식 가능 여부 확인 성공", response);
     }
 

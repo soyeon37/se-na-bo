@@ -142,7 +142,7 @@ public class WalkService {
             changeStressAmount = 10;
         } else {
             changeAffectionAmount = 5;
-            changeStressAmount = -10;
+            changeStressAmount = -50;
         }
         stressService.saveStress(member, StressType.WALK, changeStressAmount);
         affectionService.saveAffection(member, ActivityType.WALK, changeAffectionAmount);

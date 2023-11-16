@@ -66,19 +66,19 @@ public class EmergencyService {
         switch (type) {
             case POOP -> {
                 body = "집에서 냄새가 나요";
-                stressService.saveStress(member, StressType.POOP, 10);
+                stressService.saveStress(member, StressType.POOP, 5);
             }
             case STOMACHACHE -> {
                 body = dogName + "가 아픈 것 같아요";
-                stressService.saveStress(member, StressType.STOMACHACHE, 10);
+                stressService.saveStress(member, StressType.STOMACHACHE, 5);
             }
             case ANXIETY -> {
                 body = "외부 소음으로 인해 불안함을 느낍니다";
-                stressService.saveStress(member, StressType.ANXIETY, 10);
+                stressService.saveStress(member, StressType.ANXIETY, 5);
             }
             case DEPRESSION -> {
                 body = dogName + "가 무기력함을 느낍니다";
-                stressService.saveStress(member, StressType.DEPRESSION, 10);
+                stressService.saveStress(member, StressType.DEPRESSION, 5);
             }
         }
 
@@ -159,7 +159,7 @@ public class EmergencyService {
         // 보낸 적이 있으면 산책 나갔는지 검사
         if (!emergencyList.isEmpty()) {
             Optional<Walk> walkOptional = walkService.findLatestData(member);
-            if (walkOptional.isEmpty()) stressService.saveStress(member, StressType.WALK, 30);
+            if (walkOptional.isEmpty()) stressService.saveStress(member, StressType.WALK, 10);
         }
         // 보낸 적이 없으면 ramdom, 무조건 1번 알림
         else {
@@ -180,7 +180,7 @@ public class EmergencyService {
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
         LocalDateTime elevenPm = now.withHour(23).withMinute(0).withSecond(0).withNano(0);
         if (ramdomSend() || now.isEqual(elevenPm) || now.isAfter(elevenPm)) {
-            stressService.saveStress(member, StressType.BARKING, 20);
+            stressService.saveStress(member, StressType.BARKING, 5);
             String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
             String body = dogName + "가 짖어서 민원이 들어올 수 있습니다";
             return fcmService.makeMessage("세상에 나쁜 보호자는 있다", body, member.getDeviceToken());
@@ -193,14 +193,14 @@ public class EmergencyService {
         // 보낸 적이 있으면 병원에 갔는지 검사
         if (!emergencyList.isEmpty()) {
             List<Expense> expenseList = expenseService.findTodayExpense(member);
-            if (expenseList.isEmpty()) stressService.saveStress(member, StressType.VOMITING, 30);
+            if (expenseList.isEmpty()) stressService.saveStress(member, StressType.VOMITING, 20);
         }
         // 보낸 적이 없으면 ramdom
         else {
             if (ramdomSend()) {
                 String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
                 String body = dogName + "의 상태가 좋지 않습니다";
-                stressService.saveStress(member, StressType.VOMITING, 10);
+                stressService.saveStress(member, StressType.VOMITING, 5);
                 return fcmService.makeMessage("세상에 나쁜 보호자는 있다", body, member.getDeviceToken());
             }
         }

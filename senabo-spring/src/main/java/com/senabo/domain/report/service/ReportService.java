@@ -75,8 +75,8 @@ public class ReportService {
 
     // 앱 사용 시간 저장
     @Transactional
-    public ReportResponse updateTotalTime(Member member, int totalTime) {
-        Report report = findLatestData(member);
+    public ReportResponse updateTotalTime(String email, int totalTime) {
+        Report report = findLatestData(memberService.findByEmail(email));
         report.updateTotalTime(totalTime);
         return ReportResponse.from(report);
     }

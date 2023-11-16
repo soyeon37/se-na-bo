@@ -82,9 +82,6 @@ public class FeedService {
         Member member = memberService.findByEmail(email);
         if (!feedRepository.existsByMemberId(member)) {
             LocalDateTime nowH = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
-            log.info("========================================");
-            log.info("밥을 먹은 적이 없음");
-            log.info("========================================");
             return CheckFeedResponse.from(true, nowH, nowH);
         }
 
@@ -94,9 +91,6 @@ public class FeedService {
         LocalDateTime nowH = now.truncatedTo(ChronoUnit.HOURS);
         LocalDateTime lastFeedH = feed.getCreateTime().truncatedTo(ChronoUnit.HOURS);
         LocalDateTime twelveAfter = lastFeedH.plusHours(12);
-            log.info("========================================");
-            log.info("밥을 먹은 적이 있음 {}", now.isAfter(twelveAfter));
-            log.info("========================================");
         return CheckFeedResponse.from(now.isAfter(twelveAfter), lastFeedH, nowH);
     }
 

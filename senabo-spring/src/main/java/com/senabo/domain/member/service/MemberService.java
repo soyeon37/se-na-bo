@@ -187,7 +187,8 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberResponse updateTotalTime(Member member, TotalTimeRequest request) {
+    public MemberResponse updateTotalTime(String email, TotalTimeRequest request) {
+        Member member = findByEmail(email);
         member.updateTotal(request);
         return MemberResponse.from(member);
     }

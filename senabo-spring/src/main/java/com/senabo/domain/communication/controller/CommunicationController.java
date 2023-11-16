@@ -10,6 +10,8 @@ import com.senabo.domain.member.entity.Member;
 import com.senabo.domain.member.service.MemberService;
 import com.senabo.domain.report.entity.Report;
 import com.senabo.domain.report.service.ReportService;
+import com.senabo.domain.stress.entity.StressType;
+import com.senabo.domain.stress.service.StressService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,6 +38,7 @@ public class CommunicationController {
     private final ReportService reportService;
     private final MemberService memberService;
     private final AffectionService affectionService;
+    private final StressService stressService;
 
     @PostMapping("/save/{type}")
     @Operation(summary = "교감 내역 저장", description = "교감 내역을 저장한다. WAIT(기다려), SIT(앉아), HAND(손), PAT(쓰다듬기), TUG(터그놀이) 5가지 타입이 있다.")
@@ -45,6 +48,7 @@ public class CommunicationController {
         int changeAmount = 5;
         CommunicationResponse response = communicationService.createCommunication(member, type);
         affectionService.saveAffection(member, type, changeAmount);
+        stressService.saveStress(member, StressType.COMMUNICATION, -1);
         return ApiResponse.success("교감 내역 저장 성공", response);
     }
 

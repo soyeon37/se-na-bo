@@ -129,9 +129,9 @@ public class MemberController {
     )
     @Operation(summary = "회원 접속 정보 수정", description = "총 접속 시간을 수정한다.")
     public ApiResponse<MemberResponse> updateTotalTime(@AuthenticationPrincipal UserDetails principal, @RequestBody TotalTimeRequest request){
-        Member member = memberService.findByEmail(principal.getUsername());
-        MemberResponse response = memberService.updateTotalTime(member, request);
-        reportService.updateTotalTime(member, request.totalTime());
+
+        MemberResponse response = memberService.updateTotalTime(principal.getUsername(), request);
+        reportService.updateTotalTime(principal.getUsername(), request.totalTime());
         return ApiResponse.success("회원 접속 정보 수정 성공", response);
     }
 

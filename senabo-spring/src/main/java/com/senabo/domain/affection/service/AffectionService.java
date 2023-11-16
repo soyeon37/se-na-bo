@@ -33,7 +33,8 @@ public class AffectionService {
     private final MemberService memberService;
 
     @Transactional
-    public AffectionResponse saveAffection(Member member, ActivityType type, int changeAmount) {
+    public AffectionResponse saveAffection(Member memberOrigin, ActivityType type, int changeAmount) {
+        Member member = memberService.findByEmail(memberOrigin.getEmail());
         int originAffection = member.getAffection();
         int score = originAffection + changeAmount;
         if (score > 100) {

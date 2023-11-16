@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -32,8 +33,9 @@ public class StressService {
     private final MemberService memberService;
 
     @Transactional
-    public StressResponse saveStress(Member member, StressType type, int changeAmount) {
+    public StressResponse saveStress(Member memberOrigin, StressType type, int changeAmount) {
         log.info("스트레스 저장");
+        Member member = memberService.findByEmail(memberOrigin.getEmail());
         int originStress = member.getStressLevel();
         int score = originStress + changeAmount;
         if (score > 100) score = 100;
