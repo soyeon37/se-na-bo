@@ -210,4 +210,14 @@ public class MemberService {
         member.updateDeviceToken(request);
         return MemberResponse.from(member);
     }
+
+    @Transactional
+    public void updateStress(String email, int score){
+        memberRepository.updateStressLevel(email, score);
+    }
+
+    @Transactional
+    public void updateAffection(String email, int score){
+        memberRepository.updateAffection(email, score);
+    }
 }

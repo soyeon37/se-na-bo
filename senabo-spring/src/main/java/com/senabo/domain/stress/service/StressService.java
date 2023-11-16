@@ -33,9 +33,8 @@ public class StressService {
     private final MemberService memberService;
 
     @Transactional
-    public StressResponse saveStress(Member memberOrigin, StressType type, int changeAmount) {
+    public StressResponse saveStress(Member member, StressType type, int changeAmount) {
         log.info("스트레스 저장");
-        Member member = memberService.findByEmail(memberOrigin.getEmail());
         int originStress = member.getStressLevel();
         int score = originStress + changeAmount;
         if (score > 100) score = 100;
@@ -43,7 +42,7 @@ public class StressService {
         Stress stress = stressRepository.save(
                 new Stress(member, type, changeAmount, score)
         );
-        member.updateStress(score);
+        memberService.updateStress(member.getEmail(), score);
         try {
             stressRepository.flush();
         } catch (DataIntegrityViolationException e) {

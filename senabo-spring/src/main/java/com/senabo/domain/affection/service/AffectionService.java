@@ -33,8 +33,7 @@ public class AffectionService {
     private final MemberService memberService;
 
     @Transactional
-    public AffectionResponse saveAffection(Member memberOrigin, ActivityType type, int changeAmount) {
-        Member member = memberService.findByEmail(memberOrigin.getEmail());
+    public AffectionResponse saveAffection(Member member, ActivityType type, int changeAmount) {
         int originAffection = member.getAffection();
         int score = originAffection + changeAmount;
         if (score > 100) {
@@ -46,7 +45,7 @@ public class AffectionService {
         Affection affection = affectionRepository.save(
                 new Affection(member, type, changeAmount, score)
         );
-        member.updateAffection(score);
+        memberService.updateAffection(member.getEmail(), score);
         try {
             affectionRepository.flush();
         } catch (DataIntegrityViolationException e) {
