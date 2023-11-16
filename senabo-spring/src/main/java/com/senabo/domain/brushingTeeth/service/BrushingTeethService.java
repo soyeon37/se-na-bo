@@ -53,7 +53,7 @@ public class BrushingTeethService {
     @Transactional
     public List<BrushingTeeth> getBrushingTeethWeek(Report report, Member member) {
         LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
-        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        LocalDateTime endTime = report.getUpdateTime().truncatedTo(ChronoUnit.DAYS).plusDays(7);
         List<BrushingTeeth> brushingTeethList = brushingTeethRepository.findBrushingTeethWeek(member, endTime, startTime);
         return brushingTeethList;
     }
