@@ -55,6 +55,7 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom {
                         report.complete.isTrue(),
                         report.week.eq(week)
                 )
+                .limit(1)
                 .fetchOne());
     }
 }

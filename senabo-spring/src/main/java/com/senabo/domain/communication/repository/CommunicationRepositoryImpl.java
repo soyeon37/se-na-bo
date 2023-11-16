@@ -11,7 +11,7 @@ import java.util.List;
 import static com.senabo.domain.communication.entity.QCommunication.communication;
 
 @RequiredArgsConstructor
-public class CommunicationRepositoryImpl implements CommunicationRepositoryCustom{
+public class CommunicationRepositoryImpl implements CommunicationRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
