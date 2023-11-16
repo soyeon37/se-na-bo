@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -52,11 +51,15 @@ public class EmergencyService {
             else if (getType == EmergencyType.ANXIETY) cnt[2]++;
             else if (getType == EmergencyType.DEPRESSION) cnt[3]++;
         }
+
         List<EmergencyType> typeList = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            if (cnt[i] != 3) {
+            if (cnt[i] <= 3) {
                 typeList.add(types[i]);
             }
+            log.info("==========================================================");
+            log.info("typeList: {}", typeList.get(i).toString());
+            log.info("==========================================================");
         }
         if (typeList.isEmpty()) return fcmService.makeEmpty();
 

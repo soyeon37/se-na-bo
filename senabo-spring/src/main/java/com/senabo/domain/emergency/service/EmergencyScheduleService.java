@@ -19,7 +19,7 @@ public class EmergencyScheduleService {
     private final FCMService fcmService;
 
     // 오후 1시 - 오후 23시 : 1시간 마다 실행, 월 - 금
-    @Scheduled(cron = "0 0 13-22 * * MON-FRI")
+    @Scheduled(cron = "0 0/3 13-22 * * MON-FRI")
     public void scheduleWeekdayDayEmergency() {
         log.info("주중 낮 돌발 상황 스케줄러 실행");
 
