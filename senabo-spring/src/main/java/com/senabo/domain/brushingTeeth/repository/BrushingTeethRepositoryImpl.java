@@ -40,6 +40,7 @@ public class BrushingTeethRepositoryImpl implements BrushingTeethRepositoryCusto
     public int countBrushingTeethWeek(Member member, LocalDateTime startTime){
         return queryFactory
                 .select(brushingTeeth.count())
+                .from(brushingTeeth)
                 .where(
                         brushingTeeth.memberId.eq(member),
                         brushingTeeth.createTime.goe(startTime)
@@ -51,6 +52,7 @@ public class BrushingTeethRepositoryImpl implements BrushingTeethRepositoryCusto
     public int countBrushingTeethToday(Member member){
         return queryFactory
                 .select(brushingTeeth.count())
+                .from(brushingTeeth)
                 .where(
                         brushingTeeth.memberId.eq(member),
                         brushingTeeth.createTime.goe(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS))
