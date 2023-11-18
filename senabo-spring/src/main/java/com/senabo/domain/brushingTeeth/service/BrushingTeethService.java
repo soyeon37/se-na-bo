@@ -70,10 +70,17 @@ public class BrushingTeethService {
 
     public CheckBrushingTeethResponse checkBrushingTeeth(Report report, Member member) {
         try {
+            log.info("=====================================");
             // 최신 주간 리포트 확인 후 start Date 가져오기
             LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
+            log.info("startTime: {}", startTime);
+
             int countWeek = brushingTeethRepository.countBrushingTeethWeek(member, startTime);
+            log.info("countWeek: {}", countWeek);
+
             int countToday = brushingTeethRepository.countBrushingTeethToday(member);
+            log.info("countToday: {}", countToday);
+            log.info("=====================================");
             boolean possibleYn = false;
             if(countWeek < 3 && countToday == 0){
                 possibleYn = true;
