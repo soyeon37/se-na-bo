@@ -85,7 +85,7 @@ public class BrushingTeethService {
             Long countToday = brushingTeethRepository.countBrushingTeethToday(member);
             log.info("countToday: {}", countToday);
             log.info("=====================================");
-            
+
             boolean possibleYn = false;
             if(countWeek < 3 && countToday == 0){
                 possibleYn = true;
