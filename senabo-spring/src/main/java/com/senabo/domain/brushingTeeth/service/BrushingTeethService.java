@@ -17,6 +17,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -72,8 +74,10 @@ public class BrushingTeethService {
         try {
             log.info("=====================================");
             // 최신 주간 리포트 확인 후 start Date 가져오기
+
+
+
             LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
-            log.info("startTime: {}", startTime);
 
             int countWeek = brushingTeethRepository.countBrushingTeethWeek(member, startTime);
             log.info("countWeek: {}", countWeek);
