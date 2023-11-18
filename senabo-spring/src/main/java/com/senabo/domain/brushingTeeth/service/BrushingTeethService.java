@@ -79,12 +79,13 @@ public class BrushingTeethService {
 
             LocalDateTime startTime = report.getCreateTime().truncatedTo(ChronoUnit.DAYS);
 
-            int countWeek = brushingTeethRepository.countBrushingTeethWeek(member, startTime);
+            Long countWeek = brushingTeethRepository.countBrushingTeethWeek(member, startTime);
             log.info("countWeek: {}", countWeek);
 
-            int countToday = brushingTeethRepository.countBrushingTeethToday(member);
+            Long countToday = brushingTeethRepository.countBrushingTeethToday(member);
             log.info("countToday: {}", countToday);
             log.info("=====================================");
+            
             boolean possibleYn = false;
             if(countWeek < 3 && countToday == 0){
                 possibleYn = true;
