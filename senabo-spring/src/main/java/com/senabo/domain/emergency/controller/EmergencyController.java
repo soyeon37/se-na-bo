@@ -44,7 +44,7 @@ public class EmergencyController {
         return ApiResponse.success("해결 못한 가장 최신 돌발상황 조회 성공", emergency);
     }
 
-    @PostMapping("/fcm/{id}")
+    @PostMapping("/fcm")
     @Operation(summary = "시연용 fcm")
     public ApiResponse<Object> sendFCM(@RequestParam Long id){
         Member member = memberService.findById(id);
