@@ -1,6 +1,7 @@
 package com.senabo.domain.emergency.controller;
 
 import com.senabo.common.api.ApiResponse;
+import com.senabo.domain.emergency.dto.request.EmergencyFCMRequest;
 import com.senabo.domain.emergency.dto.response.EmergencyResponse;
 import com.senabo.domain.emergency.entity.Emergency;
 import com.senabo.domain.emergency.service.EmergencyService;
@@ -46,8 +47,8 @@ public class EmergencyController {
 
     @PostMapping("/fcm")
     @Operation(summary = "시연용 fcm")
-    public ApiResponse<Object> sendFCM(@RequestParam Long id){
-        Member member = memberService.findById(id);
+    public ApiResponse<Object> sendFCM(@RequestBody EmergencyFCMRequest request){
+        Member member = memberService.findById(request.id());
         emergencyService.sendFcm(member);
         return ApiResponse.success("FCM 전송 성공", "");
     }
