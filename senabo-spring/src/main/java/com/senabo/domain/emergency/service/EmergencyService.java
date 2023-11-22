@@ -226,14 +226,19 @@ public class EmergencyService {
         try{
             if(member.getDeviceToken() == null) return;
             String title = "세상에 나쁜 개는 없다";
-            String body = "집에서 냄새가 나요";
+            String body = "";
+
+//
+//            body = "집에서 냄새가 나요";
+//            String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
+//
+//            fcmService.sendNotificationByToken(title, body, member.getDeviceToken());
+//            saveEmergency(member, EmergencyType.POOP);
+//
+//            TimeUnit.SECONDS.sleep(1);
+
+
             String dogName = parsingMessageService.parseLastCharacter(member.getDogName());
-
-            fcmService.sendNotificationByToken(title, body, member.getDeviceToken());
-            saveEmergency(member, EmergencyType.POOP);
-
-            TimeUnit.SECONDS.sleep(1);
-
             body = dogName + "가 아픈 것 같아요";
             fcmService.sendNotificationByToken(title, body, member.getDeviceToken());
             saveEmergency(member, EmergencyType.STOMACHACHE);
@@ -246,11 +251,11 @@ public class EmergencyService {
 
             TimeUnit.SECONDS.sleep(1);
 
-            body = dogName + "가 분리불안을 느끼고 있어요";
-            fcmService.sendNotificationByToken(title, body, member.getDeviceToken());
-            saveEmergency(member, EmergencyType.CRUSH);
-
-            TimeUnit.SECONDS.sleep(1);
+//            body = dogName + "가 분리불안을 느끼고 있어요";
+//            fcmService.sendNotificationByToken(title, body, member.getDeviceToken());
+//            saveEmergency(member, EmergencyType.CRUSH);
+//
+//            TimeUnit.SECONDS.sleep(1);
 
             body = dogName + "가 무기력함을 느낍니다";
             fcmService.sendNotificationByToken(title, body, member.getDeviceToken());
