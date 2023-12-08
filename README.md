@@ -9,6 +9,8 @@
 <div>SSAFY 9기 자율 프로젝트</div>
 <div><b>"세상에 나쁜 보호자는 있다"</b></div>
 <br>
+<div>🏆 SSAFY 9기 자율프로젝트 우수상 🏆</div>
+<br>
 <div>
 <img src="Documents/youtube.png" width="20px"/>&nbsp;  <a href="https://youtu.be/MqXQiv8_k_o">프로젝트 소개 UCC</a>
 </div>
@@ -50,8 +52,9 @@
 ![Java 뱃지](https://img.shields.io/badge/Java-007396.svg?style=flat-square&logo=Java&logoColor=white)
 ![JDK](https://img.shields.io/badge/JDK%2017-007396.svg?style=flat-square&logo=Java&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring%20boot%203.1.5-6DB33F.svg?style=flat-square&logo=Spring%20Boot&logoColor=white)
-![Spring Security 6 뱃지](https://img.shields.io/badge/Spring%20Security-6DB33F.svg?style=flat-square&logo=Spring%20Security&logoColor=white)
+![Spring Security 6 뱃지](https://img.shields.io/badge/Spring%20Security%206-6DB33F.svg?style=flat-square&logo=Spring%20Security&logoColor=white)
 ![JWT 뱃지](https://img.shields.io/badge/JWT-000000.svg?style=flat-square&logo=JSON%20Web%20Tokens&logoColor=white)
+![Firebase 뱃지](https://img.shields.io/badge/Firebase-%23039BE5.svg?style=flat-square&logo=firebase&logoColor=white)
 ![Redis 뱃지](https://img.shields.io/badge/Redis-DC382D.svg?style=flat-square&logo=Redis&logoColor=white)
 ![MariaDB 뱃지](https://img.shields.io/badge/MariaDB-003545.svg?style=flat-square&logo=MariaDB&logoColor=white)
 
@@ -62,7 +65,7 @@
 ![Docker-Compose 뱃지](https://img.shields.io/badge/Docker--Compose-1C72C7.svg?style=flat-square&logo=Docker&logoColor=white)
 
 
-## 4. 시스템 모식도 & ERD
+## 4. Architecture & ERD
 <img src="Documents/architecture.png" width="400" height="300">
 <img src="Documents/erd.png" width="400" height="300">
 
@@ -71,7 +74,7 @@
 #### (1) 반려견 케어
 |밥 주기|목욕|교감|
 |:--:|:--:|:--:|
-|<img src="Documents/ServiceGif/food.gif" width="160" height="100%">|<img src="Documents/ServiceGif/bath.gif" width="160" height="100%">|<img src="Documents/ServiceGif/heart.gif" width="160" height="100%">|
+|<img src="Documents/ServiceGif/food.gif" width="100%" height="100%">|<img src="Documents/ServiceGif/bath.gif" width="200" height="100%">|<img src="Documents/ServiceGif/heart.gif" width="100%" height="100%">|
 
 #### (2) 반려견 상태 알림 및 돌발 이벤트
 |상태 알림|돌발 이벤트|
